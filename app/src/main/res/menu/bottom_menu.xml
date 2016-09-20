@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bb_menu_memorialday"
+        android:icon="@drawable/memorialday"
+        android:title=""
+        android:textSize="0sp" />
+    <item
+        android:id="@+id/bb_menu_site"
+        android:icon="@drawable/site"
+        android:title="" />
+    <item
+        android:id="@+id/bb_menu_trip"
+        android:icon="@drawable/trip"
+        android:title="" />
+</menu>

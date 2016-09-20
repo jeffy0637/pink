@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="5dp">
+
+    <ImageView
+        android:layout_width="92dp"
+        android:layout_height="92dp"
+        android:id="@+id/attraction_image"
+        android:src="@drawable/clock"
+        android:scaleType="centerCrop"
+        android:layout_gravity="top|left" /><!--scaleType圖片置中並自動裁減大小-->
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="155dp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_horizontal|top">
+
+            <TextView
+                android:layout_width="155dp"
+                android:layout_height="wrap_content"
+                android:text="六十石山"
+                android:textSize = "18dp"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:id="@+id/title"
+                android:layout_margin="5dp" />
+
+            <TextView
+                android:layout_width="155dp"
+                android:layout_height="wrap_content"
+                android:text="花蓮縣"
+                android:textSize="10dp"
+                android:id="@+id/location"
+                android:layout_margin="5dp" />
+
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingBar"
+                android:numStars="5"
+                android:rating="5"
+                android:stepSize="0.5"
+                android:isIndicator="true"/>
+        </LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:text="delete"
+            android:id="@+id/button_delete" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:text="modify"
+            android:id="@+id/button_modify" />
+    </LinearLayout>
+</LinearLayout>

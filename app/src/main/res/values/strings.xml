@@ -1,0 +1,150 @@
+<resources>
+    <string name="app_name">mcoupledate</string>
+    <string name="facebook_app_id">152132441862956</string>
+    <string name="login">登入</string>
+    <string name="title_activity_home_page">HomePageActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="button_backward">返回</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="mday">MDAY</string>
+
+    //左拉選單
+    <string name="page_memberData">設定會員資料</string>
+    <string name="page_memorialDay">設定紀念日</string>
+    <string name="page_myViewpoint">管理我的景點</string>
+    <string name="page_myTravle">景點搜尋</string>
+    <string name="page_travleEdit">景點頁面</string>
+    <string name="page_logout">餐廳搜尋</string>
+
+    <string name="title_activity_member_data">memberData</string>
+    <string name="title_activity_site">SiteActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+
+    <string name="collect_site">收藏景點</string>
+    <string name="join_trip">加入行程</string>
+
+    <string name="select_region_dialog_title">Spinner 對話視窗標題</string>
+    <string name="select_region_dialog_title_city">大行政區</string>
+    <string-array name="spn_list_city">
+        <item>大行政區</item>
+        <item>高雄市</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_area">小行政區</string>
+    <string-array name="spn_list_area">
+        <item>小行政區</item>
+        <item>楠梓區</item>
+        <item>左營區</item>
+        <item>鼓山區</item>
+        <item>三民區</item>
+        <item>鹽埕區</item>
+        <item>前金區</item>
+        <item>新興區</item>
+        <item>苓雅區</item>
+        <item>前鎮區</item>
+        <item>旗津區</item>
+        <item>小港區</item>
+        <item>鳳山區</item>
+        <item>大寮區</item>
+        <item>鳥松區</item>
+        <item>林園區</item>
+        <item>仁武區</item>
+        <item>大樹區</item>
+        <item>大社區</item>
+        <item>岡山區</item>
+        <item>路竹區</item>
+        <item>橋頭區</item>
+        <item>梓官區</item>
+        <item>彌陀區</item>
+        <item>永安區</item>
+        <item>燕巢區</item>
+        <item>田寮區</item>
+        <item>阿蓮區</item>
+        <item>茄萣區</item>
+        <item>湖內區</item>
+        <item>旗山區</item>
+        <item>美濃區</item>
+        <item>內門區</item>
+        <item>杉林區</item>
+        <item>甲仙區</item>
+        <item>六龜區</item>
+        <item>茂林區</item>
+        <item>桃源區</item>
+        <item>那瑪夏區</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_country1">餐飲類別1</string>
+    <string-array name="spn_list_country1">
+        <item>餐飲類別1</item>
+        <item>美式</item>
+        <item>歐陸</item>
+        <item>南洋</item>
+        <item>日式</item>
+        <item>韓式</item>
+        <item>中港台</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_country2">餐飲類別2</string>
+    <string-array name="spn_list_country2">
+        <item>餐飲類別2</item>
+        <item>美式</item>
+        <item>歐陸</item>
+        <item>南洋</item>
+        <item>日式</item>
+        <item>韓式</item>
+        <item>中港台</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_country3">餐飲類別3</string>
+    <string-array name="spn_list_country3">
+        <item>餐飲類別3</item>
+        <item>美式</item>
+        <item>歐陸</item>
+        <item>南洋</item>
+        <item>日式</item>
+        <item>韓式</item>
+        <item>中港台</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_time">用餐時段</string>
+    <string-array name="spn_list_time">
+        <item>用餐時段</item>
+        <item>早餐</item>
+        <item>午餐</item>
+        <item>早午餐</item>
+        <item>下午茶</item>
+        <item>晚餐</item>
+        <item>消夜</item>
+    </string-array>
+
+    <string name="select_region_dialog_title_catagory">餐飲種類</string>
+    <string-array name="spn_list_kind">
+        <item>餐飲種類</item>
+        <item>火烤</item>
+        <item>吃到飽</item>
+        <item>壽喜燒</item>
+        <item>輕食</item>
+        <item>晚餐</item>
+        <item>素食</item>
+        <item>速食</item>
+        <item>海鮮</item>
+        <item>手搖飲品</item>
+        <item>咖啡廳</item>
+        <item>小吃</item>
+        <item>酒吧</item>
+        <item>壽司</item>
+        <item>火鍋</item>
+        <item>排餐</item>
+        <item>鐵板燒</item>
+        <item>烘培</item>
+        <item>熱炒</item>
+        <item>甜點</item>
+        <item>冰品</item>
+        <item>拉麵</item>
+        <item>炸物</item>
+    </string-array>
+</resources>
