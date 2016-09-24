@@ -147,4 +147,5 @@
         <item>拉麵</item>
         <item>炸物</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>

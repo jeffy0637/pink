@@ -21,6 +21,7 @@ public class Logo extends AppCompatActivity {
             @Override
             public void run() {
                 startActivity(new Intent().setClass(Logo.this, MainActivity.class));
+                Logo.this.finish();
             }
         }, 3000);
     }

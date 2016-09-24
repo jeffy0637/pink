@@ -1,12 +1,374 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="m.mcoupledate.AddNewSiteActivity">
 
-</RelativeLayout>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:scrollbars="none"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="false">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context=".AddNewSiteActivity">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:id="@+id/title"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/hr"  />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="#696969"
+            android:id="@+id/hr"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="地址"
+            android:ems="10"
+            android:id="@+id/search"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/hr" />
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:id="@+id/searchSuggestion"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/search" />
+
+
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/map"
+            android:transitionName="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            map:zOrderOnTop="true"
+            map:uiZoomControls="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/searchSuggestion" />
+        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
+        <!--xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:id="@+id/map"-->
+        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--tools:context="m.mcoupledate.AddNewSiteActivity" />-->
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="名稱"
+            android:ems="10"
+            android:id="@+id/sName"
+            android:layout_below="@+id/map"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:id="@+id/description"
+            android:layout_below="@+id/sName"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:hint="描述" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectSiteClass_allSite"
+            android:layout_below="@+id/description">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="大行政區"
+                android:id="@+id/selectCity" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="小行政區"
+                android:id="@+id/selectArea" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectSiteClass_restaurant"
+            android:layout_below="@+id/selectSiteClass_allSite"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="時段"
+                android:id="@+id/selectTime" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="種類"
+                android:id="@+id/selectFoodKind" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="口味"
+                android:id="@+id/selectCountry" />
+
+        </LinearLayout>
+
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:hint="電話"
+            android:ems="10"
+            android:id="@+id/phone"
+            android:layout_below="@+id/selectSiteClass_restaurant"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/transportation"
+            android:hint="交通方式"
+            android:layout_below="@+id/phone"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="email"
+            android:ems="10"
+            android:id="@+id/email"
+            android:layout_below="@+id/transportation"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="網站"
+            android:ems="10"
+            android:id="@+id/website"
+            android:layout_below="@+id/email"
+            android:layout_alignRight="@+id/email"
+            android:layout_alignEnd="@+id/email" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/activity"
+            android:hint="活動"
+            android:layout_below="@+id/website"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/note"
+            android:hint="備註"
+            android:layout_below="@+id/activity"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/upLoadPics"
+            android:layout_below="@+id/note">
+
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:id="@+id/p1"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:id="@+id/p2"
+                android:layout_centerHorizontal="true"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="150dp"
+                android:id="@+id/p3"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:scaleType="centerCrop" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拍照上傳"
+                android:id="@+id/c1"
+                android:layout_below="@+id/p1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/p1"
+                android:layout_alignEnd="@+id/p1" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拍照上傳"
+                android:id="@+id/c2"
+                android:layout_below="@+id/p2"
+                android:layout_alignRight="@+id/p2"
+                android:layout_alignEnd="@+id/p2"
+                android:layout_alignLeft="@+id/p2"
+                android:layout_alignStart="@+id/p2" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拍照上傳"
+                android:id="@+id/c3"
+                android:layout_below="@+id/p3"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignLeft="@+id/p3"
+                android:layout_alignStart="@+id/p3" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/formBtns"
+            android:layout_below="@+id/upLoadPics">
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/searchStart"
+                android:src="@drawable/abc_ic_search_api_material" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/searchClean"
+                android:src="@drawable/abc_ic_clear_material" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/submit"
+                android:src="@android:drawable/ic_input_add" />
+        </LinearLayout>
+
+
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectCityOptions"
+            android:numColumns="3"
+            android:layout_below="@+id/selectSiteClass_allSite"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
+
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectAreaOptions"
+            android:numColumns="3"
+            android:layout_below="@+id/selectSiteClass_allSite"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
+
+
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectTimeOptions"
+            android:numColumns="3"
+            android:layout_below="@+id/selectSiteClass_restaurant"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
+
+
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectFoodKindOptions"
+            android:numColumns="3"
+            android:layout_below="@+id/selectSiteClass_restaurant"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
+
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectCountryOptions"
+            android:numColumns="3"
+            android:layout_below="@+id/selectSiteClass_restaurant"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+
+</ScrollView>

@@ -256,6 +256,7 @@ public class HomePageActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+
         if (id == R.id.nav_memberData) {
             // 設定從這個活動跳至 home 的活動
             Intent intent = new Intent(HomePageActivity.this, MemberData.class);
@@ -276,7 +277,8 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_travleEdit) {
-            Intent go2 = new Intent(HomePageActivity.this, SiteInfo.class);
+            Intent go2 = new Intent(HomePageActivity.this, AddNewSiteActivity.class);
+            go2.putExtra("siteType", "r");
             startActivity(go2);
 
         } else if (id == R.id.nav_logout) {
