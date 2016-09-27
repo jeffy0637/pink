@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
+<m.mcoupledate.classes.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
@@ -17,6 +17,8 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         tools:context=".AddNewSiteActivity">
 
         <TextView
@@ -25,8 +27,7 @@
             android:text="Title"
             android:id="@+id/title"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_above="@+id/hr"  />
+            android:layout_alignParentStart="true" />
 
         <View
             android:layout_width="match_parent"
@@ -34,39 +35,31 @@
             android:background="#696969"
             android:id="@+id/hr"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="地址"
-            android:ems="10"
-            android:id="@+id/search"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/hr" />
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:id="@+id/searchSuggestion"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/search" />
+            android:layout_below="@+id/title" />
 
 
         <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             android:id="@+id/map"
-            android:transitionName="com.google.android.gms.maps.SupportMapFragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             map:zOrderOnTop="true"
             map:uiZoomControls="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/searchSuggestion" />
+            android:layout_below="@+id/hr" >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="搜尋地圖"
+                android:id="@+id/searchMap"
+                android:layout_gravity="left|top"
+                android:background="#94000000"
+                android:textColor="#ffffff" />
+        </FrameLayout>
         <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
         <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
         <!--xmlns:tools="http://schemas.android.com/tools"-->
@@ -98,11 +91,21 @@
             android:layout_alignParentStart="true"
             android:hint="描述" />
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:id="@+id/address"
+            android:layout_below="@+id/description"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:hint="地址" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectSiteClass_allSite"
-            android:layout_below="@+id/description">
+            android:id="@+id/selectSiteClass_allSiteText"
+            android:layout_below="@+id/address">
 
             <TextView
                 android:layout_width="0dp"
@@ -123,8 +126,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectSiteClass_restaurant"
-            android:layout_below="@+id/selectSiteClass_allSite"
+            android:id="@+id/selectSiteClass_restaurantText"
+            android:layout_below="@+id/selectSiteClass_allSiteText"
             android:visibility="gone">
 
             <TextView
@@ -159,7 +162,7 @@
             android:hint="電話"
             android:ems="10"
             android:id="@+id/phone"
-            android:layout_below="@+id/selectSiteClass_restaurant"
+            android:layout_below="@+id/selectSiteClass_restaurantText"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
@@ -219,93 +222,38 @@
             android:layout_alignParentStart="true" />
 
 
-        <LinearLayout
+        <m.mcoupledate.classes.ResponsiveGridView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/upLoadPics"
-            android:layout_below="@+id/note">
-
-
-            <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="150dp"
-                android:id="@+id/p1"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:scaleType="centerCrop" />
-
-            <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="150dp"
-                android:id="@+id/p2"
-                android:layout_centerHorizontal="true"
-                android:scaleType="centerCrop" />
-
-            <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="150dp"
-                android:id="@+id/p3"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:scaleType="centerCrop" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="拍照上傳"
-                android:id="@+id/c1"
-                android:layout_below="@+id/p1"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignRight="@+id/p1"
-                android:layout_alignEnd="@+id/p1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="拍照上傳"
-                android:id="@+id/c2"
-                android:layout_below="@+id/p2"
-                android:layout_alignRight="@+id/p2"
-                android:layout_alignEnd="@+id/p2"
-                android:layout_alignLeft="@+id/p2"
-                android:layout_alignStart="@+id/p2" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="拍照上傳"
-                android:id="@+id/c3"
-                android:layout_below="@+id/p3"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignLeft="@+id/p3"
-                android:layout_alignStart="@+id/p3" />
-        </LinearLayout>
+            android:id="@+id/uploadPics"
+            android:numColumns="3"
+            android:layout_below="@+id/note"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="visible" />
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/formBtns"
-            android:layout_below="@+id/upLoadPics">
+            android:layout_below="@+id/uploadPics">
 
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:id="@+id/searchStart"
-                android:src="@drawable/abc_ic_search_api_material" />
+                android:id="@+id/uploadPic_album"
+                android:src="@drawable/album" />
+
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:id="@+id/searchClean"
-                android:src="@drawable/abc_ic_clear_material" />
+                android:id="@+id/uploadPic_camera"
+                android:src="@drawable/camera" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -316,59 +264,121 @@
         </LinearLayout>
 
 
-        <m.mcoupledate.classes.ResponsiveGridView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectCityOptions"
-            android:numColumns="3"
-            android:layout_below="@+id/selectSiteClass_allSite"
+            android:layout_height="match_parent"
+            android:id="@+id/selectSiteClass_allSiteOptions"
+            android:layout_below="@+id/selectSiteClass_allSiteText"
+            android:background="@color/white"
+            android:visibility="gone">
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectCityOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectAreaOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/selectSiteClass_restaurantOptions"
+            android:layout_below="@+id/selectSiteClass_restaurantText"
+            android:background="@color/white"
+            android:visibility="gone">
+
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectTimeOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectFoodKindOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectCountryOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/searchMapMask"
+            android:orientation="vertical"
+            android:background="#e5ffffff"
+            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:visibility="gone" />
+            android:layout_alignBottom="@+id/formBtns"
+            android:visibility="gone">
 
-        <m.mcoupledate.classes.ResponsiveGridView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectAreaOptions"
-            android:numColumns="3"
-            android:layout_below="@+id/selectSiteClass_allSite"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:visibility="gone" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/searchMapMaskBack"
+                    android:background="#00ffffff"
+                    android:text="↩"
+                    android:textSize="24dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="textPersonName"
+                    android:hint="搜尋地圖"
+                    android:ems="10"
+                    android:id="@+id/searchMapQuery" />
 
 
-        <m.mcoupledate.classes.ResponsiveGridView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectTimeOptions"
-            android:numColumns="3"
-            android:layout_below="@+id/selectSiteClass_restaurant"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:visibility="gone" />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/searchMapQueryClean"
+                    android:background="#00ffffff"
+                    android:text="✕"
+                    android:textSize="18dp"/>
 
+            </LinearLayout>
 
-        <m.mcoupledate.classes.ResponsiveGridView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectFoodKindOptions"
-            android:numColumns="3"
-            android:layout_below="@+id/selectSiteClass_restaurant"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:visibility="gone" />
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="500dp"
+                android:id="@+id/searchMapSuggestion" />
 
-        <m.mcoupledate.classes.ResponsiveGridView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectCountryOptions"
-            android:numColumns="3"
-            android:layout_below="@+id/selectSiteClass_restaurant"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:visibility="gone" />
+        </LinearLayout>
 
     </RelativeLayout>
 
 
-</ScrollView>
+</m.mcoupledate.classes.LockableScrollView>

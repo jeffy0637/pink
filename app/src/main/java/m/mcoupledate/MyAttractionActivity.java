@@ -169,7 +169,7 @@ public class MyAttractionActivity extends AppCompatActivity {
                                 area[0] = "不限";
 
                                 for (int a=1; a<(jArr.length()+1); ++a)
-                                    city[a] = jArr.optJSONObject(a-1).optString("city");
+                                    city[a] = jArr.optJSONObject(a-1).optString("oName");
 
 
                                 menuOption = new ArrayList<>();
@@ -200,7 +200,7 @@ public class MyAttractionActivity extends AppCompatActivity {
                                 area[0] = "不限";
 
                                 for (int a=1; a<(jArr.length()+1); ++a)
-                                    area[a] = jArr.optJSONObject(a-1).optString("area");
+                                    area[a] = jArr.optJSONObject(a-1).optString("oName");
 
                                 ((ConstellationAdapter)mDropDownMenu.adapterMap.get(1)).changeData(Arrays.asList(area));
                                 mDropDownMenu.setTabText(1, "小行政區");

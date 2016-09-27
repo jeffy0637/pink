@@ -2,18 +2,19 @@ package m.mcoupledate;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
@@ -24,14 +25,15 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,6 +79,8 @@ import java.util.Map;
 import m.mcoupledate.classes.ClusterSite;
 import m.mcoupledate.classes.ClusterSiteRenderer;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
+import m.mcoupledate.classes.GridAlbumAdapter;
+import m.mcoupledate.classes.LockableScrollView;
 import m.mcoupledate.classes.ResponsiveGridView;
 import m.mcoupledate.classes.WorkaroundMapFragment;
 import m.mcoupledate.funcs.AuthChecker6;
@@ -94,7 +98,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
     SharedPreferences pref;
     SharedPreferences.Editor prefEditor;
 
-    private ScrollView scrollView;
+    private LockableScrollView scrollView;
 
     private GoogleMap mMap;
     private ClusterManager<ClusterSite> mClusterManager;
@@ -110,17 +114,21 @@ public class AddNewSiteActivity extends FragmentActivity implements
     private AuthChecker6 mapChecker;    //  用來檢查android 6權限和定位功能是否開啟
 
     private TextView title;
-    private ImageButton searchStart, searchClean, submit;
-    private ListView searchSuggestion;  //  搜尋建議
+    private ImageButton submit;
+
 
     private Map<String, EditText> input;    //  輸入欄位的map
 
 
-    private final int USER_TYPING = 0, FROM_SUGGESTIONLIST = 1;
-    private int searchSuggestionStatus = USER_TYPING;
+    //  搜尋地圖
+    private ListView searchMapSuggestion;
+    private Button searchMap, searchMapMaskBack, searchMapQueryClean;
+    private LinearLayout searchMapMask;
+    private EditText searchMapQuery;
 
-    ArrayAdapter<String> adapter;
+    ArrayAdapter<String> searchMapAdapter;
     ArrayList<String> suggestions;
+
     private Marker suggestMarker = null;
     private String suggestAddress = "";     //  利用input查詢到的地址存於此，submit時將此送出為地址
     private LatLng newSiteLatLng = null;    //  查到的地點的LatLng ，submit時將此送出為Py, Px
@@ -130,36 +138,31 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
 
     private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2, SITECLASS_TIME = 3, SITECLASS_FOODKIND = 4, SITECLASS_COUNTRY = 5;
-    //    private HashMap<Integer, HashMap<Integer, View>> siteClassViews = new HashMap<Integer, HashMap<Integer, View>>();
     private SparseArray<HashMap<String, View>> siteClassViews = new SparseArray<HashMap<String, View>>();
     private HashMap<Integer, ConstellationAdapter> siteClassesAdapters = new HashMap<Integer, ConstellationAdapter>();
 
 
+    private InputMethodManager keyboard;
+    private IBinder windowToken;
+
+
+    private GridView uploadPicsAlbum;
+    private GridAlbumAdapter gaAdapter;
+    private ImageButton uploadPic_album, uploadPic_camera;
 
     //-------------------------飛---------------------------
-    private ImageButton p1, p2, p3;
-    private Button c1, c2, c3;
 
     //常數
-    private final static int CAMERA1 = 1;
-    private final static int CAMERA2 = 2;
-    private final static int CAMERA3 = 3;
-    private final static int PHOTO1 = 4;
-    private final static int PHOTO2 = 5;
-    private final static int PHOTO3 = 6;
+    private final static int UPLOADPIC_CAMERA = 1, UPLOADPIC_ALBUM = 2;
 
     //照片路徑
     private String strImage;
 
     //php位置
-    private String upLoadServerUri = "http://140.117.71.216/pinkCon/uploadPicture.php";
+    private String upLoadServerUri = pinkCon + "uploadPicture.php";
     private ProgressDialog dialog = null;
     private int serverResponseCode = 0;
 
-    //路徑
-    private String path1 = null;
-    private String path2 = null;
-    private String path3 = null;
 
     //存圖片uri 之後拿來將圖片設定給相簿使用
     private Uri uriMyImage;
@@ -177,16 +180,12 @@ public class AddNewSiteActivity extends FragmentActivity implements
         pref = this.getSharedPreferences("pinkpink", 0);
         prefEditor = pref.edit();
 
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        scrollView = (LockableScrollView) findViewById(R.id.scrollView);
 
         WorkaroundMapFragment mapFragment = (WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-
         if (mapFragment == null)
         {
-//            Log.d("HF", "HFFFFFFFFFF");
             mapFragment = new WorkaroundMapFragment(); // (WorkaroundMapFragment) WorkaroundMapFragment.newInstance();
             getSupportFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
         }
@@ -212,33 +211,76 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
 
         input = new HashMap<String, EditText>();
-
         input.put("sName", (EditText)findViewById(R.id.sName));
+        input.put("address", (EditText)findViewById(R.id.address));
 
-        searchStart = (ImageButton)findViewById(R.id.searchStart);
-        searchStart.setOnClickListener(this);
-        searchClean = (ImageButton)findViewById(R.id.searchClean);
-        searchClean.setOnClickListener(this);
         submit = (ImageButton)findViewById(R.id.submit);
         submit.setOnClickListener(this);
 
-        input.put("search", (EditText)findViewById(R.id.search));
-        input.get("search").addTextChangedListener(new TextWatcher()
+
+
+        /*       以下 -> 動態搜尋地圖       */
+
+        keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        windowToken = (new View(AddNewSiteActivity.this)).getWindowToken();
+
+        final Animation searchMapMaskIn = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_in);
+        final Animation searchMapMaskOut = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_out);
+        searchMapMaskOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+            @Override
+            public void onAnimationEnd(Animation animation)
+            {
+                searchMapMask.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        suggestions = new ArrayList<String>();
+        searchMapAdapter = new ArrayAdapter<String>(this , android.R.layout.simple_list_item_1 ,suggestions);
+
+
+        searchMapSuggestion = (ListView)findViewById(R.id.searchMapSuggestion);
+        searchMapSuggestion.setAdapter(searchMapAdapter);
+        searchMapSuggestion.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3)
+            {
+                ListView suggestionList = (ListView) arg0;
+
+                if (suggestionList.getItemAtPosition(arg2).toString().compareTo("查無結果")==0)
+                    return ;
+
+                //  當使用者點擊listItem時，將建議填入搜尋框，設status為0，避免填入時被onTextChanged重新要求
+//                searchSuggestionStatus = FROM_SUGGESTIONLIST;
+//                searchMapQuery.setText(suggestionList.getItemAtPosition(arg2).toString());
+                searchMapLocatePlace(suggestionList.getItemAtPosition(arg2).toString());
+
+                searchMapMask.startAnimation(searchMapMaskOut);
+                scrollView.unlock();
+            }
+        });
+
+        searchMapQuery = (EditText)findViewById(R.id.searchMapQuery);
+        searchMapQuery.addTextChangedListener(new TextWatcher()
         {
             //  設定當地址欄內文字改變時，跟google place api要求建議字句
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
             {
-                if (searchSuggestionStatus==USER_TYPING) // 但若是由程式改變的話則不要求
-                {
-                    String query = input.get("search").getText().toString().replace(" ", "+");
+
+//                if (searchSuggestionStatus==USER_TYPING) // 但若是由程式改變的話則不要求
+//                {
+                    String query = searchMapQuery.getText().toString().replace(" ", "+");
                     Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
 
                     StringRequest stringRequest = new StringRequest(Request.Method.GET, uri.toString(),
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
-
                                     try {
                                         JSONObject o = new JSONObject(response);
 
@@ -250,21 +292,23 @@ public class AddNewSiteActivity extends FragmentActivity implements
                                             for (int a = 0; a < jArr.length(); ++a)
                                                 suggestions.add(String.valueOf(jArr.getJSONObject(a).optString("description")));
 
-                                            adapter.notifyDataSetChanged();
+                                            searchMapAdapter.notifyDataSetChanged();
                                         }
-                                        else if (input.get("search").getText().toString().compareTo("")==0)
+                                        else if (searchMapQuery.getText().toString().compareTo("")==0)
                                         {
                                             suggestions.clear();
-                                            adapter.notifyDataSetChanged();
+                                            searchMapAdapter.notifyDataSetChanged();
                                         }
                                         else
                                         {
                                             suggestions.clear();
                                             suggestions.add("查無結果");
-                                            adapter.notifyDataSetChanged();
+                                            searchMapAdapter.notifyDataSetChanged();
                                         }
 
-                                    } catch (JSONException e) { e.printStackTrace(); }
+                                    } catch (JSONException e) {
+                                        Log.d("HFDYNAMICERROR", e.getMessage());
+                                    }
                                 }
                             },
                             new Response.ErrorListener() {
@@ -274,37 +318,44 @@ public class AddNewSiteActivity extends FragmentActivity implements
                                 }
                             });
                     mQueue.add(stringRequest);
-                }
+//                }
             }
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void afterTextChanged(Editable editable)
-            {   searchSuggestionStatus = USER_TYPING;   }
-        });
-
-        suggestions = new ArrayList<String>();
-        adapter = new ArrayAdapter<>(this , android.R.layout.simple_list_item_1 ,suggestions);
-
-        searchSuggestion = (ListView)findViewById(R.id.searchSuggestion);
-        searchSuggestion.setAdapter(adapter);
-        searchSuggestion.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3)
             {
-                ListView suggestionList = (ListView) arg0;
-
-                if (suggestionList.getItemAtPosition(arg2).toString().compareTo("查無結果")==0)
-                    return ;
-
-                //  當使用者點擊listItem時，將建議填入搜尋框，設status為0，避免填入時被onTextChanged重新要求
-                searchSuggestionStatus = FROM_SUGGESTIONLIST;
-                input.get("search").setText(suggestionList.getItemAtPosition(arg2).toString());
-                searchPlaceLocate(suggestionList.getItemAtPosition(arg2).toString());
+                //searchSuggestionStatus = USER_TYPING;
             }
         });
 
+
+
+        searchMapMask = (LinearLayout) findViewById(R.id.searchMapMask);
+        searchMap = (Button) findViewById(R.id.searchMap);
+        searchMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchMapMask.setVisibility(View.VISIBLE);
+                searchMapMask.startAnimation(searchMapMaskIn);
+                scrollView.lock();
+                searchMapQuery.requestFocus();
+            }
+        });
+
+        searchMapMaskBack = (Button) findViewById(R.id.searchMapMaskBack);
+        searchMapMaskBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                keyboard.hideSoftInputFromWindow(windowToken, 0);
+                searchMapMask.startAnimation(searchMapMaskOut);
+                scrollView.unlock();
+            }
+        });
+
+        searchMapQueryClean = (Button)findViewById(R.id.searchMapQueryClean);
+        searchMapQueryClean.setOnClickListener(this);
+        /*       以上 -> 動態搜尋地圖       */
 
 
 
@@ -323,7 +374,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
         if (siteType.compareTo("r")==0)
         {
-            ((LinearLayout) findViewById(R.id.selectSiteClass_restaurant)).setVisibility(View.VISIBLE);
+            ((LinearLayout) findViewById(R.id.selectSiteClass_restaurantText)).setVisibility(View.VISIBLE);
 
             HashMap<String, View> siteClassTime = new HashMap<String, View>();
             siteClassTime.put("text", (TextView) findViewById(R.id.selectTime));
@@ -335,67 +386,46 @@ public class AddNewSiteActivity extends FragmentActivity implements
             siteClassFoodKind.put("text", (TextView) findViewById(R.id.selectFoodKind));
             siteClassFoodKind.put("options", (ResponsiveGridView) findViewById(R.id.selectFoodKindOptions));
             siteClassViews.put(SITECLASS_FOODKIND, siteClassFoodKind);
-            setClassOptions(SITECLASS_FOODKIND, ConstellationAdapter.RADIO, null);
+            setClassOptions(SITECLASS_FOODKIND, ConstellationAdapter.CHECK, null);
 
             HashMap<String, View> siteClassCountry = new HashMap<String, View>();
             siteClassCountry.put("text", (TextView) findViewById(R.id.selectCountry));
             siteClassCountry.put("options", (ResponsiveGridView) findViewById(R.id.selectCountryOptions));
             siteClassViews.put(SITECLASS_COUNTRY, siteClassCountry);
-            setClassOptions(SITECLASS_COUNTRY, ConstellationAdapter.RADIO, null);
+            setClassOptions(SITECLASS_COUNTRY, ConstellationAdapter.CHECK, null);
         }
 
 
 
+        uploadPicsAlbum = (GridView) findViewById(R.id.uploadPics);
+        gaAdapter = new GridAlbumAdapter(AddNewSiteActivity.this);
+        uploadPicsAlbum.setAdapter(gaAdapter);
 
 
         //-------------------------------------飛-----------------------------------------
-        p1 = (ImageButton)findViewById(R.id.p1);
-        p2 = (ImageButton)findViewById(R.id.p2);
-        p3 = (ImageButton)findViewById(R.id.p3);
-        c1 = (Button)findViewById(R.id.c1);
-        c2 = (Button)findViewById(R.id.c2);
-        c3 = (Button)findViewById(R.id.c3);
+        uploadPic_album = (ImageButton) findViewById(R.id.uploadPic_album);
+
         //使用者選相簿
-        p1.setOnClickListener(new View.OnClickListener() {
+        uploadPic_album.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //開啟相簿相片集，須由startActivityForResult且帶入requestCode進行呼叫，原因為點選相片後返回程式呼叫onActivityResult
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_PICK);
-                intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, PHOTO1);
-            }
-        });
-        p2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //開啟相簿相片集，須由startActivityForResult且帶入requestCode進行呼叫，原因為點選相片後返回程式呼叫onActivityResult
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_PICK);
-                intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, PHOTO2);
-            }
-        });
-        p3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //開啟相簿相片集，須由startActivityForResult且帶入requestCode進行呼叫，原因為點選相片後返回程式呼叫onActivityResult
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_PICK);
-                intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, PHOTO3);
+                intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                startActivityForResult(intent, UPLOADPIC_ALBUM);
             }
         });
 
         //使用者選照相機
-        c1.setOnClickListener(new View.OnClickListener() {
+        uploadPic_camera = (ImageButton) findViewById(R.id.uploadPic_camera);
+        uploadPic_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //先判斷內置SD存不存在
-                if(ExistSDCard()){
+                if(existSDCard()){
                     if(getSDFreeSize() > 25) {//看有沒有容量
                         //取得時間
                         Calendar c = Calendar.getInstance();
@@ -408,65 +438,14 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
                         Log.v("path", strImage);
 
-                        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uriMyImage);
-                        startActivityForResult(intent, CAMERA1);
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, uriMyImage);
+
+                        startActivityForResult(intent, UPLOADPIC_CAMERA);
                     }
                     else
                         Toast.makeText(view.getContext(), "空間不足", Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-        c2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //先判斷內置SD存不存在
-                if(ExistSDCard()){
-                    if(getSDFreeSize() > 25){//看有沒有容量
-                        //取得時間
-                        Calendar c = Calendar.getInstance();
-
-                        String path = getExtermalStoragePublicDir("Love%%GO").getPath();
-                        //照片路徑
-                        strImage = path+"/"+c.get(Calendar.YEAR)+(c.get(Calendar.MONTH)+1)+c.get(Calendar.DAY_OF_MONTH)+c.get(Calendar.HOUR_OF_DAY)+c.get(Calendar.MINUTE)+c.get(Calendar.SECOND)+".jpg";
-                        File myImage = new File(strImage);
-                        uriMyImage = Uri.fromFile(myImage);
-
-                        Log.v("path", strImage);
-
-                        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uriMyImage);
-                        startActivityForResult(intent, CAMERA2);
-                    }
-                    else
-                        Toast.makeText(view.getContext(), "空間不足", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        c3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(getSDFreeSize() > 25) {//看有沒有容量
-                    //先判斷內置SD存不存在
-                    if(ExistSDCard()){
-                        //取得時間
-                        Calendar c = Calendar.getInstance();
-
-                        String path = getExtermalStoragePublicDir("Love%%GO").getPath();
-                        //照片路徑
-                        strImage = path+"/"+c.get(Calendar.YEAR)+(c.get(Calendar.MONTH)+1)+c.get(Calendar.DAY_OF_MONTH)+c.get(Calendar.HOUR_OF_DAY)+c.get(Calendar.MINUTE)+c.get(Calendar.SECOND)+".jpg";
-                        File myImage = new File(strImage);
-                        uriMyImage = Uri.fromFile(myImage);
-
-                        Log.v("path", strImage);
-
-                        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uriMyImage);
-                        startActivityForResult(intent, CAMERA3);
-                    }
-                }
-                else
-                    Toast.makeText(view.getContext(), "空間不足", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -518,8 +497,6 @@ public class AddNewSiteActivity extends FragmentActivity implements
         suggestMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("✓ 點擊確認新增"));
         suggestMarker.showInfoWindow();
 
-        suggestAddress = "";
-
         StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://maps.googleapis.com/maps/api/geocode/json?latlng="+String.valueOf(latLng.latitude)+","+String.valueOf(latLng.longitude)+"&result_type=street_address&language=zh-TW&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg",
                 new Response.Listener<String>() {
                     @Override
@@ -529,11 +506,11 @@ public class AddNewSiteActivity extends FragmentActivity implements
                         {
                             JSONArray jArr = new JSONObject(response).getJSONArray("results");
 
-                            suggestAddress = jArr.getJSONObject(0).optString("formatted_address");
+                            input.get("address").setText(jArr.getJSONObject(0).optString("formatted_address"));
 
                         } catch (JSONException e) {
 //                            Toast.makeText(AddNewSiteActivity.this, e.getMessage()+" - "+e.toString(), Toast.LENGTH_LONG).show();
-                            suggestAddress = "";
+                            input.get("address").setText("");
                         }
 
 
@@ -705,123 +682,41 @@ public class AddNewSiteActivity extends FragmentActivity implements
         switch (requestCode)
         {
             /*       ↓       飛       ↓       */
-            case CAMERA1:
+            case UPLOADPIC_CAMERA:
                 if (resultCode == RESULT_OK) {//避免點旁邊會閃退
                     galleryAddPic(uriMyImage);// 將圖片設定給相簿使用
                     Bitmap bmp = BitmapFactory.decodeFile(strImage);
                     //Log.v("path", strImage);
-                    accessPath(strImage, 1);//儲存路徑
-                    if (bmp.getWidth() > bmp.getHeight())
-                        ScalePic(bmp, CAMERA1);
-                    else
-                        ScalePic(bmp, CAMERA1);
+//                    accessPath = strImage;//儲存路徑
+
+                    gaAdapter.add(bmp, strImage);
+
                 }
                 break;
 
-            case CAMERA2:
-                if (resultCode == RESULT_OK) {//避免點旁邊會閃退
-                    galleryAddPic(uriMyImage);// 將圖片設定給相簿使用
-                    Bitmap bmp = BitmapFactory.decodeFile(strImage);
-                    Log.v("path", strImage);
-                    accessPath(strImage, CAMERA2);//儲存路徑
-                    if (bmp.getWidth() > bmp.getHeight())
-                        ScalePic(bmp, CAMERA2);
-                    else
-                        ScalePic(bmp, CAMERA2);
-                }
-                break;
-
-            case CAMERA3:
-                if (resultCode == RESULT_OK) {//避免點旁邊會閃退
-                    galleryAddPic(uriMyImage);// 將圖片設定給相簿使用
-                    Bitmap bmp = BitmapFactory.decodeFile(strImage);
-                    Log.v("path", strImage);
-                    accessPath(strImage, CAMERA3);//儲存路徑
-                    if (bmp.getWidth() > bmp.getHeight())
-                        ScalePic(bmp, CAMERA3);
-                    else
-                        ScalePic(bmp, CAMERA3);
-                }
-                break;
-
-            case PHOTO1:
-                if (resultCode == RESULT_OK) {//避免點旁邊會閃退
+            case UPLOADPIC_ALBUM:
+                if (resultCode == RESULT_OK)
+                {   //避免點旁邊會閃退
                     //取得照片路徑uri
                     Uri uri = data.getData();
                     ContentResolver cr = this.getContentResolver();
-                    try {
+                    try
+                    {
                         Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(uri));
                         String[] pojo = {MediaStore.Images.Media.DATA};
                         Cursor cursor = managedQuery(uri, pojo, null, null, null);
                         if (cursor != null) {
                             int colunm_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                             cursor.moveToFirst();
-                            String path = cursor.getString(colunm_index);
-                            accessPath(path, 1);//儲存路徑
+//                            accessPath = cursor.getString(colunm_index);     //儲存路徑
+                            gaAdapter.add(bitmap, cursor.getString(colunm_index));
                             //showPicturePath.setText(path);
                         }
 
-                        //判斷照片為橫向或者為直向，並進入ScalePic判斷圖片是否要進行縮放
-                        if (bitmap.getWidth() > bitmap.getHeight())
-                            ScalePic(bitmap, 1);
-                        else
-                            ScalePic(bitmap, 1);
-                    } catch (FileNotFoundException e) {
+//                        gaAdapter.add(bitmap);
+
                     }
-                }
-                break;
-
-            case PHOTO2:
-                if (resultCode == RESULT_OK) {//避免點旁邊會閃退
-                    //取得照片路徑uri
-                    Uri uri = data.getData();
-                    ContentResolver cr = this.getContentResolver();
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(uri));
-                        String[] pojo = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = managedQuery(uri, pojo, null, null, null);
-                        if (cursor != null) {
-                            int colunm_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                            cursor.moveToFirst();
-                            String path = cursor.getString(colunm_index);
-                            accessPath(path, 2);//儲存路徑
-                            //showPicturePath.setText(path);
-                        }
-
-                        //判斷照片為橫向或者為直向，並進入ScalePic判斷圖片是否要進行縮放
-                        if (bitmap.getWidth() > bitmap.getHeight())
-                            ScalePic(bitmap, 2);
-                        else
-                            ScalePic(bitmap, 2);
-                    } catch (FileNotFoundException e) {
-                    }
-                }
-                break;
-
-            case PHOTO3:
-                if (resultCode == RESULT_OK) {//避免點旁邊會閃退
-                    //取得照片路徑uri
-                    Uri uri = data.getData();
-                    ContentResolver cr = this.getContentResolver();
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream(cr.openInputStream(uri));
-                        String[] pojo = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = managedQuery(uri, pojo, null, null, null);
-                        if (cursor != null) {
-                            int colunm_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                            cursor.moveToFirst();
-                            String path = cursor.getString(colunm_index);
-                            accessPath(path, 3);//儲存路徑
-                            //showPicturePath.setText(path);
-                        }
-
-                        //判斷照片為橫向或者為直向，並進入ScalePic判斷圖片是否要進行縮放
-                        if (bitmap.getWidth() > bitmap.getHeight())
-                            ScalePic(bitmap, 3);
-                        else
-                            ScalePic(bitmap, 3);
-                    } catch (FileNotFoundException e) {
-                    }
+                    catch (FileNotFoundException e) {}
                 }
                 break;
             /*       ↑       飛       ↑       */
@@ -841,11 +736,8 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
         switch (view.getId())
         {
-            case R.id.searchStart:
-                searchPlaceLocate(suggestions.get(0));
-                break;
-            case R.id.searchClean:
-                input.get("search").setText("");
+            case R.id.searchMapQueryClean:
+                searchMapQuery.setText("");
                 break;
             case R.id.submit:
                 submit();
@@ -854,11 +746,20 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        if (searchMapMask.getVisibility()==View.VISIBLE)
+            searchMapMask.setVisibility(View.GONE);
+        else
+            super.onBackPressed();
+    }
+
 
 
     //  使用者點擊搜尋按鈕時，將其位置定位至mMap
     //  或選擇建議時，同時導至該建議的點
-    private void searchPlaceLocate(String query)
+    private void searchMapLocatePlace(String query)
     {
         Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/textsearch/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
 
@@ -932,21 +833,24 @@ public class AddNewSiteActivity extends FragmentActivity implements
                     @Override
                     public void onResponse(String response)
                     {
-                        Log.d("HFFFFF", response);
+                        Log.d("HFSUBMITRESPONSE", response);
                         Toast.makeText(AddNewSiteActivity.this, "新增成功", Toast.LENGTH_SHORT).show();
 
                         /*       ↓       飛       ↓       */
-                        final String Id = response;
-                        Log.v("Id", Id);                     //將資料送入資料庫
+                        final String id = response;
+                        Log.v("Id", id);                     //將資料送入資料庫
                         dialog = ProgressDialog.show(AddNewSiteActivity.this, "", "Uploading file...", true);
                         new Thread(new Runnable() {
                             public void run() {
-                                if(path1 != null)
-                                    uploadFile(path1, 1, Id);
-                                if(path2 != null)
-                                    uploadFile(path2, 2, Id);
-                                if(path3 != null)
-                                    uploadFile(path3, 3, Id);
+                                int seq = 97;
+                                for (HashMap<String, Object> pic : gaAdapter.album)
+                                {
+                                    uploadFile((String) pic.get("path"), (char)(seq++), id);
+                                }
+                                dialog.dismiss();
+                                AddNewSiteActivity.this.finish();
+//                                if(accessPath != null)
+//                                    uploadFile(accessPath, 1, Id);
                             }
                         }).start();
                         /*       ↑       飛       ↑       */
@@ -956,7 +860,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Toast.makeText(AddNewSiteActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("HFSUBMITERROR", error.getMessage());
                     }
                 }){
             @Override
@@ -965,7 +869,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
                 map.put("sName", input.get("sName").getText().toString());
                 map.put("description", input.get("description").getText().toString());
-                map.put("address", suggestAddress);
+                map.put("address", input.get("address").toString());
                 map.put("phone", input.get("phone").getText().toString());
                 map.put("transportation", input.get("transportation").getText().toString());
                 map.put("email", input.get("email").getText().toString());
@@ -978,6 +882,13 @@ public class AddNewSiteActivity extends FragmentActivity implements
                 map.put("creator", pref.getString("mId", null));
                 map.put("note", input.get("note").getText().toString());
                 map.put("siteType", siteType);
+
+                if (siteType.compareTo("r")==0)
+                {
+                    map.put("time", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
+                    map.put("country", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
+                    map.put("food_kind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
+                }
 
                 return map;
             }
@@ -1001,6 +912,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_48dp));
 
             input.get("sName").setText(marker.getSnippet());
+            input.get("address").setText(suggestAddress);
         }
     }
 
@@ -1037,15 +949,13 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
     private void setClassOptions(final int siteClass, final int selectType, String param)
     {
-        String url = pinkCon+"getSiteClasses.php?opt="+siteClass+"&"+param;
-        Log.d("HFurl", url);
+        final String url = pinkCon+"getSiteClasses.php?opt="+siteClass+"&"+param;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
                     {
-                        Log.d("HFresponse", response);
                         try {
 
                             JSONArray jArr = new JSONArray(response);
@@ -1073,7 +983,8 @@ public class AddNewSiteActivity extends FragmentActivity implements
                     public void onErrorResponse(VolleyError error)
                     {
 
-                        Log.d("HF2", error.getMessage());
+                        Log.d("HF1031", url);
+//                        Log.d("HF2", error.getMessage());
                     }
                 });
 
@@ -1085,8 +996,6 @@ public class AddNewSiteActivity extends FragmentActivity implements
     {
         final ConstellationAdapter cAdapter = new ConstellationAdapter(this, options, selectType);
         siteClassesAdapters.put(siteClass, cAdapter);
-        Log.d("HFFFFinit", String.valueOf(siteClass));
-
 
         TextView selectClass = (TextView) siteClassViews.get(siteClass).get("text");
         final ResponsiveGridView selectClassOptions = (ResponsiveGridView) siteClassViews.get(siteClass).get("options");
@@ -1097,14 +1006,18 @@ public class AddNewSiteActivity extends FragmentActivity implements
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 cAdapter.setCheckItem(position);
                 if (siteClass==SITECLASS_CITY)
+                {
                     setClassOptions(SITECLASS_AREA, 0, "city="+cAdapter.getItem(position));
 
+                }
             }
         });
 
 
-        final Animation optionsIn = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.selectoptions_in);
-        final Animation optionsOut = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.selectoptions_out);
+        final LinearLayout optionTabsContainer = (LinearLayout) selectClassOptions.getParent();
+
+        final Animation optionsIn = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_in);
+        final Animation optionsOut = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_out);
 
         optionsOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -1113,6 +1026,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
             public void onAnimationEnd(Animation animation)
             {
                 selectClassOptions.setVisibility(View.GONE);
+                optionTabsContainer.setVisibility(View.GONE);
             }
             @Override
             public void onAnimationRepeat(Animation animation) {}
@@ -1121,20 +1035,35 @@ public class AddNewSiteActivity extends FragmentActivity implements
         selectClass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("HFCONTAINERID", String.valueOf(optionTabsContainer.getId()));
 
-                if (selectClassOptions.getVisibility()==View.GONE)
+                if (optionTabsContainer.getVisibility()!=View.VISIBLE)
                 {
-                    if (siteClass==SITECLASS_CITY)
-                        ((ResponsiveGridView) siteClassViews.get(SITECLASS_AREA).get("options")).setVisibility(View.GONE);
-                    else if (siteClass==SITECLASS_AREA)
-                        ((ResponsiveGridView) siteClassViews.get(SITECLASS_CITY).get("options")).setVisibility(View.GONE);
+                    Log.d("HFCONTAINERACTION", "1");
+                    optionTabsContainer.setVisibility(View.VISIBLE);
+                    selectClassOptions.setVisibility(View.VISIBLE);
+                    optionTabsContainer.startAnimation(optionsIn);
+                }
+                else if (selectClassOptions.getVisibility()!=View.VISIBLE)
+                {
+                    Log.d("HFCONTAINERACTION", "2");
+
+                    int a = 0;
+                    while (true)
+                    {
+                        if (optionTabsContainer.getChildAt(a)==null)
+                            break;
+
+                        optionTabsContainer.getChildAt(a).setVisibility(View.GONE);
+                        ++a;
+                    }
 
                     selectClassOptions.setVisibility(View.VISIBLE);
                     selectClassOptions.startAnimation(optionsIn);
                 }
-                else
+                else// if (selectClassOptions.getVisibility()==View.VISIBLE)
                 {
-//                    selectCountryOptions.setVisibility(View.GONE);
+                    Log.d("HFCONTAINERACTION", "3");
                     selectClassOptions.startAnimation(optionsOut);
                 }
             }
@@ -1180,63 +1109,10 @@ public class AddNewSiteActivity extends FragmentActivity implements
             return new File(file, albumName);
     }
     /**
-     * 把路徑存進全域變數
-     * @param p
-     * @param choose
-     */
-    private void accessPath(String p, int choose){
-        switch (choose){
-            case 1:
-                path1 = p;
-                break;
-            case 2:
-                path2 = p;
-                break;
-            case 3:
-                path3 = p;
-                break;
-        }
-    }
-    /**
-     * 裁切相片
-     * @param bitmap
-     * @param choose
-     */
-    private void ScalePic(Bitmap bitmap, int choose) {
-
-        //判斷縮放比例
-        float scaleWidth = ((float) p1.getWidth()) / bitmap.getWidth();
-
-        float scaleHeight = ((float) p1.getHeight()) / bitmap.getHeight();
-
-        Matrix mMat = new Matrix();
-        mMat.setScale(scaleWidth, scaleHeight);
-
-        Bitmap mScaleBitmap = Bitmap.createBitmap(bitmap,
-                0,
-                0,
-                bitmap.getWidth(),
-                bitmap.getHeight(),
-                mMat,
-                false);
-        if (choose == 1 || choose == CAMERA1){
-            p1.setImageBitmap(mScaleBitmap);
-            //p1_path.setText(path1);
-        }
-        else if (choose == 2 || choose == CAMERA2){
-            p2.setImageBitmap(mScaleBitmap);
-            //p2_path.setText(path2);
-        }
-        else if (choose == 3 || choose == CAMERA3){
-            p3.setImageBitmap(mScaleBitmap);
-            //p3_path.setText(path3);
-        }
-    }
-    /**
      * 判斷SD存不存在
      * @return
      */
-    private boolean ExistSDCard(){
+    private boolean existSDCard(){
 
         if (Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
             return true;
@@ -1267,7 +1143,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
      * @param sourceFileUri
      * @return
      */
-    public int uploadFile(String sourceFileUri, int choose, String Id){
+    public int uploadFile(String sourceFileUri, char seq, String id){
         String fileName = sourceFileUri;
 
         HttpURLConnection conn = null;
@@ -1279,6 +1155,9 @@ public class AddNewSiteActivity extends FragmentActivity implements
         byte[] buffer;
         int maxBufferSize = 1 * 1024 * 1024;
         File sourceFile = new File(sourceFileUri);
+
+        Log.d("HFFILENAME", siteType + id + seq+ ".jpg");
+
         if (!sourceFile.isFile()) {
             dialog.dismiss();
             //Log.e("uploadFile", "Source File not exist :"+imagepath);
@@ -1315,12 +1194,9 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
                 //更改圖片在sever的檔名
-                if(choose == 1)
-                    fileName = siteType + Id + "a.jpg";
-                else if(choose == 2)
-                    fileName = siteType + Id + "b.jpg";
-                else if(choose == 3)
-                    fileName = siteType + Id + "c.jpg";
+
+                fileName =  siteType + id + seq+ ".jpg";
+
 
                 dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
                         + fileName + "\"" + lineEnd);
@@ -1396,7 +1272,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                 });
                 Log.e("Upload Exception", "Exception : "  + e.getMessage(), e);
             }
-            dialog.dismiss();
+//            dialog.dismiss();
             return serverResponseCode;
 
         } // End else block

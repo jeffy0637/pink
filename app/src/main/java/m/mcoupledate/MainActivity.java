@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements
         pref = this.getSharedPreferences("pinkpink", 0);
         prefEditor = pref.edit();
 
-        prefEditor.clear().commit();
+//        prefEditor.clear().commit();
 
         try
         {
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        fbLogout();
+//        fbLogout();
 
         mQueue = Volley.newRequestQueue(this);
 
@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     //給其他頁面要求使用者id
+    @Deprecated
     public static String getUserId(){
         return id;
     }
