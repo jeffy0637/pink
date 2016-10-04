@@ -73,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements
 
 //        prefEditor.clear().commit();
 
+        Intent go2 = new Intent(MainActivity.this, HomePageActivity.class);
+        startActivity(go2);
+
         try
         {
             if (pref.getString("mId", null)!=null)

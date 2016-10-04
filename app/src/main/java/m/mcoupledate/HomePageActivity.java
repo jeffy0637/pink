@@ -34,8 +34,8 @@ public class HomePageActivity extends AppCompatActivity
 
     private String conAPI = "http://140.117.71.216/pinkCon/";
 
-    private String id = MainActivity.getUserId();
-    //private String id = "1763438647274913";
+   // private String id = MainActivity.getUserId();
+    private String id = "1763438647274913";
     private SQLiteDatabase db = null;
 
     //此TextView是靜態新增的
@@ -57,7 +57,7 @@ public class HomePageActivity extends AppCompatActivity
                     case R.id.bb_menu_memorialday:
                         break;
                     case R.id.bb_menu_site:
-                        Intent go2 = new Intent(HomePageActivity.this, SiteAttractionActivity.class);
+                        Intent go2 = new Intent(HomePageActivity.this, SiteSearchActivity.class);
                         startActivity(go2);
                         break;
                     case R.id.bb_menu_trip:
@@ -68,7 +68,9 @@ public class HomePageActivity extends AppCompatActivity
 
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
-                //重选事件，当前已经选择了这个，又点了这个tab。微博点击首页刷新页面
+                //重选事件，当前已经选择了这个，又点了这个tab。
+                Intent go2 = new Intent(HomePageActivity.this, SiteSearchActivity.class);
+                startActivity(go2);
             }
         });
 
@@ -268,11 +270,13 @@ public class HomePageActivity extends AppCompatActivity
             // 開始跳頁
             startActivity(intent);
 
-        } else if (id == R.id.nav_myViewpoint) {
-            Intent go2 = new Intent(HomePageActivity.this, ManageSiteActivity.class);
-            startActivity(go2);
+        } else if (id == R.id.homepage) {
+            // 設定從這個活動跳至 home 的活動
+            Intent intent = new Intent(HomePageActivity.this, HomePageActivity.class);
+            // 開始跳頁
+            startActivity(intent);
 
-        } else if (id == R.id.nav_myTravle) {
+        }else if (id == R.id.nav_myTravle) {
             Intent go2 = new Intent(HomePageActivity.this, SiteAttractionActivity.class);
             startActivity(go2);
 
@@ -282,8 +286,8 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_logout) {
-            Intent go2 = new Intent(HomePageActivity.this, SiteRestaurantActivity.class);
-            startActivity(go2);
+            //登出
+
         } else if (id == R.id.my_attraction) {
             Intent go2 = new Intent(HomePageActivity.this, MyAttractionActivity.class);
             startActivity(go2);

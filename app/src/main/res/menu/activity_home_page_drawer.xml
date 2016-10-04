@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/homepage"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="首頁" />
+        <item
             android:id="@+id/nav_memberData"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/page_memberData" />
@@ -10,10 +14,6 @@
             android:id="@+id/nav_memorialDay"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/page_memorialDay" />
-        <item
-            android:id="@+id/nav_myViewpoint"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/page_myViewpoint" />
         <item
             android:id="@+id/nav_myTravle"
             android:icon="@drawable/ic_menu_manage"

@@ -13,12 +13,11 @@
     <string name="mday">MDAY</string>
 
     //左拉選單
-    <string name="page_memberData">設定會員資料</string>
+    <string name="page_memberData">使用者資訊</string>
     <string name="page_memorialDay">設定紀念日</string>
-    <string name="page_myViewpoint">管理我的景點</string>
-    <string name="page_myTravle">景點搜尋</string>
-    <string name="page_travleEdit">景點頁面</string>
-    <string name="page_logout">餐廳搜尋</string>
+    <string name="page_myTravle">我的行程</string>
+    <string name="page_travleEdit">行程修改(目前是景點頁面)</string>
+    <string name="page_logout">登出</string>
 
     <string name="title_activity_member_data">memberData</string>
     <string name="title_activity_site">SiteActivity</string>
@@ -148,4 +147,5 @@
         <item>炸物</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_site_search">SiteSearchActivity</string>
 </resources>

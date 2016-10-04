@@ -11,4 +11,13 @@
 
     <dimen name="map_custom_profile_image">50dp</dimen>
     <dimen name="map_custom_profile_padding">2dp</dimen>
+
+    <dimen name="default_margin">5dp</dimen>
+    <!--text_size-->
+    <dimen name="title_txt_size">24sp</dimen>
+    <dimen name="content_txt_size_big">18sp</dimen>
+    <dimen name="content_txt_size_medium">14sp</dimen>
+    <dimen name="content_txt_size_small">9sp</dimen>
+    <!--icon_size-->
+    <dimen name="icon_size">25dp</dimen>
 </resources>

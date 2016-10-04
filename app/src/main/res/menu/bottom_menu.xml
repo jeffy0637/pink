@@ -3,15 +3,18 @@
 
     <item
         android:id="@+id/bb_menu_memorialday"
-        android:icon="@drawable/memorialday"
+        android:icon="@drawable/memorialday_icon"
+        android:color="#00000000"
         android:title=""
         android:textSize="0sp" />
     <item
         android:id="@+id/bb_menu_site"
-        android:icon="@drawable/site"
+        android:icon="@drawable/site_icon"
+        android:color="#00000000"
         android:title="" />
     <item
         android:id="@+id/bb_menu_trip"
-        android:icon="@drawable/trip"
+        android:icon="@drawable/travel_icon"
+        android:color="#00000000"
         android:title="" />
 </menu>
