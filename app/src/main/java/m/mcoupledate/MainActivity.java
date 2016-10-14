@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements
 
 //        prefEditor.clear().commit();
 
+
         try
         {
             if (pref.getString("mId", null)!=null)
