@@ -141,8 +141,8 @@ public class AuthChecker6 extends Activity
     //  設定map的我的位置按鈕
     private void initMyPositionFunc()
     {
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+//        mMap.setMyLocationEnabled(true);
+//        mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         getMyLocation();
     }

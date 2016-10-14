@@ -10,6 +10,13 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="24" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="24" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -72,7 +79,7 @@
             android:name=".SiteAttractionActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AddNewSiteActivity"
+            android:name=".EditSite"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MyAttractionActivity"

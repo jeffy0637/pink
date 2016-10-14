@@ -4,49 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:scrollbars="none"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:fillViewport="false"
+    android:id="@+id/scrollView">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/album"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/picture1"
-                android:scaleType="centerCrop" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/picture2"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/picture3"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-        </FrameLayout>
+            android:layout_height="300dp"
+            android:scrollbars="none" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -65,7 +37,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="六十石山"
+                    android:text=""
                     android:textSize = "20dp"
                     android:textColor="#000"
                     android:textStyle="bold"
@@ -75,7 +47,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="花蓮縣"
+                    android:text=""
                     android:textSize="15dp"
                     android:id="@+id/site_area"
                     android:layout_margin="5dp" />
@@ -89,10 +61,10 @@
                 <RatingBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/ratingBar"
+                    android:id="@+id/loveRateBar"
                     android:numStars="5"
                     android:rating="5"
-                    android:stepSize="0.5"
+                    android:stepSize="0.1"
                     android:isIndicator="true"
                     android:layout_gravity="center"/>
 
@@ -117,8 +89,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="收藏景點"
-                android:id="@+id/collect_site"
+                android:text="加入收藏"
+                android:id="@+id/addLikeBtn"
                 android:layout_weight="1" />
 
             <Button
@@ -126,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="加入行程"
-                android:id="@+id/join_trip"
+                android:id="@+id/addTravelBtn"
                 android:layout_weight="1" />
 
         </LinearLayout>
@@ -135,9 +107,10 @@
             android:id="@+id/address"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -159,18 +132,12 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="983花蓮縣富里鄉"
+                    android:text="暫無地址資訊"
                     android:textSize="15dp"
                     android:id="@+id/site_address"
                     android:layout_gravity="center" />
             </FrameLayout>
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="75dp">
-
-        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/time"
@@ -178,7 +145,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="15dp">
+            android:layout_marginBottom="15dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -192,23 +160,28 @@
                     android:layout_gravity="center" />
             </FrameLayout>
 
-            <LinearLayout
-                android:padding="5dp"
-                android:orientation="vertical"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/time_L"
-                >
+                android:layout_height="match_parent"
+                android:padding="5dp">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="暫無營業時間資訊"
+                    android:textSize="15dp"
+                    android:id="@+id/site_time"
+                    android:layout_gravity="center" />
+            </FrameLayout>
 
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:id="@+id/info"
@@ -232,7 +205,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="每年8月到9月，是金針花盛開的季節"
+                    android:text="暫無描述"
                     android:textSize="15dp"
                     android:id="@+id/site_description"
                     android:layout_gravity="center" />
@@ -243,9 +216,10 @@
             android:id="@+id/phone"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75sp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -267,7 +241,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="無"
+                    android:text="暫無電話資訊"
                     android:textSize="15dp"
                     android:id="@+id/attraction_phone"
                     android:layout_gravity="center" />
@@ -285,9 +259,10 @@
             android:id="@+id/website"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -309,7 +284,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="無"
+                    android:text="暫無網址"
                     android:textSize="15dp"
                     android:id="@+id/attraction_website"
                     android:layout_gravity="center" />
@@ -319,9 +294,10 @@
             android:id="@+id/trans"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -343,7 +319,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="交通"
+                    android:text="暫無交通資訊"
                     android:textSize="15dp"
                     android:id="@+id/site_transportation"
                     android:layout_gravity="center" />
@@ -354,9 +330,10 @@
             android:id="@+id/activity"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -378,7 +355,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="活動"
+                    android:text="暫無活動資訊"
                     android:textSize="15dp"
                     android:id="@+id/site_activity"
                     android:layout_gravity="center" />
@@ -389,8 +366,9 @@
             android:id="@+id/note"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:layout_gravity="center">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:minHeight="75dp">
 
             <FrameLayout
                 android:layout_width="60dp"
@@ -412,12 +390,39 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="備註"
+                    android:text="暫無備註"
                     android:textSize="15dp"
                     android:id="@+id/site_note"
                     android:layout_gravity="center" />
             </FrameLayout>
         </LinearLayout>
+
+
+        <FrameLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/siteInfoMap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            map:zOrderOnTop="true"
+            map:uiZoomControls="true" >
+
+            <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="搜尋地圖"-->
+            <!--android:id="@+id/searchMap"-->
+            <!--android:layout_gravity="left|top"-->
+            <!--android:background="#94000000"-->
+            <!--android:textColor="#ffffff" />-->
+        </FrameLayout>
+
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="600dp"
+            android:id="@+id/allComments" />
 
         <LinearLayout
             android:id="@+id/edit"
@@ -426,21 +431,21 @@
             android:layout_height="75dp"
             android:layout_gravity="center">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="覺得景點資訊不夠完整嗎?"
-                    android:textSize="15dp"
-                    android:id="@+id/editQ"
-                    android:layout_gravity="center" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="覺得景點資訊不夠完整嗎?"
+                android:textSize="15dp"
+                android:id="@+id/editQ"
+                android:layout_gravity="center" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="點此修改"
-                    android:textSize="15dp"
-                    android:id="@+id/want_edit"
-                    android:layout_gravity="center" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="點此修改"
+                android:textSize="15dp"
+                android:id="@+id/want_edit"
+                android:layout_gravity="center" />
 
         </LinearLayout>
     </LinearLayout>

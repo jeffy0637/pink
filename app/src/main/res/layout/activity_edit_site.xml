@@ -19,7 +19,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        tools:context=".AddNewSiteActivity">
+        tools:context=".AddnewSite">
 
         <TextView
             android:layout_width="wrap_content"
@@ -39,9 +39,10 @@
             android:layout_below="@+id/title" />
 
 
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <FrameLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/map"
+            android:id="@+id/newSiteMap"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="300dp"
@@ -60,14 +61,7 @@
                 android:background="#94000000"
                 android:textColor="#ffffff" />
         </FrameLayout>
-        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
-        <!--xmlns:tools="http://schemas.android.com/tools"-->
-        <!--android:id="@+id/map"-->
-        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--tools:context="m.mcoupledate.AddNewSiteActivity" />-->
+
 
 
         <EditText
@@ -77,7 +71,7 @@
             android:hint="名稱"
             android:ems="10"
             android:id="@+id/sName"
-            android:layout_below="@+id/map"
+            android:layout_below="@+id/newSiteMap"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 

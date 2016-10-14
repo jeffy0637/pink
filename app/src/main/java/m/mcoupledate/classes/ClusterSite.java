@@ -32,6 +32,13 @@ public class ClusterSite implements ClusterItem {
         this.pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_mountain);
     }
 
+    public ClusterSite(LatLng position, String name)
+    {
+        this.position = position;
+        this.name = name;
+        this.pic = null;
+    }
+
     @Override
     public LatLng getPosition() {
         return position;

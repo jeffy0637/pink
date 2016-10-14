@@ -1,19 +1,27 @@
 package m.mcoupledate;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,272 +33,531 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SiteInfo extends AppCompatActivity {
+import m.mcoupledate.classes.ClusterMapFragmentActivity;
+import m.mcoupledate.classes.ClusterSite;
+import m.mcoupledate.classes.CommentAdapter;
+import m.mcoupledate.classes.RecyclerAlbumAdapter;
+import m.mcoupledate.classes.WorkaroundMapFragment;
+import m.mcoupledate.funcs.PinkErrorHandler;
 
-    private String conAPI = "http://140.117.71.216/pinkCon/";
-    private Context mContext;
+public class SiteInfo extends ClusterMapFragmentActivity implements
+        OnMapReadyCallback {
+
+    SharedPreferences pref;
+
+    private String pinkCon = "http://140.117.71.216/pinkCon/";
     private RequestQueue mRequestQueue;
-    private StringRequest mStringRequest;
 
-
-    //印site照片
-    private ImageView picture1;
-    private ImageView picture2;
-    private ImageView picture3;
+    private String sId, mId, picId;
+    private String siteTypeName;
+    private Boolean ifLiked;
 
     //印資訊
-    private TextView site_name;
-    private TextView site_area;
-    private TextView site_address;
-    private TextView site_description;
-    private TextView site_phone;
-    private TextView site_website;
-    private TextView site_transportation;
-    private TextView site_activity;
-    private TextView site_note;
+    private HashMap<String, TextView> siteCol;
+    private RatingBar loveRateBar;
 
-    private Button call_button;
 
-    private String sId = "7";//測試用
-    private String Id = "";
-    private Double love = 0.0;
-    Button add_site, add_travel, scoreB;
+    private Button phoneCallBtn, commentBtn;
+    private Boolean ifCommented = false;
+    private View commentPage;
+    private RatingBar commentRBar;
+    private TextView commentText;
+
+
+    Button editLikeBtn, addTravelBtn;
     TextView edit;
+
+
+    private ScrollView scrollView;
+
+    private GoogleMap mMap;
+
+
+    RecyclerView album;
+    LinearLayoutManager mLayoutManager;
+    RecyclerAlbumAdapter raAdapter;
+
+
+    ListView allComments;
+    CommentAdapter allCommentsAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_site_info);
 
+        pref = this.getSharedPreferences("pinkpink", 0);
+        mId = pref.getString("mId", null);
+
+        mRequestQueue = Volley.newRequestQueue(this);
+
+        sId = this.getIntent().getStringExtra("sId");
+
+        siteCol = new HashMap<String, TextView>();
         //先印圖片 aId+a 不是sId
-        picture1 = (ImageView) findViewById(R.id.picture1);
-        picture2 = (ImageView) findViewById(R.id.picture2);
-        picture3 = (ImageView) findViewById(R.id.picture3);
-        site_name = (TextView) findViewById(R.id.site_name);
-        site_area = (TextView) findViewById(R.id.site_area);
-        site_address = (TextView) findViewById(R.id.site_address);
-        site_description = (TextView) findViewById(R.id.site_description);
-        site_phone = (TextView) findViewById(R.id.attraction_phone);
-        site_website = (TextView) findViewById(R.id.attraction_website) ;
-        site_website.setAutoLinkMask(Linkify.ALL);
-        site_transportation = (TextView) findViewById(R.id.site_transportation);
-        site_activity = (TextView) findViewById(R.id.site_activity);
-        site_note = (TextView) findViewById(R.id.site_note);
-        call_button = (Button) findViewById(R.id.call);
-        //在這裡判斷是哪一種site
+        siteCol.put("sName", (TextView) findViewById(R.id.site_name));
+        siteCol.put("area", (TextView) findViewById(R.id.site_area));
+        siteCol.put("time", (TextView) findViewById(R.id.site_time));
+        siteCol.put("address", (TextView) findViewById(R.id.site_address));
+        siteCol.put("description", (TextView) findViewById(R.id.site_description));
+        siteCol.put("phone", (TextView) findViewById(R.id.attraction_phone));
+        siteCol.put("website", (TextView) findViewById(R.id.attraction_website));
+        siteCol.put("transportation", (TextView) findViewById(R.id.site_transportation));
+        siteCol.put("activity", (TextView) findViewById(R.id.site_activity));
+        siteCol.put("note", (TextView) findViewById(R.id.site_note));
 
-        //從資料庫抓景點資料出來
-        getAttractionInformationFromMariDB();
+        siteCol.get("website").setAutoLinkMask(Linkify.ALL);
 
-        call_button.setOnClickListener(new View.OnClickListener() {
+        loveRateBar = (RatingBar)findViewById(R.id.loveRateBar);
+        LayerDrawable stars = (LayerDrawable) loveRateBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for filled stars
+        stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for half filled stars
+        stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP); // for empty stars
+
+
+        //從資料庫抓景點資料出來 (函式移至onMapReady呼叫)
+//        initSiteInfoFromMariDB();
+
+        editLikeBtn = (Button)findViewById(R.id.addLikeBtn);
+        editLikeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent phoneIntent = new Intent(Intent.ACTION_CALL);
-                phoneIntent.setData(Uri.parse("tel:" + site_phone.getText().toString()));
-                //phoneIntent.setData(Uri.parse("tel:0981916023"));
-                try {
-                    startActivity(phoneIntent);
-                    finish();
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(SiteInfo.this,
-                            "Call faild, please try again later.", Toast.LENGTH_SHORT).show();
-                }
+                editLike();
             }
-
         });
 
-        add_site = (Button)findViewById(R.id.collect_site);
-        add_travel = (Button)findViewById(R.id.join_trip);
-        edit = (TextView)findViewById(R.id.want_edit);
-        scoreB = (Button)findViewById(R.id.score);
+        addTravelBtn = (Button)findViewById(R.id.addTravelBtn);
+        addTravelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-        add_site.setOnClickListener(addSiteOnClickListener);
-        add_travel.setOnClickListener(addTravelOnClickListener);
-        edit.setOnClickListener(editOnClickListener);
-        scoreB.setOnClickListener(score);
+            }
+        });
+
+        edit = (TextView)findViewById(R.id.want_edit);
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                Intent i = new Intent(SiteInfo.this, EditSite.class);
+                i.putExtra("sId", sId);
+                i.putExtra("siteType", siteTypeName.substring(0));
+                i.putExtra("picId", picId);
+                startActivity(i);
+            }
+        });
+
+
+
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+
+
+        WorkaroundMapFragment mapFragment = getMapFragment(R.id.siteInfoMap);
+        mapFragment.setListener(new WorkaroundMapFragment.OnTouchListener() {
+            @Override
+            public void onTouch() {
+                scrollView.requestDisallowInterceptTouchEvent(true);
+            }
+        });
+
+        mapFragment.getMapAsync(this);
+
+
+        album = (RecyclerView)findViewById(R.id.album);
+        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        album.setLayoutManager(mLayoutManager);
+        //album.setHasFixedSize(true);    //   如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
+
+        raAdapter = new RecyclerAlbumAdapter(this, album.getHeight());
+        album.setAdapter(raAdapter);
     }
 
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+
+        setUpClusterMap(SiteInfo.this, mMap);
+
+        initSiteInfoFromMariDB();
+
+    }
+
+
     /**
-     * 用valley取景點資料
+     * 用volley取景點資料
      */
-    private void getAttractionInformationFromMariDB(){
-        mContext = this;
-        final TextView site_time1 = new TextView(this);
-        final TextView site_time2 = new TextView(this);
-        final TextView site_time3 = new TextView(this);
-        final TextView site_time4 = new TextView(this);
-        final TextView site_time5 = new TextView(this);
-        final TextView site_time6 = new TextView(this);
-        final TextView site_time7 = new TextView(this);
-        mRequestQueue = Volley.newRequestQueue(mContext);
-        mStringRequest = new StringRequest(Request.Method.POST, conAPI+"getSiteInformationFromMariDB.php",
+    private void initSiteInfoFromMariDB(){
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon +"siteInfo_initSiteInfo.php?sId="+sId+"&mId="+mId,
                 new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(String response)
+                    {
                         try {
-                            JSONObject o = new JSONObject(response);
-                            LinearLayout timeL = (LinearLayout) findViewById(R.id.time_L);
-                            site_name.setText(o.getJSONArray("site").getJSONObject(0).optString("sName"));
+                            final JSONObject o = new JSONObject(response);
 
-                            //合併城市跟區域
-                            String city_area = o.getJSONArray("site").getJSONObject(0).optString("city") + o.getJSONArray("site").getJSONObject(0).optString("area");
-                            site_area.setText(city_area);
-                            site_address.setText(o.getJSONArray("site").getJSONObject(0).optString("address"));
-                            site_description.setText(o.getJSONArray("site").getJSONObject(0).optString("description"));
-                            site_phone.setText(o.getJSONArray("site").getJSONObject(0).optString("phone"));
-                            //site_website.setText(o.getJSONArray("site").getJSONObject(0).optString("website"));
-                            String website = o.getJSONArray("site").getJSONObject(0).optString("website");
-                            if(website=="null") website = "無";
-                            site_website.setText(website);
-                            site_transportation.setText(o.getJSONArray("site").getJSONObject(0).optString("transportation"));
-                            site_activity.setText(o.getJSONArray("site").getJSONObject(0).optString("activity"));
-                            site_note.setText(o.getJSONArray("site").getJSONObject(0).optString("note"));
+                            final JSONObject site = o.getJSONArray("site").getJSONObject(0);
 
-                            love = o.getJSONArray("three_sites").getJSONObject(0).optDouble("love");
+                            String[] siteColName = {"sName", "area", "address", "description", "phone", "website", "transportation", "activity", "note"};
+                            for (String colName : siteColName)
+                            {
+                                String content;
+                                if (colName.compareTo("area")==0)
+                                    content = site.optString("city") + site.optString("area");//合併城市跟區域
+                                else
+                                    content = site.optString(colName);
 
-                            Id = o.getJSONArray("three_sites").getJSONObject(0).optString("ID");
-                            //印景點圖片
-                            printPicture();
+                                if (content!=null && content.compareTo("null")!=0)
+                                    siteCol.get(colName).setText(content);
+                            }
 
-                                for(int i = 0 ; i < o.getJSONArray("business_hours").length() ; i++){
 
-                                    int day = Integer.valueOf(o.getJSONArray("business_hours").getJSONObject(i).optString("day"));
+                            String time = "";
+                            String[] weekDays = {"一", "二", "三", "四", "五", "六", "日"};
+                            for(int i = 0 ; i < o.getJSONArray("business_hours").length() ; i++)
+                            {
+                                time += "("+ weekDays[i] +")  " + o.getJSONArray("business_hours").getJSONObject(i).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(i).optString("end_time")+"\n";
+                            }
+                            siteCol.get("time").setText(time);
 
-                                    switch (day){
-                                        case 1:
-                                            site_time1.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 2:
-                                            site_time2.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 3:
-                                            site_time3.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 4:
-                                            site_time4.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 5:
-                                            site_time5.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 6:
-                                            site_time6.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        case 7:
-                                            site_time7.setText(o.getJSONArray("business_hours").getJSONObject(day-1).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(day-1).optString("end_time"));
-                                            timeL.addView(site_time1);
-                                            break;
-                                        default:
-                                            Log.v("error","營業時間有錯");
-                                            break;
+
+                            loveRateBar.setRating((float)o.getJSONArray("diffSite").getJSONObject(0).optDouble("site_love"));
+
+                            picId = o.getJSONArray("diffSite").getJSONObject(0).optString("picId");
+                            siteTypeName = o.getJSONArray("diffSite").getJSONObject(0).optString("siteTypeName");
+
+                            phoneCallBtn = (Button) findViewById(R.id.call);
+                            phoneCallBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+                                    phoneIntent.setData(Uri.parse("tel:" + site.optString("phone")));
+                                    //phoneIntent.setData(Uri.parse("tel:0981916023"));
+                                    try {
+                                        startActivity(phoneIntent);
+                                        finish();
+                                    } catch (android.content.ActivityNotFoundException ex) {
+                                        Toast.makeText(SiteInfo.this, "Call faild, please try again later.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
+
+                            });
+
+
+                            commentPage = LayoutInflater.from(SiteInfo.this).inflate(R.layout.dialog_score, null);
+
+                            commentRBar = ((RatingBar) commentPage.findViewById(R.id.rating));
+                            LayerDrawable stars = (LayerDrawable) commentRBar.getProgressDrawable();
+                            stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for filled stars
+                            stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for half filled stars
+                            stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP); // for empty stars
+
+                            commentText = (TextView) commentPage.findViewById(R.id.text);
+
+                            commentBtn = (Button) findViewById(R.id.score);
+                            final AlertDialog commentDialog = new AlertDialog.Builder(SiteInfo.this)
+                                    .setTitle("請輸入評論")
+                                    .setView(commentPage)
+                                    .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            if (ifCommented)
+                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "edit");
+                                            else
+                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "new");
+                                        }
+                                    })
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener(){
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {}
+                                    }).create();
+
+                            commentBtn.setOnClickListener(new View.OnClickListener(){
+                                @Override
+                                public void onClick(View arg0) {
+                                    //評分
+                                    commentDialog.show();
+                                }});
+
+
+                            if (o.optString("myComment").compareTo("null")==0)
+                            {
+                                ifCommented = false;
+                            }
+                            else
+                            {
+                                ifCommented = true;
+
+                                JSONObject myComment = new JSONObject(o.optString("myComment"));
+                                setCommentContent((float) myComment.optDouble("person_love"), myComment.optString("text"));
+                            }
+
+
+
+                            ifLiked = o.optBoolean("ifLiked");
+                            setEditLikeBtn();
+
+                            //印景點圖片
+                            printPicture(picId);
+
+                            LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
+
+//                            mMap..animateCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
+
+
+                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
+
+                            markClusterSites();
+
+
+                            allCommentsAdapter = new CommentAdapter(SiteInfo.this, o.optJSONArray("allComments"));
+                            allComments = (ListView) findViewById(R.id.allComments);
+                            allComments.setAdapter(allCommentsAdapter);
+
                         }
                         catch (Exception e) {
+                            Log.d("HFFF", e.getMessage());
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+
+                        PinkErrorHandler.retryConnect(scrollView, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                initSiteInfoFromMariDB();
+//                                startActivity(SiteInfo.this.getIntent());
+                            }
+                        });
                     }
-                }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("sId", sId);
-                return map;
-            }
-        };
-        mRequestQueue.add(mStringRequest);
+                });
+
+        mRequestQueue.add(stringRequest);
     }
 
     /**
      * 三種site的印圖片method
      */
-    private void printPicture(){
-        Glide.with(this)
-                .load(conAPI + "images/sitePic/" + Id + "a.jpg")
-                .asBitmap()
-                .error(R.drawable.defualt_img)
-                .into(picture1);
-        Glide.with(this)
-                .load(conAPI + "images/sitePic/" + Id + "b.jpg")
-                .asBitmap()
-                .error(R.drawable.defualt_img)
-                .into(picture2);
-        Glide.with(this)
-                .load(conAPI + "images/sitePic/" + Id + "c.jpg")
-                .asBitmap()
-                .error(R.drawable.defualt_img)
-                .into(picture3);
+    private void printPicture(String id)
+    {
+        int seq = 97;
+        int picNum = 4; //  (寫死)
+
+        while (picNum>0)
+        {
+            Glide.with(SiteInfo.this)
+                    .load(pinkCon + "images/sitePic/" + id + (char)(seq) +".jpg")
+                    .asBitmap()
+                    .into(new SimpleTarget<Bitmap>(Resources.getSystem().getDisplayMetrics().widthPixels, 300)
+                          {
+                              @Override
+                              public void onResourceReady(Bitmap bitmap, GlideAnimation anim)
+                              {
+                                  raAdapter.add(bitmap, null);
+                              }
+                              @Override
+                              public void onLoadFailed(Exception e, Drawable errorDrawable)
+                              {
+                                  Log.d("HFGLIDEERROR", e.getMessage());
+                              }
+
+                          }
+                    );
+
+            ++seq;
+            --picNum;
+        }
     }
 
-    private Button.OnClickListener addSiteOnClickListener
-            = new Button.OnClickListener(){
 
-        @Override
-        public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-            //加入收藏
-        }};
+    public void markClusterSites()
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, pinkCon+"getAroundSites.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("HFMAPSITERESPONSE", response);
+                        try
+                        {
+                            JSONArray jArr = new JSONArray(response);
+                            JSONObject o;
 
-    private Button.OnClickListener addTravelOnClickListener
-            = new Button.OnClickListener(){
+                            for (int a=0; a<jArr.length(); ++a)
+                            {
+                                o = jArr.getJSONObject(a);
 
-        @Override
-        public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-            //加入行程
-        }};
+                                if (a==(jArr.length()-1))
+                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), true);
+                                else
+                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), false);
 
-    private Button.OnClickListener editOnClickListener
-            = new Button.OnClickListener(){
-
-        @Override
-        public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-            //修改景點
-        }};
-
-    private Button.OnClickListener score
-            = new Button.OnClickListener(){
-
-        @Override
-        public void onClick(View arg0) {
-            // TODO Auto-generated method stub
-            //評分
-            LayoutInflater inflater = LayoutInflater.from(SiteInfo.this);
-            final View v = inflater.inflate(R.layout.dialog_score, null);
-
-            new AlertDialog.Builder(SiteInfo.this)
-                    .setTitle("請輸入你的id")
-                    .setView(v)
-                    .setPositiveButton("確定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "謝謝您的評分", Toast.LENGTH_SHORT).show();
+//                                if (a==(jArr.length()-1))
+//                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), true);
+//                                else
+//                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), false);
+                            }
                         }
-                    })
-                    .show();
+                        catch (Exception e)
+                        {
+                            Log.d("HFFF", e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.d("HFFF", error.getMessage());
+                    }
+                });
+
+        mRequestQueue.add(stringRequest);
+    }
 
 
-        }};
+
+    private void submitComment(final String text, final float personLove, final String editType)
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"siteInfo_editComment.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        if (editType.compareTo("new")==0)
+                        {
+                            ifCommented = true;
+                            setCommentContent(personLove, text);
+                        }
+
+                        loveRateBar.setRating(Float.valueOf(response));
+
+                        Toast.makeText(getApplicationContext(), "謝謝您的評分", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+//                        Log.d("HFSUBMITCOMMENTERROR", error.getMessage());
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("sId", sId);
+                map.put("member", mId);
+                map.put("text", text);
+                map.put("person_love", String.valueOf(personLove));
+                map.put("siteTypeName", siteTypeName);
+                map.put("editType", editType);
+
+                return map;
+            }
+        };
+
+        mRequestQueue.add(stringRequest);
+
+    }
+
+
+    private void setCommentContent(float personLove, String text)
+    {
+        commentRBar.setRating(personLove);
+        commentText.setText(text);
+        commentBtn.setText("編輯評論");
+    }
+
+
+
+    private void editLike()
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"siteInfo_editMyLike.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        if (ifLiked)
+                        {
+                            Toast.makeText(SiteInfo.this, "移除成功", Toast.LENGTH_SHORT).show();
+                            ifLiked = false;
+                        }
+                        else
+                        {
+                            Toast.makeText(SiteInfo.this, "收藏成功", Toast.LENGTH_SHORT).show();
+                            ifLiked = true;
+                        }
+
+                        setEditLikeBtn();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+//                        Log.d("HF", error.getMessage());
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("sId", sId);
+                map.put("mId", mId);
+
+                if (ifLiked)
+                    map.put("editType", "remove");
+                else
+                    map.put("editType", "add");
+
+                return map;
+            }
+        };
+
+        mRequestQueue.add(stringRequest);
+    }
+
+
+    private void setEditLikeBtn()
+    {
+        if (ifLiked)
+            editLikeBtn.setText("移除收藏");
+        else
+            editLikeBtn.setText("加入收藏");
+    }
+
+
 
 
 
 }
+
+
 
 //加入我的收藏時是SQLite 跟 MariaDB一起新增
 //所以在mainactivity要建SQLite表格
