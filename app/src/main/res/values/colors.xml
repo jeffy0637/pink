@@ -24,4 +24,8 @@
 
     <color name="transparent">#00000000</color>
     <color name="stressedBlue">#92A8D1</color>
+
+    //拖拉用的
+    <color name="list_item_background">#AACCCCCC</color>
+    <color name="app_color">#8EAE3C</color>
 </resources>
