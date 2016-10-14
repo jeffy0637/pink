@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private Context mContext;
 
-
     //  初始化頁面和變數設定
     @Override
     protected void onCreate(Bundle savedInstanceState) {
