@@ -13,8 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -72,6 +74,11 @@ public class MemberData extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
+        TextView userId = (TextView) header.findViewById(R.id.userId);
+        userId.setText(id);
+        TextView name = (TextView) header.findViewById(R.id.userName);
+        name.setText("名字");
 
         //name editview
         editText = (EditText)findViewById(R.id.username);

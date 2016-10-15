@@ -34,8 +34,8 @@ public class HomePageActivity extends AppCompatActivity
 
     private String conAPI = "http://140.117.71.216/pinkCon/";
 
-   // private String id = MainActivity.getUserId();
-    private String id = "1763438647274913";
+    private String id = MainActivity.getUserId();
+
     private SQLiteDatabase db = null;
 
     //此TextView是靜態新增的
@@ -92,6 +92,11 @@ public class HomePageActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
+        TextView userId = (TextView) header.findViewById(R.id.userId);
+        userId.setText(id);
+        TextView name = (TextView) header.findViewById(R.id.userName);
+        name.setText("名字");
 
         //靜態
         totalDaysDialog = (TextView) findViewById(R.id.totalDaysDialog);
@@ -287,7 +292,6 @@ public class HomePageActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
-            go2.putExtra("siteType", "r");
             startActivity(go2);
             //登出
 

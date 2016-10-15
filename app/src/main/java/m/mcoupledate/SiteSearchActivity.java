@@ -42,6 +42,7 @@ public class SiteSearchActivity extends AppCompatActivity
     private TextView tv_tab0, tv_tab1, tv_tab2; // 3个选项卡
     private int moveOne = 0; // 下划线移动一个选项卡
     private BottomBar mBottomBar;
+    private String id = MainActivity.getUserId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,11 @@ public class SiteSearchActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
+        TextView userId = (TextView) header.findViewById(R.id.userId);
+        userId.setText(id);
+        TextView name = (TextView) header.findViewById(R.id.userName);
+        name.setText("名字");
 
         initView();
         initLineImage();
