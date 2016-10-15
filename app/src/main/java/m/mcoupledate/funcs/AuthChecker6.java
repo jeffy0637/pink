@@ -29,8 +29,8 @@ public class AuthChecker6 extends Activity
     private LocationListener locationListener;
     private DialogInterface.OnClickListener checkLocatableListener;
     private final int REQ_LOCATION_PERMISSION = 234;
-    private final int REQ_INIT_MYLOCATION = 235;
-    private final int REQ_GET_MYPOSITION = 236;
+    public static final int REQ_INIT_MYLOCATION = 235;
+    public static final int REQ_GET_MYPOSITION = 236;
     protected Location mLocation = null;
 
 

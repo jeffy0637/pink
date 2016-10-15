@@ -25,7 +25,7 @@ import m.mcoupledate.R;
 /**
  * Created by user on 2016/7/22.
  */
-public class ClusterSiteRenderer extends DefaultClusterRenderer<m.mcoupledate.classes.ClusterSite> {
+public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
 
     private final IconGenerator mIconGenerator;
     private final IconGenerator mClusterIconGenerator;
