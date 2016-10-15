@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.StatFs;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -44,20 +42,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,22 +67,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import m.mcoupledate.classes.ClusterMapFragmentActivity;
 import m.mcoupledate.classes.ClusterSite;
-import m.mcoupledate.classes.ClusterSiteRenderer;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.GridAlbumAdapter;
 import m.mcoupledate.classes.LockableScrollView;
 import m.mcoupledate.classes.ResponsiveGridView;
 import m.mcoupledate.classes.WorkaroundMapFragment;
 import m.mcoupledate.funcs.AuthChecker6;
+import m.mcoupledate.funcs.PinkErrorHandler;
 
-public class AddNewSiteActivity extends FragmentActivity implements
+public class EditSite extends ClusterMapFragmentActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMapLongClickListener,
-        ClusterManager.OnClusterClickListener<ClusterSite>,
-        ClusterManager.OnClusterInfoWindowClickListener<ClusterSite>,
-        ClusterManager.OnClusterItemClickListener<ClusterSite>,
-        ClusterManager.OnClusterItemInfoWindowClickListener<ClusterSite>,
         View.OnClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
@@ -101,7 +89,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
     private LockableScrollView scrollView;
 
     private GoogleMap mMap;
-    private ClusterManager<ClusterSite> mClusterManager;
+//    private ClusterManager<ClusterSite> mClusterManager;
 
     private final int REQ_INIT_MYLOCATION = 235;
     private final int REQ_GET_MYPOSITION = 236;
@@ -174,7 +162,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_new_site);
+        setContentView(R.layout.activity_edit_site);
 
 
         pref = this.getSharedPreferences("pinkpink", 0);
@@ -182,21 +170,13 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
         scrollView = (LockableScrollView) findViewById(R.id.scrollView);
 
-        WorkaroundMapFragment mapFragment = (WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-        if (mapFragment == null)
-        {
-            mapFragment = new WorkaroundMapFragment(); // (WorkaroundMapFragment) WorkaroundMapFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
-        }
-
+        WorkaroundMapFragment mapFragment = getMapFragment(R.id.newSiteMap);
         mapFragment.setListener(new WorkaroundMapFragment.OnTouchListener() {
             @Override
             public void onTouch() {
                 scrollView.requestDisallowInterceptTouchEvent(true);
             }
         });
-
 
         mapFragment.getMapAsync(this);
 
@@ -213,6 +193,13 @@ public class AddNewSiteActivity extends FragmentActivity implements
         input = new HashMap<String, EditText>();
         input.put("sName", (EditText)findViewById(R.id.sName));
         input.put("address", (EditText)findViewById(R.id.address));
+        input.put("description", (EditText) findViewById(R.id.description));
+        input.put("phone", (EditText)findViewById(R.id.phone));
+        input.put("transportation", (EditText) findViewById(R.id.transportation));
+        input.put("email", (EditText) findViewById(R.id.email));
+        input.put("website", (EditText) findViewById(R.id.website));
+        input.put("activity", (EditText) findViewById(R.id.activity));
+        input.put("note", (EditText) findViewById(R.id.note));
 
         submit = (ImageButton)findViewById(R.id.submit);
         submit.setOnClickListener(this);
@@ -222,10 +209,10 @@ public class AddNewSiteActivity extends FragmentActivity implements
         /*       以下 -> 動態搜尋地圖       */
 
         keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        windowToken = (new View(AddNewSiteActivity.this)).getWindowToken();
+        windowToken = (new View(EditSite.this)).getWindowToken();
 
-        final Animation searchMapMaskIn = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_in);
-        final Animation searchMapMaskOut = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_out);
+        final Animation searchMapMaskIn = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_in);
+        final Animation searchMapMaskOut = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_out);
         searchMapMaskOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}
@@ -274,50 +261,50 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
 //                if (searchSuggestionStatus==USER_TYPING) // 但若是由程式改變的話則不要求
 //                {
-                    String query = searchMapQuery.getText().toString().replace(" ", "+");
-                    Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
+                String query = searchMapQuery.getText().toString().replace(" ", "+");
+                Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
 
-                    StringRequest stringRequest = new StringRequest(Request.Method.GET, uri.toString(),
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    try {
-                                        JSONObject o = new JSONObject(response);
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, uri.toString(),
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject o = new JSONObject(response);
 
-                                        if (o.optString("status").compareTo("OK") == 0)
-                                        {
-                                            JSONArray jArr = o.getJSONArray("predictions");
-                                            suggestions.clear();
+                                    if (o.optString("status").compareTo("OK") == 0)
+                                    {
+                                        JSONArray jArr = o.getJSONArray("predictions");
+                                        suggestions.clear();
 
-                                            for (int a = 0; a < jArr.length(); ++a)
-                                                suggestions.add(String.valueOf(jArr.getJSONObject(a).optString("description")));
+                                        for (int a = 0; a < jArr.length(); ++a)
+                                            suggestions.add(String.valueOf(jArr.getJSONObject(a).optString("description")));
 
-                                            searchMapAdapter.notifyDataSetChanged();
-                                        }
-                                        else if (searchMapQuery.getText().toString().compareTo("")==0)
-                                        {
-                                            suggestions.clear();
-                                            searchMapAdapter.notifyDataSetChanged();
-                                        }
-                                        else
-                                        {
-                                            suggestions.clear();
-                                            suggestions.add("查無結果");
-                                            searchMapAdapter.notifyDataSetChanged();
-                                        }
-
-                                    } catch (JSONException e) {
-                                        Log.d("HFDYNAMICERROR", e.getMessage());
+                                        searchMapAdapter.notifyDataSetChanged();
                                     }
+                                    else if (searchMapQuery.getText().toString().compareTo("")==0)
+                                    {
+                                        suggestions.clear();
+                                        searchMapAdapter.notifyDataSetChanged();
+                                    }
+                                    else
+                                    {
+                                        suggestions.clear();
+                                        suggestions.add("查無結果");
+                                        searchMapAdapter.notifyDataSetChanged();
+                                    }
+
+                                } catch (JSONException e) {
+                                    Log.d("HFDYNAMICERROR", e.getMessage());
                                 }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Toast.makeText(AddNewSiteActivity.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                    mQueue.add(stringRequest);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(EditSite.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                mQueue.add(stringRequest);
 //                }
             }
             @Override
@@ -398,7 +385,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
 
         uploadPicsAlbum = (GridView) findViewById(R.id.uploadPics);
-        gaAdapter = new GridAlbumAdapter(AddNewSiteActivity.this);
+        gaAdapter = new GridAlbumAdapter(EditSite.this);
         uploadPicsAlbum.setAdapter(gaAdapter);
 
 
@@ -458,31 +445,25 @@ public class AddNewSiteActivity extends FragmentActivity implements
         mMap.setOnMapLongClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        setUpClusterer();
-
-        //  當camera移動時就呼叫 markClusterSites 印出週遭景點
-        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
-            @Override
-            public void onCameraIdle() {
-                if (mMap.getCameraPosition().zoom>=12)
-                    markClusterSites(mMap.getCameraPosition().target);
-            }
-        });
-
-        LatLng y = new LatLng(23.9036873,121.0793705);  // 預設台灣
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(y, 6));
-
+        setUpClusterMap(EditSite.this, mMap);
 
         //  檢查是否有存取目前定位的權限，確認後載入附近景點
-        mapChecker = new AuthChecker6(AddNewSiteActivity.this){
+        mapChecker = new AuthChecker6(EditSite.this){
             @Override
             public void onResult(Object result)
             {
                 Location location = (Location) result;
-                markClusterSites(new LatLng(location.getLatitude(), location.getLongitude()));
+
+                LatLng y = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(y, 6));
+                markClusterSites(y);
             }
         };
         mapChecker.checkMapMyLocation(mMap);
+
+
+        if (intent.getStringExtra("sId")!=null)
+            initEdittedSite(intent.getStringExtra("sId"));
     }
 
 
@@ -509,7 +490,6 @@ public class AddNewSiteActivity extends FragmentActivity implements
                             input.get("address").setText(jArr.getJSONObject(0).optString("formatted_address"));
 
                         } catch (JSONException e) {
-//                            Toast.makeText(AddNewSiteActivity.this, e.getMessage()+" - "+e.toString(), Toast.LENGTH_LONG).show();
                             input.get("address").setText("");
                         }
 
@@ -519,7 +499,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(AddNewSiteActivity.this, error.getMessage()+"-----"+error.toString()+"--vvv", Toast.LENGTH_LONG).show();
+                        Toast.makeText(EditSite.this, error.getMessage()+"-----"+error.toString()+"--vvv", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -527,33 +507,10 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
     }
 
-    private void setUpClusterer()
-    {
-        mClusterManager = new ClusterManager<ClusterSite>(this, mMap);
-
-        mClusterManager.setRenderer(new ClusterSiteRenderer(AddNewSiteActivity.this, mMap, mClusterManager));
-
-        mMap.setOnMarkerClickListener(mClusterManager);
-        //mMap.setOnInfoWindowClickListener(mClusterManager); //  當點擊資訊視窗時引發事件
-
-        // 當點擊群集時引發事件
-        mClusterManager.setOnClusterClickListener(this);
-        mClusterManager.setOnClusterInfoWindowClickListener(this);
-        mClusterManager.setOnClusterItemClickListener(this);
-        mClusterManager.setOnClusterItemInfoWindowClickListener(this);
-
-    }
-
 
     public void markClusterSites(LatLng latlng)
     {
         //  以 cluster 印出 latlng 附近的景點
-
-        if (cameraMoveType== TOTAG__PLACE)  // 若為程式呼叫非使用者移動則不清空cluster
-        {
-            mClusterManager.clearItems();
-            mClusterManager.cluster();
-        }
 
         cameraMoveType = DEFAULT_GESTURE;  //   判斷完後先改回預設
 
@@ -567,110 +524,38 @@ public class AddNewSiteActivity extends FragmentActivity implements
                             JSONArray jArr = new JSONArray(response);
                             JSONObject o;
 
+                            Bitmap bitmap = BitmapFactory.decodeResource(EditSite.this.getResources(), R.drawable.couple);
                             for (int a=0; a<jArr.length(); ++a)
                             {
                                 o = jArr.getJSONObject(a);
 
-                                if (a%10==9 || a==(jArr.length()-1))
-                                    setOneMarker(o, 1);
+                                if (a==30)
+                                {
+                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), bitmap), true);
+                                    break;
+                                }
                                 else
-                                    setOneMarker(o, 0);
+                                {
+                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), bitmap), false);
+                                }
 
                             }
                         }
                         catch (Exception e)
                         {
-                            Toast.makeText(AddNewSiteActivity.this, e.getMessage()+"-----"+e.toString()+"--vvv", Toast.LENGTH_LONG).show();
+                            Toast.makeText(EditSite.this, e.getMessage()+"-----"+e.toString()+"--vvv", Toast.LENGTH_LONG).show();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(AddNewSiteActivity.this, error.getMessage()+"-----"+error.toString()+"--vvv", Toast.LENGTH_LONG).show();
+                        Toast.makeText(EditSite.this, error.getMessage()+"-----"+error.toString()+"--vvv", Toast.LENGTH_LONG).show();
                     }
                 });
 
         mQueue.add(stringRequest);
 
-
-    }
-
-    private void setOneMarker(final JSONObject o, final int ifNeedCluster)
-    {
-
-        Glide.with(AddNewSiteActivity.this)
-                .load(pinkCon + "images/sitePic/" + o.optString("picId") + "a.jpg")
-                .asBitmap()
-                .into(new SimpleTarget<Bitmap>(50, 50)
-                      {
-                          @Override
-                          public void onResourceReady(Bitmap bitmap, GlideAnimation anim)
-                          {
-                              mClusterManager.addItem(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), bitmap));
-
-                              if (ifNeedCluster==1)
-                                  mClusterManager.cluster();
-                          }
-                          @Override
-                          public void onLoadFailed(Exception e, Drawable errorDrawable)
-                          {
-                              //                            mClusterManager.addItem(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), AddNewSiteActivity.this));
-                          }
-
-                      }
-                );
-    }
-
-    @Override
-    public boolean onClusterClick(Cluster<ClusterSite> cluster)
-    {
-        // Show a toast with some info when the cluster is clicked.
-        String firstName = cluster.getItems().iterator().next().name;
-        Toast.makeText(this,  firstName+"和"+(cluster.getSize()-1)+"個景點", Toast.LENGTH_SHORT).show();
-
-        // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
-        // inside of bounds, then animate to center of the bounds.
-
-        // Create the builder to collect all essential cluster items for the bounds.
-        LatLngBounds.Builder builder = LatLngBounds.builder();
-        for (ClusterItem item : cluster.getItems()) {
-            builder.include(item.getPosition());
-        }
-        // Get the LatLngBounds
-        final LatLngBounds bounds = builder.build();
-
-        // Animate camera to the bounds
-        try {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onClusterInfoWindowClick(Cluster<ClusterSite> cluster) {
-        // Does nothing, but you could go to a list of the users.
-    }
-
-    @Override
-    public boolean onClusterItemClick(ClusterSite item) {
-        // Does nothing, but you could go into the user's profile page, for example.
-        return false;
-    }
-
-    @Override
-    public void onClusterItemInfoWindowClick(ClusterSite item) {
-        try
-        {
-            Toast.makeText(AddNewSiteActivity.this, item.name, Toast.LENGTH_SHORT).show();
-        }
-        catch(Exception e)
-        {
-            Toast.makeText(AddNewSiteActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
 
     }
 
@@ -791,7 +676,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                             }
                             else
                             {
-                                Toast.makeText(AddNewSiteActivity.this, "查無結果", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditSite.this, "查無結果", Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) { e.printStackTrace(); }
@@ -800,7 +685,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(AddNewSiteActivity.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
+                        Toast.makeText(EditSite.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -811,15 +696,6 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
     private void submit()
     {
-
-        input.put("description", (EditText) findViewById(R.id.description));
-        input.put("phone", (EditText)findViewById(R.id.phone));
-        input.put("transportation", (EditText) findViewById(R.id.transportation));
-        input.put("email", (EditText) findViewById(R.id.email));
-        input.put("website", (EditText) findViewById(R.id.website));
-        input.put("activity", (EditText) findViewById(R.id.activity));
-        input.put("note", (EditText) findViewById(R.id.note));
-
 
         if (checkForm(input)==false)
             return ;
@@ -834,12 +710,12 @@ public class AddNewSiteActivity extends FragmentActivity implements
                     public void onResponse(String response)
                     {
                         Log.d("HFSUBMITRESPONSE", response);
-                        Toast.makeText(AddNewSiteActivity.this, "新增成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditSite.this, "新增成功", Toast.LENGTH_SHORT).show();
 
                         /*       ↓       飛       ↓       */
                         final String id = response;
                         Log.v("Id", id);                     //將資料送入資料庫
-                        dialog = ProgressDialog.show(AddNewSiteActivity.this, "", "Uploading file...", true);
+                        dialog = ProgressDialog.show(EditSite.this, "", "Uploading file...", true);
                         new Thread(new Runnable() {
                             public void run() {
                                 int seq = 97;
@@ -848,7 +724,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                                     uploadFile((String) pic.get("path"), (char)(seq++), id);
                                 }
                                 dialog.dismiss();
-                                AddNewSiteActivity.this.finish();
+                                EditSite.this.finish();
 //                                if(accessPath != null)
 //                                    uploadFile(accessPath, 1, Id);
                             }
@@ -940,7 +816,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
         }
 
         if (status==false)
-            Toast.makeText(AddNewSiteActivity.this, msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditSite.this, msg, Toast.LENGTH_SHORT).show();
 
         return status;
 
@@ -1016,8 +892,8 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
         final LinearLayout optionTabsContainer = (LinearLayout) selectClassOptions.getParent();
 
-        final Animation optionsIn = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_in);
-        final Animation optionsOut = AnimationUtils.loadAnimation(AddNewSiteActivity.this, R.anim.fade_out);
+        final Animation optionsIn = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_in);
+        final Animation optionsOut = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_out);
 
         optionsOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -1070,11 +946,70 @@ public class AddNewSiteActivity extends FragmentActivity implements
         });
     }
 
-//    private interface OptionsSelectAction
-//    {
-//        public void act(String param);
-//    }
+    private void initEdittedSite(final String sId)
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon +"editSite_initEdittedSite.php?sId="+sId,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        try {
+                            final JSONObject o = new JSONObject(response);
+                            Log.d("HFINITEDITRESPONSE", response);
 
+                            final JSONObject site = o.getJSONArray("site").getJSONObject(0);
+
+                            String[] siteColName = {"sName", "area", "address", "description", "phone", "website", "transportation", "activity", "note"};
+                            for (String colName : siteColName)
+                            {
+                                input.get(colName).setText(site.optString(colName));
+                            }
+
+//
+//                            String time = "";
+//                            String[] weekDays = {"一", "二", "三", "四", "五", "六", "日"};
+//                            for(int i = 0 ; i < o.getJSONArray("business_hours").length() ; i++)
+//                            {
+//                                time += "("+ weekDays[i] +")  " + o.getJSONArray("business_hours").getJSONObject(i).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(i).optString("end_time")+"\n";
+//                            }
+//                            siteCol.get("time").setText(time);
+
+
+
+                            LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
+
+
+                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_48dp)));
+
+
+                        }
+                        catch (Exception e) {
+                            Log.d("HFFF", e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        PinkErrorHandler.retryConnect(scrollView, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                initEdittedSite(sId);
+//                                startActivity(SiteInfo.this.getIntent());
+                            }
+                        });
+                    }
+                });
+
+
+        mQueue.add(stringRequest);
+
+    }
 
 
 
@@ -1114,7 +1049,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
      */
     private boolean existSDCard(){
 
-        if (Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             return true;
         }
         else
@@ -1238,7 +1173,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
                     runOnUiThread(new Runnable() {
                         public void run() {
                             String msg = "File Upload Completed.\n\n See uploaded file your server. \n\n";
-                            Toast.makeText(AddNewSiteActivity.this, "File Upload Complete.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditSite.this, "File Upload Complete.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -1255,7 +1190,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(AddNewSiteActivity.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditSite.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -1267,7 +1202,7 @@ public class AddNewSiteActivity extends FragmentActivity implements
 
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(AddNewSiteActivity.this, "Got Exception : see logcat ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditSite.this, "Got Exception : see logcat ", Toast.LENGTH_SHORT).show();
                     }
                 });
                 Log.e("Upload Exception", "Exception : "  + e.getMessage(), e);

@@ -281,7 +281,7 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_travleEdit) {
-            Intent go2 = new Intent(HomePageActivity.this, AddNewSiteActivity.class);
+            Intent go2 = new Intent(HomePageActivity.this, EditSite.class);
             go2.putExtra("siteType", "r");
             startActivity(go2);
 
@@ -289,7 +289,8 @@ public class HomePageActivity extends AppCompatActivity
             //登出
 
         } else if (id == R.id.my_attraction) {
-            Intent go2 = new Intent(HomePageActivity.this, MyAttractionActivity.class);
+            Intent go2 = new Intent(HomePageActivity.this, SiteInfo.class);
+            go2.putExtra("sId", "7");
             startActivity(go2);
         } else if (id == R.id.my_restaurant) {
             Intent go2 = new Intent(HomePageActivity.this, MyRestaurantActivity.class);

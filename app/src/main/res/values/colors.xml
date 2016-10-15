@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="pinkpink">#99ffcc</color>
+
     <color name="colorPrimary">#7D7D7D</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FF99CC</color>
@@ -22,4 +24,8 @@
 
     <color name="transparent">#00000000</color>
     <color name="stressedBlue">#92A8D1</color>
+
+    //拖拉用的
+    <color name="list_item_background">#AACCCCCC</color>
+    <color name="app_color">#8EAE3C</color>
 </resources>

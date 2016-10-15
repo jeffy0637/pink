@@ -9,6 +9,12 @@
     <!-- 調用內部電話 -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="24" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="24" />
 
     <application
         android:allowBackup="true"
@@ -72,7 +78,7 @@
             android:name=".SiteAttractionActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AddNewSiteActivity"
+            android:name=".EditSite"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MyAttractionActivity"
@@ -88,7 +94,8 @@
         <activity
             android:name=".SiteSearchActivity"
             android:label="@string/title_activity_site_search"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".StrokeActivity"></activity>
     </application>
 
 </manifest>
