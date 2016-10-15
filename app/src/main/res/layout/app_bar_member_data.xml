@@ -122,8 +122,8 @@
                         android:layout_height="match_parent">
 
                         <EditText
-                            android:layout_width="100dp"
-                            android:layout_height="50dp"
+                            android:layout_width="80sp"
+                            android:layout_height="50sp"
                             android:inputType="date"
                             android:ems="10"
                             android:id="@+id/b_year"
@@ -140,8 +140,8 @@
                             android:layout_gravity="bottom" />
 
                         <EditText
-                            android:layout_width="100dp"
-                            android:layout_height="50dp"
+                            android:layout_width="80sp"
+                            android:layout_height="50sp"
                             android:inputType="date"
                             android:ems="6"
                             android:maxLength = "2"
@@ -152,8 +152,8 @@
                             android:layout_gravity="bottom" />
 
                         <EditText
-                            android:layout_width="100dp"
-                            android:layout_height="50dp"
+                            android:layout_width="80sp"
+                            android:layout_height="50sp"
                             android:inputType="date"
                             android:ems="10"
                             android:hint="Day"
@@ -202,7 +202,7 @@
                         android:layout_height="match_parent">
 
                         <EditText
-                            android:layout_width="100dp"
+                            android:layout_width="80dp"
                             android:layout_height="50dp"
                             android:inputType="date"
                             android:ems="10"
@@ -213,7 +213,7 @@
                             android:layout_gravity="bottom" />
 
                         <EditText
-                            android:layout_width="100dp"
+                            android:layout_width="80dp"
                             android:layout_height="50dp"
                             android:inputType="date"
                             android:ems="10"
@@ -224,7 +224,7 @@
                             android:layout_gravity="bottom" />
 
                         <EditText
-                            android:layout_width="100dp"
+                            android:layout_width="80dp"
                             android:layout_height="50dp"
                             android:inputType="date"
                             android:ems="10"
