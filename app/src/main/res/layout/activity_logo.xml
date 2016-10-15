@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/ListGray"
+    android:background="@color/white"
     tools:context="m.mcoupledate.Logo">
 
     <ImageView
@@ -15,10 +15,8 @@
         android:layout_height="300dp"
         android:src="@mipmap/ic_launcher"
         android:id="@+id/imageView3"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="78dp" />
-
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

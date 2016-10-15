@@ -80,7 +80,7 @@
                     android:id="@+id/ic_newsite_name"
                     android:layout_width="@dimen/icon_size"
                     android:layout_height="@dimen/icon_size"
-                    android:src="@drawable/ic_site_name"
+                    android:src="@drawable/ic_add_new"
                     android:layout_gravity="center"/>
             </FrameLayout>
             <FrameLayout
@@ -252,13 +252,47 @@
             </FrameLayout>
         </LinearLayout>
 
+        <!--open time-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_time"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_phone"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_time"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_time"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_time"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType=""
+                    android:hint="@string/site_openTime"
+                    android:ems="10"
+                    android:id="@+id/time"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
 
         <!--transportation-->
         <LinearLayout
             android:id="@+id/layout_newsite_trans"
             android:layout_width="match_parent"
             android:layout_height="@dimen/info_layout_height"
-            android:layout_below="@+id/layout_newsite_phone"
+            android:layout_below="@+id/layout_newsite_time"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true">
 

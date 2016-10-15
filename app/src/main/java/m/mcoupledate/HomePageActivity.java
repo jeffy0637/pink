@@ -286,6 +286,9 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_logout) {
+            Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
+            go2.putExtra("siteType", "r");
+            startActivity(go2);
             //登出
 
         } else if (id == R.id.my_attraction) {

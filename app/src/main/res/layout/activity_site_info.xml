@@ -89,7 +89,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="加入收藏"
+                android:text="@string/addToFavorite"
+                android:background="@drawable/circle_corner_button_selector"
                 android:id="@+id/addLikeBtn"
                 android:layout_weight="1" />
 
@@ -98,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@color/transparent"
-                android:src="@drawable/add_schedule"
+                android:text="@string/joinMyTrip"
                 android:scaleType="centerInside"
                 android:id="@+id/addTravelBtn"
                 android:layout_weight="1"/>
