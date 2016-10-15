@@ -16,6 +16,8 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         tools:context=".AddNewSiteActivity">
 
         <TextView
@@ -24,40 +26,19 @@
             android:text="Title"
             android:id="@+id/title"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/submit"
-            android:layout_above="@+id/hr"  />
+            android:layout_alignParentStart="true" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dip"
             android:background="#696969"
             android:id="@+id/hr"
-            android:layout_below="@+id/searchStart"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="搜尋地點"
-            android:ems="10"
-            android:id="@+id/searchMapQuery"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/hr" />
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:id="@+id/searchMapSuggestion"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/searchMapQuery" />
+            android:layout_below="@+id/title" />
 
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -67,7 +48,26 @@
             map:uiZoomControls="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/searchMapSuggestion" />
+            android:layout_below="@+id/hr" >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="搜尋地圖"
+                android:id="@+id/searchMap"
+                android:layout_gravity="left|top"
+                android:background="#94000000"
+                android:textColor="#ffffff" />
+        </FrameLayout>
+        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
+        <!--xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:id="@+id/map"-->
+        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--tools:context="m.mcoupledate.AddNewSiteActivity" />-->
+
 
         <EditText
             android:layout_width="match_parent"
@@ -93,11 +93,75 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:id="@+id/address"
+            android:layout_below="@+id/description"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:hint="地址" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectSiteClass_allSiteText"
+            android:layout_below="@+id/address">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="大行政區"
+                android:id="@+id/selectCity" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="小行政區"
+                android:id="@+id/selectArea" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectSiteClass_restaurantText"
+            android:layout_below="@+id/selectSiteClass_allSiteText"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="時段"
+                android:id="@+id/selectTime" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="種類"
+                android:id="@+id/selectFoodKind" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="34dp"
+                android:layout_weight="1"
+                android:text="口味"
+                android:id="@+id/selectCountry" />
+
+        </LinearLayout>
+
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:inputType="phone"
             android:hint="電話"
             android:ems="10"
             android:id="@+id/phone"
-            android:layout_below="@+id/description"
+            android:layout_below="@+id/selectSiteClass_restaurantText"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
@@ -115,7 +179,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
+            android:inputType="textPersonName"
             android:hint="email"
             android:ems="10"
             android:id="@+id/email"
@@ -157,33 +221,161 @@
             android:layout_alignParentStart="true" />
 
 
-        <ImageButton
-            android:layout_width="wrap_content"
+        <m.mcoupledate.classes.ResponsiveGridView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/searchStart"
-            android:src="@drawable/abc_ic_search_api_material"
+            android:id="@+id/uploadPics"
+            android:numColumns="3"
+            android:layout_below="@+id/note"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:visibility="visible" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/formBtns"
+            android:layout_below="@+id/uploadPics">
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/uploadPic_album"
+                android:src="@drawable/album" />
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/uploadPic_camera"
+                android:src="@drawable/camera" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/submit"
+                android:src="@android:drawable/ic_input_add" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/selectSiteClass_allSiteOptions"
+            android:layout_below="@+id/selectSiteClass_allSiteText"
+            android:background="@color/white"
+            android:visibility="gone">
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectCityOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectAreaOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/selectSiteClass_restaurantOptions"
+            android:layout_below="@+id/selectSiteClass_restaurantText"
+            android:background="@color/white"
+            android:visibility="gone">
+
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectTimeOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectFoodKindOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+            <m.mcoupledate.classes.ResponsiveGridView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectCountryOptions"
+                android:numColumns="3"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/searchMapMask"
+            android:orientation="vertical"
+            android:background="#e5ffffff"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignBottom="@+id/formBtns"
+            android:visibility="gone">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/searchMapQueryClean"
-            android:src="@drawable/abc_ic_clear_material"
-            android:layout_alignTop="@+id/searchStart"
-            android:layout_toLeftOf="@+id/searchStart"
-            android:layout_toStartOf="@+id/searchStart" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/submit"
-            android:src="@android:drawable/ic_input_add"
-            android:layout_alignTop="@+id/searchMapQueryClean"
-            android:layout_toLeftOf="@+id/searchMapQueryClean"
-            android:layout_toStartOf="@+id/searchMapQueryClean"
-            android:layout_alignBottom="@+id/searchMapQueryClean" />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/searchMapMaskBack"
+                    android:background="#00ffffff"
+                    android:text="↩"
+                    android:textSize="24dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="textPersonName"
+                    android:hint="搜尋地圖"
+                    android:ems="10"
+                    android:id="@+id/searchMapQuery" />
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/searchMapQueryClean"
+                    android:background="#00ffffff"
+                    android:text="✕"
+                    android:textSize="18dp"/>
+
+            </LinearLayout>
+
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="500dp"
+                android:id="@+id/searchMapSuggestion" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 

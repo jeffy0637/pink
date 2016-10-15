@@ -16,7 +16,7 @@
     <string name="page_memberData">使用者資訊</string>
     <string name="page_memorialDay">設定紀念日</string>
     <string name="page_myTravle">我的行程</string>
-    <string name="page_travleEdit">行程修改(目前是景點頁面)</string>
+    <string name="page_travleEdit">行程修改(目前是新增景點頁面)</string>
     <string name="page_logout">登出</string>
 
     <string name="title_activity_member_data">memberData</string>
@@ -148,4 +148,18 @@
     </string-array>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_site_search">SiteSearchActivity</string>
+
+    <string name="site_name">名稱</string>
+    <string name="site_desc">描述</string>
+    <string name="site_address">位址</string>
+    <string name="site_phone">電話</string>
+    <string name="site_selectTime">營業時段</string>
+    <string name="selectCountry">餐廳口味</string>
+    <string name="transportation">交通方式</string>
+    <string name="email">email</string>
+    <string name="activity">活動</string>
+    <string name="note">備註</string>
+    <string name="website">網站</string>
+
+
 </resources>
