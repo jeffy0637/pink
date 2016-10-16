@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
@@ -291,7 +293,10 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_logout) {
-            Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
+            FacebookSdk.sdkInitialize(getApplicationContext());
+            LoginManager.getInstance().logOut();
+            this.getSharedPreferences("pinkpink", 0).edit().clear().commit();
+            Intent go2 = new Intent(HomePageActivity.this, MainActivity.class);
             startActivity(go2);
             //登出
 
@@ -300,7 +305,7 @@ public class HomePageActivity extends AppCompatActivity
             go2.putExtra("sId", "7");
             startActivity(go2);
         } else if (id == R.id.my_restaurant) {
-            Intent go2 = new Intent(HomePageActivity.this, MyRestaurantActivity.class);
+            Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
             startActivity(go2);
         }
 

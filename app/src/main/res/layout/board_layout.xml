@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 
-<m.mcoupledate.BoardView
+<m.mcoupledate.draglib.BoardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/board_view"
     android:layout_width="match_parent"

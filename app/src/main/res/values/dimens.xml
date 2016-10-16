@@ -23,4 +23,7 @@
     <dimen name="content_txt_size_small">9sp</dimen>
     <!--icon_size-->
     <dimen name="icon_size">25dp</dimen>
+
+    <!--EditSite inputTimeDialog-->
+    <dimen name="dialog_sign_size">15sp</dimen>
 </resources>

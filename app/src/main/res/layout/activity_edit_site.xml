@@ -167,11 +167,52 @@
             </FrameLayout>
         </LinearLayout>
 
+        <!--address-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_city_area"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_address"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_city_area"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_city_area"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/location"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_city_area"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:text="高雄市 鹽埕區"
+                    android:id="@+id/city_area"
+                    android:layout_gravity="center"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cityAreaInputBtn"
+                    android:src="@drawable/edit"
+                    android:background="#00ffffff" />
+            </FrameLayout>
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/selectSiteClass_allSiteText"
-            android:layout_below="@+id/layout_newsite_address">
+            android:layout_below="@+id/layout_newsite_city_area">
 
             <TextView
                 android:layout_width="0dp"
@@ -278,14 +319,19 @@
                 android:id="@+id/right_layout_newsite_time"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <EditText
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType=""
-                    android:hint="@string/site_openTime"
                     android:ems="10"
                     android:id="@+id/time"
                     android:layout_gravity="center"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timeInputBtn"
+                    android:src="@drawable/edit"
+                    android:background="#00ffffff" />
             </FrameLayout>
         </LinearLayout>
 

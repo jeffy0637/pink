@@ -76,8 +76,10 @@ import m.mcoupledate.classes.ClusterMapFragmentActivity;
 import m.mcoupledate.classes.ClusterSite;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.GridAlbumAdapter;
+import m.mcoupledate.classes.InputDialogManager;
 import m.mcoupledate.classes.LockableScrollView;
 import m.mcoupledate.classes.ResponsiveGridView;
+import m.mcoupledate.classes.TimeInputEditText;
 import m.mcoupledate.classes.WorkaroundMapFragment;
 import m.mcoupledate.funcs.AuthChecker6;
 import m.mcoupledate.funcs.PinkErrorHandler;
@@ -107,6 +109,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
 
     private Map<String, EditText> input;    //  輸入欄位的map
+    private ImageButton cityAreaInputBtn, timeInputBtn;
+    private InputDialogManager cityAreaInputDialogManager, restaurantClassessInputDialogManager, timeInputDialogManager;
 
 
     //  搜尋地圖
@@ -375,11 +379,115 @@ public class EditSite extends ClusterMapFragmentActivity implements
         }
 
 
+        cityAreaInputDialogManager = new InputDialogManager(EditSite.this, R.layout.dialog_content_select_city_area_classes, "區域類別");
+
+        cityAreaInputBtn = (ImageButton) findViewById(R.id.cityAreaInputBtn);
+        cityAreaInputBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cityAreaInputDialogManager.dialog.show();
+            }
+        });
+
+
+
+
+        timeInputDialogManager = new InputDialogManager(EditSite.this, R.layout.dialog_time_input, "營業時間"){
+            @Override
+            protected void initContent()
+            {
+                final SparseArray extraBtnTargetIds = new SparseArray<Integer>();
+                extraBtnTargetIds.put(R.id.w1_extra, R.id.w1_2);
+                extraBtnTargetIds.put(R.id.w2_extra, R.id.w2_2);
+                extraBtnTargetIds.put(R.id.w3_extra, R.id.w3_2);
+                extraBtnTargetIds.put(R.id.w4_extra, R.id.w4_2);
+                extraBtnTargetIds.put(R.id.w5_extra, R.id.w5_2);
+                extraBtnTargetIds.put(R.id.w6_extra, R.id.w6_2);
+                extraBtnTargetIds.put(R.id.w7_extra, R.id.w7_2);
+
+                Button.OnClickListener extraBtnListener = new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        LinearLayout extraBtnTarget = (LinearLayout) dialogContent.findViewById((Integer) extraBtnTargetIds.get(view.getId()));
+                        if (extraBtnTarget.getVisibility()==View.GONE)
+                        {
+                            ((Button)view).setText("✖");
+                            extraBtnTarget.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            ((Button)view).setText("✚");
+                            extraBtnTarget.setVisibility(View.GONE);
+                            ((TimeInputEditText) extraBtnTarget.getChildAt(1)).setText("");
+                            ((TimeInputEditText) extraBtnTarget.getChildAt(3)).setText("");
+                        }
+                    }
+                };
+
+                for (int a=0; a<extraBtnTargetIds.size(); ++a)
+                    ((Button) dialogContent.findViewById(extraBtnTargetIds.keyAt(a))).setOnClickListener(extraBtnListener);
+
+                TimeInputEditText[][][] inputs = {
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w1_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w1_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w1_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w1_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w2_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w2_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w2_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w2_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w3_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w3_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w3_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w3_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w4_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w4_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w4_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w4_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w5_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w5_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w5_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w5_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w6_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w6_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w6_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w6_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w7_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w7_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w7_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w7_end2)}},
+                };
+                vars.put("inputIds", inputs);
+
+            }
+
+            @Override
+            public String getInputsData() throws JSONException
+            {
+                JSONArray openTimeJArr = new JSONArray();
+                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
+                {
+                    JSONArray weekDayJArr = new JSONArray();
+                    for (TimeInputEditText[] period : weekDayInputs)
+                    {
+                        JSONObject onePeriod = new JSONObject();
+                        onePeriod.put("start_time", period[0].getText().toString());
+                        onePeriod.put("end_time", period[1].getText().toString());
+
+                        weekDayJArr.put(onePeriod);
+                    }
+                    openTimeJArr.put(weekDayJArr);
+                }
+
+                return openTimeJArr.toString();
+            }
+
+            @Override
+            protected  void onCancel()
+            {
+                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
+                {
+                    for (TimeInputEditText[] period : weekDayInputs)
+                    {
+                        period[0].setText("");
+                        period[1].setText("");
+                    }
+                }
+            }
+        };
+        timeInputBtn = (ImageButton) findViewById(R.id.timeInputBtn);
+        timeInputBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timeInputDialogManager.dialog.show();
+            }
+        });
+
+
+
 
         uploadPicsAlbum = (GridView) findViewById(R.id.uploadPics);
         gaAdapter = new GridAlbumAdapter(EditSite.this);
         uploadPicsAlbum.setAdapter(gaAdapter);
-
 
         //-------------------------------------飛-----------------------------------------
         uploadPic_album = (ImageButton) findViewById(R.id.uploadPic_album);
@@ -1042,6 +1150,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
         mQueue.add(stringRequest);
 
     }
+
+
 
 
 

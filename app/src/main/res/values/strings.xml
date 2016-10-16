@@ -172,9 +172,12 @@
     <string name="activity">活動</string>
     <string name="note">備註</string>
     <string name="website">網站</string>
-    
+
     <string name="addToFavorite">加入收藏</string>
     <string name="joinMyTrip">加入行程</string>
 
 
+    <!--EditSite InputTimeDialog-->
+    <string name="startTimeHint">00:00</string>
+    <string name="endTimeHint">23:59</string>
 </resources>

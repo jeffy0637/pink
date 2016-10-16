@@ -70,20 +70,6 @@ public class MainActivity extends AppCompatActivity implements
         pref = this.getSharedPreferences("pinkpink", 0);
         prefEditor = pref.edit();
 
-//        prefEditor.clear().commit();
-
-
-        try
-        {
-            if (pref.getString("mId", null)!=null)
-            {
-                startActivity(new Intent(MainActivity.this, HomePageActivity.class));
-                MainActivity.this.finish();
-            }
-        }
-        catch(Exception e)
-        {}
-
         //狀態列透明
         WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
         localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
@@ -167,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements
                                                 checkSQLiteTable();
 
                                                 prefEditor.putString("mId", id);
+                                                prefEditor.putString("mName", object.optString("name"));
                                                 prefEditor.commit();
 
                                                 startActivity(new Intent(MainActivity.this, HomePageActivity.class));

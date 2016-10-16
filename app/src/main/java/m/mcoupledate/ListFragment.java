@@ -15,6 +15,7 @@
  */
 
 package m.mcoupledate;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,13 +35,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.util.ArrayList;
+
+import m.mcoupledate.draglib.DragItem;
+import m.mcoupledate.draglib.DragListView;
 
 public class ListFragment extends Fragment {
 
     private ArrayList<Pair<Long, String>> mItemArray;
-    private m.mcoupledate.DragListView mDragListView;
+    private DragListView mDragListView;
     private MySwipeRefreshLayout mRefreshLayout;
 
     public static ListFragment newInstance() {
@@ -57,9 +60,9 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_layout, container, false);
         mRefreshLayout = (MySwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        mDragListView = (m.mcoupledate.DragListView) view.findViewById(R.id.drag_list_view);
+        mDragListView = (DragListView) view.findViewById(R.id.drag_list_view);
         mDragListView.getRecyclerView().setVerticalScrollBarEnabled(true);
-        mDragListView.setDragListListener(new m.mcoupledate.DragListView.DragListListenerAdapter() {
+        mDragListView.setDragListListener(new DragListView.DragListListenerAdapter() {
             @Override
             public void onItemDragStarted(int position) {
                 mRefreshLayout.setEnabled(false);
@@ -166,7 +169,7 @@ public class ListFragment extends Fragment {
         mDragListView.setCustomDragItem(null);
     }
 
-    private static class MyDragItem extends m.mcoupledate.DragItem {
+    private static class MyDragItem extends DragItem {
 
         public MyDragItem(Context context, int layoutId) {
             super(context, layoutId);
