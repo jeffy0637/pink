@@ -24,7 +24,7 @@ public class Logo extends AppCompatActivity {
                 {
                     if (Logo.this.getSharedPreferences("pinkpink", 0).getString("mId", null)!=null)
                     {
-                        startActivity(new Intent(Logo.this, StrokeActivity.class));
+                        startActivity(new Intent(Logo.this, HomePageActivity.class));
                         Logo.this.finish();
                     }
                     else
