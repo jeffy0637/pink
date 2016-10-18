@@ -133,7 +133,8 @@ public class BoardFragment extends Fragment {
                 addColumnList();
                 return true;
             case R.id.action_remove_column:
-                mBoardView.removeColumn(0);
+                mBoardView.removeColumn(mColumns - 1);
+                mColumns--;
                 return true;
             case R.id.action_clear_board:
                 mBoardView.clearBoard();
