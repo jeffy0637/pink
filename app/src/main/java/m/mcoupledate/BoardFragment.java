@@ -15,10 +15,10 @@
  */
 
 package m.mcoupledate;
+
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,7 +26,6 @@ import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.text.AlteredCharSequence;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,20 +33,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-
 import java.util.ArrayList;
+
+import m.mcoupledate.draglib.BoardView;
+import m.mcoupledate.draglib.DragItem;
 
 public class BoardFragment extends Fragment {
 
     private static int sCreatedItems = 0;
-    private m.mcoupledate.BoardView mBoardView;
+    private BoardView mBoardView;
     private int mColumns;
 
     public static BoardFragment newInstance() {
@@ -64,12 +62,12 @@ public class BoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.board_layout, container, false);
 
-        mBoardView = (m.mcoupledate.BoardView) view.findViewById(R.id.board_view);
+        mBoardView = (BoardView) view.findViewById(R.id.board_view);
         mBoardView.setSnapToColumnsWhenScrolling(true);
         mBoardView.setSnapToColumnWhenDragging(true);
         mBoardView.setSnapDragItemToTouch(true);
         mBoardView.setCustomDragItem(new MyDragItem(getActivity(), R.layout.column_item));
-        mBoardView.setBoardListener(new m.mcoupledate.BoardView.BoardListener() {
+        mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
                 Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
@@ -199,7 +197,7 @@ public class BoardFragment extends Fragment {
         mColumns++;
     }
 
-    private static class MyDragItem extends m.mcoupledate.DragItem {
+    private static class MyDragItem extends DragItem {
 
         public MyDragItem(Context context, int layoutId) {
             super(context, layoutId);

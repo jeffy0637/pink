@@ -42,7 +42,7 @@
         <FrameLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/newSiteMap"
+            android:id="@+id/editSiteMap"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="300dp"
@@ -63,56 +63,169 @@
         </FrameLayout>
 
 
-
-        <EditText
+        <!--name-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="名稱"
-            android:ems="10"
-            android:id="@+id/sName"
-            android:layout_below="@+id/newSiteMap"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/editSiteMap"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true">
 
-        <EditText
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_name"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_name"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_add_new"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="@string/site_name"
+                    android:ems="10"
+                    android:id="@+id/sName"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+        <!--description-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:id="@+id/description"
-            android:layout_below="@+id/sName"
+            android:layout_below="@+id/layout_newsite_name"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:hint="描述" />
+            android:longClickable="false"
+            android:minHeight="@dimen/info_layout_height">
 
-        <EditText
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_desc"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_desc"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/info_2"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_desc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:hint="@string/site_desc"
+                    android:id="@+id/description"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+        <!--address-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_address"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:id="@+id/address"
-            android:layout_below="@+id/description"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:hint="地址" />
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_desc"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_address"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_location"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/location"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_address"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="@string/site_address"
+                    android:ems="10"
+                    android:id="@+id/address"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--address-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_city_area"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_address"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_city_area"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_city_area"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/location"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_city_area"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:text="高雄市 鹽埕區"
+                    android:id="@+id/city_area"
+                    android:layout_gravity="center"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cityAreaInputBtn"
+                    android:src="@drawable/edit"
+                    android:background="#00ffffff" />
+            </FrameLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/selectSiteClass_allSiteText"
-            android:layout_below="@+id/address">
+            android:layout_below="@+id/layout_newsite_city_area">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
-                android:text="大行政區"
+                android:text="@string/select_region_dialog_title_city"
                 android:id="@+id/selectCity" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
-                android:text="小行政區"
+                android:text="@string/select_region_dialog_title_area"
                 android:id="@+id/selectArea" />
 
         </LinearLayout>
@@ -128,92 +241,275 @@
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
-                android:text="時段"
+                android:text="@string/select_region_dialog_title_time"
                 android:id="@+id/selectTime" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
-                android:text="種類"
+                android:text="@string/select_region_dialog_title_catagory"
                 android:id="@+id/selectFoodKind" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="34dp"
                 android:layout_weight="1"
-                android:text="口味"
+                android:text="@string/selectCountry"
                 android:id="@+id/selectCountry" />
 
         </LinearLayout>
 
-
-
-        <EditText
+        <!--phone-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_phone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:hint="電話"
-            android:ems="10"
-            android:id="@+id/phone"
+            android:layout_height="@dimen/info_layout_height"
             android:layout_below="@+id/selectSiteClass_restaurantText"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/transportation"
-            android:hint="交通方式"
-            android:layout_below="@+id/phone"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_phone"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_phone"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_phone"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_phone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:hint="@string/site_phone"
+                    android:ems="10"
+                    android:id="@+id/phone"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
 
-        <EditText
+        <!--open time-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_time"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="email"
-            android:ems="10"
-            android:id="@+id/email"
-            android:layout_below="@+id/transportation"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_phone"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:hint="網站"
-            android:ems="10"
-            android:id="@+id/website"
-            android:layout_below="@+id/email"
-            android:layout_alignRight="@+id/email"
-            android:layout_alignEnd="@+id/email" />
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_time"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_time"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_time"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_time"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:id="@+id/time"
+                    android:layout_gravity="center"/>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/activity"
-            android:hint="活動"
-            android:layout_below="@+id/website"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timeInputBtn"
+                    android:src="@drawable/edit"
+                    android:background="#00ffffff" />
+            </FrameLayout>
+        </LinearLayout>
 
-        <EditText
+        <!--transportation-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_trans"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/note"
-            android:hint="備註"
-            android:layout_below="@+id/activity"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_time"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_trans"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_trans"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_trans"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_trans"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:hint="@string/transportation"
+                    android:ems="10"
+                    android:id="@+id/transportation"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--Email-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_email"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_trans"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_email"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_email"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_email"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_email"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/email"
+                    android:ems="10"
+                    android:id="@+id/email"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--Web-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_website"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_email"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_website"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_website"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_web"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_website"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/website"
+                    android:ems="10"
+                    android:id="@+id/website"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--Activity-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_activity"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_website"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_activity"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_activity"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_pricetag"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_activity"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:hint="@string/activity"
+                    android:ems="10"
+                    android:id="@+id/activity"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--Note-->
+        <LinearLayout
+            android:id="@+id/layout_newsite_note"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/info_layout_height"
+            android:layout_below="@+id/layout_newsite_activity"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_note"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_note"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_quote"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_newsite_note"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:hint="@string/note"
+                    android:ems="10"
+                    android:id="@+id/note"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+        </LinearLayout>
+
 
 
         <m.mcoupledate.classes.ResponsiveGridView
@@ -221,7 +517,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/uploadPics"
             android:numColumns="3"
-            android:layout_below="@+id/note"
+            android:layout_below="@+id/layout_newsite_note"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:visibility="visible" />

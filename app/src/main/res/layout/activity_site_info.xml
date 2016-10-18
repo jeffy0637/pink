@@ -89,7 +89,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="加入收藏"
+                android:text="@string/addToFavorite"
+                android:background="@drawable/circle_corner_button_selector"
                 android:id="@+id/addLikeBtn"
                 android:layout_weight="1" />
 
@@ -97,9 +98,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="加入行程"
+                android:background="@color/transparent"
+                android:text="@string/joinMyTrip"
+                android:scaleType="centerInside"
                 android:id="@+id/addTravelBtn"
-                android:layout_weight="1" />
+                android:layout_weight="1"/>
 
         </LinearLayout>
 
@@ -156,7 +159,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_time"
-                    android:src="@drawable/clock"
+                    android:src="@drawable/ic_time"
                     android:layout_gravity="center" />
             </FrameLayout>
 
@@ -193,7 +196,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_description"
-                    android:src="@drawable/info_2"
+                    android:src="@drawable/ic_info"
                     android:layout_gravity="center" />
             </FrameLayout>
 
@@ -229,7 +232,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_phone"
-                    android:src="@drawable/phone"
+                    android:src="@drawable/ic_phone"
                     android:layout_gravity="center" />
             </FrameLayout>
 
@@ -272,7 +275,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_website"
-                    android:src="@drawable/web"
+                    android:src="@drawable/ic_web"
                     android:layout_gravity="center" />
             </FrameLayout>
 
@@ -342,7 +345,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_activity"
-                    android:src="@drawable/avtivity"
+                    android:src="@drawable/ic_pricetag"
                     android:layout_gravity="center" />
 
             </FrameLayout>
@@ -377,7 +380,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/icon_note"
-                    android:src="@drawable/note"
+                    android:src="@drawable/ic_quote"
                     android:layout_gravity="center" />
 
             </FrameLayout>

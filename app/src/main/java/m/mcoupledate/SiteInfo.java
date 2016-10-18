@@ -157,7 +157,7 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
             {
                 Intent i = new Intent(SiteInfo.this, EditSite.class);
                 i.putExtra("sId", sId);
-                i.putExtra("siteType", siteTypeName.substring(0));
+                i.putExtra("siteType", siteTypeName.split("")[0]);
                 i.putExtra("picId", picId);
                 startActivity(i);
             }
@@ -367,12 +367,14 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
     private void printPicture(String id)
     {
         int seq = 97;
-        int picNum = 4; //  (寫死)
+        int picNum = getResources().getInteger(R.integer.sitePicMaxLimit);
 
         while (picNum>0)
         {
+            String url = pinkCon + "images/sitePic/" + id + (char)(seq) +".jpg";
+//            Log.d("sitePicUrl", url);
             Glide.with(SiteInfo.this)
-                    .load(pinkCon + "images/sitePic/" + id + (char)(seq) +".jpg")
+                    .load(url)
                     .asBitmap()
                     .into(new SimpleTarget<Bitmap>(Resources.getSystem().getDisplayMetrics().widthPixels, 300)
                           {

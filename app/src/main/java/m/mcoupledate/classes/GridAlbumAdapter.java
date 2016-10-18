@@ -35,6 +35,7 @@ public class GridAlbumAdapter extends BaseAdapter {
         HashMap<String, Object> pic = new HashMap<String, Object>();
         pic.put("bitmap", bitmap);
         pic.put("path", path);
+        pic.put("seq", (char) (97+this.album.size()+1));
 
         this.album.add(pic);
 

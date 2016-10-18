@@ -5,10 +5,12 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,6 +44,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -71,8 +76,10 @@ import m.mcoupledate.classes.ClusterMapFragmentActivity;
 import m.mcoupledate.classes.ClusterSite;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.GridAlbumAdapter;
+import m.mcoupledate.classes.InputDialogManager;
 import m.mcoupledate.classes.LockableScrollView;
 import m.mcoupledate.classes.ResponsiveGridView;
+import m.mcoupledate.classes.TimeInputEditText;
 import m.mcoupledate.classes.WorkaroundMapFragment;
 import m.mcoupledate.funcs.AuthChecker6;
 import m.mcoupledate.funcs.PinkErrorHandler;
@@ -80,8 +87,7 @@ import m.mcoupledate.funcs.PinkErrorHandler;
 public class EditSite extends ClusterMapFragmentActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMapLongClickListener,
-        View.OnClickListener,
-        GoogleMap.OnInfoWindowClickListener {
+        View.OnClickListener {
 
     SharedPreferences pref;
     SharedPreferences.Editor prefEditor;
@@ -89,15 +95,12 @@ public class EditSite extends ClusterMapFragmentActivity implements
     private LockableScrollView scrollView;
 
     private GoogleMap mMap;
-//    private ClusterManager<ClusterSite> mClusterManager;
-
-    private final int REQ_INIT_MYLOCATION = 235;
-    private final int REQ_GET_MYPOSITION = 236;
 
     RequestQueue mQueue;
     String pinkCon = "http://140.117.71.216/pinkCon/";
 
     Intent intent;
+    Boolean ifEditting = false;
 
     private AuthChecker6 mapChecker;    //  用來檢查android 6權限和定位功能是否開啟
 
@@ -106,24 +109,20 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
 
     private Map<String, EditText> input;    //  輸入欄位的map
+    private ImageButton cityAreaInputBtn, timeInputBtn;
+    private InputDialogManager cityAreaInputDialogManager, restaurantClassessInputDialogManager, timeInputDialogManager;
 
 
     //  搜尋地圖
-    private ListView searchMapSuggestion;
-    private Button searchMap, searchMapMaskBack, searchMapQueryClean;
+    private ListView searchMapSuggestionList;
+    private Button searchMapBtn, searchMapMaskBackBtn, searchMapQueryCleanBtn;
     private LinearLayout searchMapMask;
     private EditText searchMapQuery;
 
     ArrayAdapter<String> searchMapAdapter;
-    ArrayList<String> suggestions;
+    ArrayList<String> searchMapSuggestions;
 
-    private Marker suggestMarker = null;
-    private String suggestAddress = "";     //  利用input查詢到的地址存於此，submit時將此送出為地址
-    private LatLng newSiteLatLng = null;    //  查到的地點的LatLng ，submit時將此送出為Py, Px
-
-    private final int TOTAG__PLACE = 1, DEFAULT_GESTURE = 0;
-    private int cameraMoveType = DEFAULT_GESTURE;   //  移動地圖camera時，記錄是程式移動或使用者移動，判斷該否先清空cluster
-
+    private Marker inputMarker = null;
 
     private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2, SITECLASS_TIME = 3, SITECLASS_FOODKIND = 4, SITECLASS_COUNTRY = 5;
     private SparseArray<HashMap<String, View>> siteClassViews = new SparseArray<HashMap<String, View>>();
@@ -170,7 +169,7 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
         scrollView = (LockableScrollView) findViewById(R.id.scrollView);
 
-        WorkaroundMapFragment mapFragment = getMapFragment(R.id.newSiteMap);
+        WorkaroundMapFragment mapFragment = getMapFragment(R.id.editSiteMap);
         mapFragment.setListener(new WorkaroundMapFragment.OnTouchListener() {
             @Override
             public void onTouch() {
@@ -225,13 +224,13 @@ public class EditSite extends ClusterMapFragmentActivity implements
             public void onAnimationRepeat(Animation animation) {}
         });
 
-        suggestions = new ArrayList<String>();
-        searchMapAdapter = new ArrayAdapter<String>(this , android.R.layout.simple_list_item_1 ,suggestions);
+        searchMapSuggestions = new ArrayList<String>();
+        searchMapAdapter = new ArrayAdapter<String>(this , android.R.layout.simple_list_item_1 , searchMapSuggestions);
 
 
-        searchMapSuggestion = (ListView)findViewById(R.id.searchMapSuggestion);
-        searchMapSuggestion.setAdapter(searchMapAdapter);
-        searchMapSuggestion.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        searchMapSuggestionList = (ListView)findViewById(R.id.searchMapSuggestion);
+        searchMapSuggestionList.setAdapter(searchMapAdapter);
+        searchMapSuggestionList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3)
@@ -241,9 +240,6 @@ public class EditSite extends ClusterMapFragmentActivity implements
                 if (suggestionList.getItemAtPosition(arg2).toString().compareTo("查無結果")==0)
                     return ;
 
-                //  當使用者點擊listItem時，將建議填入搜尋框，設status為0，避免填入時被onTextChanged重新要求
-//                searchSuggestionStatus = FROM_SUGGESTIONLIST;
-//                searchMapQuery.setText(suggestionList.getItemAtPosition(arg2).toString());
                 searchMapLocatePlace(suggestionList.getItemAtPosition(arg2).toString());
 
                 searchMapMask.startAnimation(searchMapMaskOut);
@@ -274,22 +270,22 @@ public class EditSite extends ClusterMapFragmentActivity implements
                                     if (o.optString("status").compareTo("OK") == 0)
                                     {
                                         JSONArray jArr = o.getJSONArray("predictions");
-                                        suggestions.clear();
+                                        searchMapSuggestions.clear();
 
                                         for (int a = 0; a < jArr.length(); ++a)
-                                            suggestions.add(String.valueOf(jArr.getJSONObject(a).optString("description")));
+                                            searchMapSuggestions.add(String.valueOf(jArr.getJSONObject(a).optString("description")));
 
                                         searchMapAdapter.notifyDataSetChanged();
                                     }
                                     else if (searchMapQuery.getText().toString().compareTo("")==0)
                                     {
-                                        suggestions.clear();
+                                        searchMapSuggestions.clear();
                                         searchMapAdapter.notifyDataSetChanged();
                                     }
                                     else
                                     {
-                                        suggestions.clear();
-                                        suggestions.add("查無結果");
+                                        searchMapSuggestions.clear();
+                                        searchMapSuggestions.add("查無結果");
                                         searchMapAdapter.notifyDataSetChanged();
                                     }
 
@@ -319,8 +315,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
 
         searchMapMask = (LinearLayout) findViewById(R.id.searchMapMask);
-        searchMap = (Button) findViewById(R.id.searchMap);
-        searchMap.setOnClickListener(new View.OnClickListener() {
+        searchMapBtn = (Button) findViewById(R.id.searchMap);
+        searchMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 searchMapMask.setVisibility(View.VISIBLE);
@@ -330,8 +326,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
             }
         });
 
-        searchMapMaskBack = (Button) findViewById(R.id.searchMapMaskBack);
-        searchMapMaskBack.setOnClickListener(new View.OnClickListener() {
+        searchMapMaskBackBtn = (Button) findViewById(R.id.searchMapMaskBack);
+        searchMapMaskBackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 keyboard.hideSoftInputFromWindow(windowToken, 0);
@@ -340,8 +336,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
             }
         });
 
-        searchMapQueryClean = (Button)findViewById(R.id.searchMapQueryClean);
-        searchMapQueryClean.setOnClickListener(this);
+        searchMapQueryCleanBtn = (Button)findViewById(R.id.searchMapQueryClean);
+        searchMapQueryCleanBtn.setOnClickListener(this);
         /*       以上 -> 動態搜尋地圖       */
 
 
@@ -383,11 +379,115 @@ public class EditSite extends ClusterMapFragmentActivity implements
         }
 
 
+        cityAreaInputDialogManager = new InputDialogManager(EditSite.this, R.layout.dialog_content_select_city_area_classes, "區域類別");
+
+        cityAreaInputBtn = (ImageButton) findViewById(R.id.cityAreaInputBtn);
+        cityAreaInputBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cityAreaInputDialogManager.dialog.show();
+            }
+        });
+
+
+
+
+        timeInputDialogManager = new InputDialogManager(EditSite.this, R.layout.dialog_time_input, "營業時間"){
+            @Override
+            protected void initContent()
+            {
+                final SparseArray extraBtnTargetIds = new SparseArray<Integer>();
+                extraBtnTargetIds.put(R.id.w1_extra, R.id.w1_2);
+                extraBtnTargetIds.put(R.id.w2_extra, R.id.w2_2);
+                extraBtnTargetIds.put(R.id.w3_extra, R.id.w3_2);
+                extraBtnTargetIds.put(R.id.w4_extra, R.id.w4_2);
+                extraBtnTargetIds.put(R.id.w5_extra, R.id.w5_2);
+                extraBtnTargetIds.put(R.id.w6_extra, R.id.w6_2);
+                extraBtnTargetIds.put(R.id.w7_extra, R.id.w7_2);
+
+                Button.OnClickListener extraBtnListener = new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        LinearLayout extraBtnTarget = (LinearLayout) dialogContent.findViewById((Integer) extraBtnTargetIds.get(view.getId()));
+                        if (extraBtnTarget.getVisibility()==View.GONE)
+                        {
+                            ((Button)view).setText("✖");
+                            extraBtnTarget.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            ((Button)view).setText("✚");
+                            extraBtnTarget.setVisibility(View.GONE);
+                            ((TimeInputEditText) extraBtnTarget.getChildAt(1)).setText("");
+                            ((TimeInputEditText) extraBtnTarget.getChildAt(3)).setText("");
+                        }
+                    }
+                };
+
+                for (int a=0; a<extraBtnTargetIds.size(); ++a)
+                    ((Button) dialogContent.findViewById(extraBtnTargetIds.keyAt(a))).setOnClickListener(extraBtnListener);
+
+                TimeInputEditText[][][] inputs = {
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w1_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w1_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w1_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w1_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w2_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w2_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w2_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w2_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w3_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w3_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w3_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w3_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w4_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w4_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w4_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w4_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w5_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w5_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w5_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w5_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w6_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w6_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w6_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w6_end2)}},
+                        {{(TimeInputEditText) dialogContent.findViewById(R.id.w7_start1), (TimeInputEditText) dialogContent.findViewById(R.id.w7_end1)}, {(TimeInputEditText) dialogContent.findViewById(R.id.w7_start2), (TimeInputEditText) dialogContent.findViewById(R.id.w7_end2)}},
+                };
+                vars.put("inputIds", inputs);
+
+            }
+
+            @Override
+            public String getInputsData() throws JSONException
+            {
+                JSONArray openTimeJArr = new JSONArray();
+                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
+                {
+                    JSONArray weekDayJArr = new JSONArray();
+                    for (TimeInputEditText[] period : weekDayInputs)
+                    {
+                        JSONObject onePeriod = new JSONObject();
+                        onePeriod.put("start_time", period[0].getText().toString());
+                        onePeriod.put("end_time", period[1].getText().toString());
+
+                        weekDayJArr.put(onePeriod);
+                    }
+                    openTimeJArr.put(weekDayJArr);
+                }
+
+                return openTimeJArr.toString();
+            }
+
+            @Override
+            protected  void onCancel()
+            {
+                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
+                {
+                    for (TimeInputEditText[] period : weekDayInputs)
+                    {
+                        period[0].setText("");
+                        period[1].setText("");
+                    }
+                }
+            }
+        };
+        timeInputBtn = (ImageButton) findViewById(R.id.timeInputBtn);
+        timeInputBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timeInputDialogManager.dialog.show();
+            }
+        });
+
+
+
 
         uploadPicsAlbum = (GridView) findViewById(R.id.uploadPics);
         gaAdapter = new GridAlbumAdapter(EditSite.this);
         uploadPicsAlbum.setAdapter(gaAdapter);
-
 
         //-------------------------------------飛-----------------------------------------
         uploadPic_album = (ImageButton) findViewById(R.id.uploadPic_album);
@@ -443,7 +543,6 @@ public class EditSite extends ClusterMapFragmentActivity implements
         mMap = googleMap;
 
         mMap.setOnMapLongClickListener(this);
-        mMap.setOnInfoWindowClickListener(this);
 
         setUpClusterMap(EditSite.this, mMap);
 
@@ -463,20 +562,17 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
 
         if (intent.getStringExtra("sId")!=null)
+        {
+            ifEditting = true;
             initEdittedSite(intent.getStringExtra("sId"));
+        }
     }
 
 
     @Override
     public void onMapLongClick(LatLng latLng)
     {
-        if (suggestMarker!=null)
-            suggestMarker.remove();
-
-        cameraMoveType = TOTAG__PLACE;
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, (mMap.getMaxZoomLevel()-8)));
-        suggestMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("✓ 點擊確認新增"));
-        suggestMarker.showInfoWindow();
+        addInputMarker(latLng, null);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://maps.googleapis.com/maps/api/geocode/json?latlng="+String.valueOf(latLng.latitude)+","+String.valueOf(latLng.longitude)+"&result_type=street_address&language=zh-TW&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg",
                 new Response.Listener<String>() {
@@ -487,9 +583,11 @@ public class EditSite extends ClusterMapFragmentActivity implements
                         {
                             JSONArray jArr = new JSONObject(response).getJSONArray("results");
 
+                            input.get("sName").setText(jArr.getJSONObject(0).optString("name"));
                             input.get("address").setText(jArr.getJSONObject(0).optString("formatted_address"));
 
                         } catch (JSONException e) {
+                            input.get("sName").setText("");
                             input.get("address").setText("");
                         }
 
@@ -511,9 +609,6 @@ public class EditSite extends ClusterMapFragmentActivity implements
     public void markClusterSites(LatLng latlng)
     {
         //  以 cluster 印出 latlng 附近的景點
-
-        cameraMoveType = DEFAULT_GESTURE;  //   判斷完後先改回預設
-
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, pinkCon+"getAroundSites.php?lat="+latlng.latitude+"&lng="+latlng.longitude,
                 new Response.Listener<String>() {
@@ -607,8 +702,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
             /*       ↑       飛       ↑       */
 
 
-            case REQ_INIT_MYLOCATION:
-            case REQ_GET_MYPOSITION:
+            case AuthChecker6.REQ_INIT_MYLOCATION:
+            case AuthChecker6.REQ_GET_MYPOSITION:
                 mapChecker.checkMapMyLocation(mMap);
                 break;
         }
@@ -659,20 +754,13 @@ public class EditSite extends ClusterMapFragmentActivity implements
                             {
                                 JSONObject place = o.getJSONArray("results").getJSONObject(0);
 
-                                suggestAddress = place.optString("formatted_address");
-                                JSONObject placeLocation = place.getJSONObject("geometry").getJSONObject("location");
+                                input.get("address").setText(place.optString("formatted_address"));
+                                input.get("sName").setText(place.optString("name"));
 
+                                JSONObject placeLocation = place.getJSONObject("geometry").getJSONObject("location");
                                 LatLng placeLatLng = new LatLng(placeLocation.optDouble("lat"), placeLocation.optDouble("lng"));
 
-                                if (suggestMarker!=null)
-                                    suggestMarker.remove();
-
-                                suggestMarker = mMap.addMarker(new MarkerOptions().position(placeLatLng).title("✓ 點擊確認新增").snippet(place.optString("name")));
-
-                                suggestMarker.showInfoWindow();
-                                cameraMoveType = TOTAG__PLACE;
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, (mMap.getMaxZoomLevel()-8)));
-
+                                addInputMarker(placeLatLng, place.optString("name"));
                             }
                             else
                             {
@@ -693,6 +781,23 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
     }
 
+    private void addInputMarker(LatLng inputLatLng, String title)
+    {
+        if (inputMarker!=null)
+            inputMarker.remove();
+
+        float zoomLevel = 0;
+        if (mMap.getCameraPosition().zoom<(mMap.getMaxZoomLevel()-8))
+            zoomLevel = mMap.getMaxZoomLevel()-8;
+        else
+            zoomLevel = mMap.getCameraPosition().zoom;
+
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(inputLatLng, zoomLevel));
+        inputMarker = mMap.addMarker(new MarkerOptions().position(inputLatLng).title(title).icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
+        inputMarker.showInfoWindow();
+    }
+
 
     private void submit()
     {
@@ -700,17 +805,20 @@ public class EditSite extends ClusterMapFragmentActivity implements
         if (checkForm(input)==false)
             return ;
 
-        final String Py = String.valueOf(newSiteLatLng.latitude);
-        final String Px = String.valueOf(newSiteLatLng.longitude);
+        final String Py = String.valueOf(inputMarker.getPosition().latitude);
+        final String Px = String.valueOf(inputMarker.getPosition().longitude);
 
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"addNewSite.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"editSite_editSite.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
                     {
-                        Log.d("HFSUBMITRESPONSE", response);
-                        Toast.makeText(EditSite.this, "新增成功", Toast.LENGTH_SHORT).show();
+//                        Log.d("HFSUBMITRESPONSE", response);
+                        if (ifEditting==false)
+                            Toast.makeText(EditSite.this, "新增成功", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(EditSite.this, "修改成功", Toast.LENGTH_SHORT).show();
 
                         /*       ↓       飛       ↓       */
                         final String id = response;
@@ -718,10 +826,10 @@ public class EditSite extends ClusterMapFragmentActivity implements
                         dialog = ProgressDialog.show(EditSite.this, "", "Uploading file...", true);
                         new Thread(new Runnable() {
                             public void run() {
-                                int seq = 97;
                                 for (HashMap<String, Object> pic : gaAdapter.album)
                                 {
-                                    uploadFile((String) pic.get("path"), (char)(seq++), id);
+                                    if (pic.get("path")!=null)
+                                        uploadFile((String) pic.get("path"), (char) pic.get("seq"), id);
                                 }
                                 dialog.dismiss();
                                 EditSite.this.finish();
@@ -745,7 +853,7 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
                 map.put("sName", input.get("sName").getText().toString());
                 map.put("description", input.get("description").getText().toString());
-                map.put("address", input.get("address").toString());
+                map.put("address", input.get("address").getText().toString());
                 map.put("phone", input.get("phone").getText().toString());
                 map.put("transportation", input.get("transportation").getText().toString());
                 map.put("email", input.get("email").getText().toString());
@@ -764,6 +872,19 @@ public class EditSite extends ClusterMapFragmentActivity implements
                     map.put("time", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
                     map.put("country", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
                     map.put("food_kind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
+                    Log.d("HFPOSTTESTtime", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
+                    Log.d("HFPOSTTESTcountry", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
+                    Log.d("HFPOSTTESTfoodkind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
+                }
+
+                if (ifEditting==false)
+                {
+                    map.put("editType", "new");
+                }
+                else
+                {
+                    map.put("editType", "edit");
+                    map.put("sId", intent.getStringExtra("sId"));
                 }
 
                 return map;
@@ -775,28 +896,29 @@ public class EditSite extends ClusterMapFragmentActivity implements
     }
 
 
-    @Override
-    public void onInfoWindowClick(Marker marker)
-    {
-        //  若點擊到marker是suggestMarker則點擊是為確認地點
-        if (marker.getId().compareTo(suggestMarker.getId())==0)
-        {
-            newSiteLatLng = suggestMarker.getPosition();
-            marker.hideInfoWindow();
-            marker.setTitle(null);
-
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_48dp));
-
-            input.get("sName").setText(marker.getSnippet());
-            input.get("address").setText(suggestAddress);
-        }
-    }
+//    @Override
+//    public void onInfoWindowClick(Marker marker)
+//    {
+//        //  若點擊到marker是suggestMarker則點擊是為確認地點
+//        if (marker.getId().compareTo(suggestMarker.getId())==0)
+//        {
+//            LatLng inputLatLng = suggestMarker.getPosition();
+//            suggestMarker.remove();
+//
+//            inputMarker = mMap.addMarker(new MarkerOptions().position(inputLatLng).title(suggestMarker.getSnippet())
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_48dp)));
+//
+//
+//            input.get("sName").setText(marker.getSnippet());
+//            input.get("address").setText(suggestAddress);
+//        }
+//    }
 
 
     private Boolean checkForm(Map<String, EditText> input)
     {
         Boolean status = true;
-        String[] notNullFields = {"sName", "description"};
+        String[] notNullFields = {"sName", "description", "address"};
         String msg = "請填寫以下欄位";
 
         for (String field : notNullFields)
@@ -809,7 +931,7 @@ public class EditSite extends ClusterMapFragmentActivity implements
             }
         }
 
-        if (newSiteLatLng == null)
+        if (inputMarker == null)
         {
             status = false;
             msg += "\n並在地圖上選擇地點";
@@ -959,31 +1081,49 @@ public class EditSite extends ClusterMapFragmentActivity implements
 
                             final JSONObject site = o.getJSONArray("site").getJSONObject(0);
 
-                            String[] siteColName = {"sName", "area", "address", "description", "phone", "website", "transportation", "activity", "note"};
+                            String[] siteColName = {"sName", "description", "address", "phone", "transportation", "email", "website", "activity", "note"};
                             for (String colName : siteColName)
                             {
-                                input.get(colName).setText(site.optString(colName));
+                                if (site.optString(colName)!=null)
+                                    input.get(colName).setText(site.optString(colName));
                             }
-
-//
-//                            String time = "";
-//                            String[] weekDays = {"一", "二", "三", "四", "五", "六", "日"};
-//                            for(int i = 0 ; i < o.getJSONArray("business_hours").length() ; i++)
-//                            {
-//                                time += "("+ weekDays[i] +")  " + o.getJSONArray("business_hours").getJSONObject(i).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(i).optString("end_time")+"\n";
-//                            }
-//                            siteCol.get("time").setText(time);
-
 
 
                             LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
 
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
+                            addInputMarker(siteLatLng, site.optString("sName"));
 
 
-                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_beenhere_black_48dp)));
+                            int seq = 97;
+                            int picNum = getResources().getInteger(R.integer.sitePicMaxLimit);
 
+                            while(picNum>0)
+                            {
+                                String url = pinkCon + "images/sitePic/" + o.getJSONArray("diffSite").getJSONObject(0).optString("picId") + (char)(seq) +".jpg";
+                                Log.d("sitePicUrl", url);
+                                Glide.with(EditSite.this)
+                                        .load(url)
+                                        .asBitmap()
+                                        .into(new SimpleTarget<Bitmap>(Resources.getSystem().getDisplayMetrics().widthPixels, 300)
+                                              {
+                                                  @Override
+                                                  public void onResourceReady(Bitmap bitmap, GlideAnimation anim)
+                                                  {
+                                                      gaAdapter.add(bitmap, null);
+                                                  }
+                                                  @Override
+                                                  public void onLoadFailed(Exception e, Drawable errorDrawable)
+                                                  {
+                                                      Log.d("HFGLIDEERROR", e.getMessage());
+                                                  }
+
+                                              }
+                                        );
+
+                                ++seq;
+                                --picNum;
+
+                            }
 
                         }
                         catch (Exception e) {
@@ -1010,6 +1150,8 @@ public class EditSite extends ClusterMapFragmentActivity implements
         mQueue.add(stringRequest);
 
     }
+
+
 
 
 

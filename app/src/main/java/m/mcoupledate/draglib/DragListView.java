@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package m.mcoupledate;
+package m.mcoupledate.draglib;
+
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import m.mcoupledate.R;
 
 public class DragListView extends FrameLayout {
 

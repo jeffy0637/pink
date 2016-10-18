@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package m.mcoupledate;
+package m.mcoupledate.draglib;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;

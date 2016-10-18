@@ -1,13 +1,18 @@
 package m.mcoupledate;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -38,6 +43,7 @@ public class ModifyMemorialDay extends AppCompatActivity {
         cursor.moveToFirst();
         do{
             if(cursor.getCount() != 0){
+                int id = Integer.parseInt(cursor.getString(0));
                 String name = cursor.getString(1);
                 String theDay = cursor.getString(2);
                 DateFormat stringFormatter = new SimpleDateFormat("yyyy-MM-dd");//要轉成String的
@@ -67,12 +73,12 @@ public class ModifyMemorialDay extends AppCompatActivity {
                 if(Integer.valueOf(theDay.substring(5, 7)) > Integer.valueOf(today.substring(5, 7))){//月大於 日就不用比了
                     long diff = d2.getTime() - d1.getTime();
                     String diffstr = "" + diff/(1000*60*60*24);
-                    init(name, theDay, Math.abs(Integer.valueOf(diffstr)));
+                    init(id,name, theDay, Math.abs(Integer.valueOf(diffstr)));
                 }
                 else if(Integer.valueOf(theDay.substring(5, 7)) == Integer.valueOf(today.substring(5, 7)) && Integer.valueOf(theDay.substring(8, 10)) >= Integer.valueOf(today.substring(8, 10))){//月等於 比日
                     long diff = d2.getTime() - d1.getTime();
                     String diffstr = "" + diff/(1000*60*60*24);
-                    init(name, theDay, Math.abs(Integer.valueOf(diffstr)));
+                    init(id,name, theDay, Math.abs(Integer.valueOf(diffstr)));
                 }
                 else if(Integer.valueOf(theDay.substring(5, 7)) < Integer.valueOf(today.substring(5, 7))){//月小於  年+1
                     try{
@@ -84,7 +90,7 @@ public class ModifyMemorialDay extends AppCompatActivity {
                     }
                     long diff = d2.getTime() - d1.getTime();
                     String diffstr = "" + diff/(1000*60*60*24);
-                    init(name, theDay, Math.abs(Integer.valueOf(diffstr)));
+                    init(id,name, theDay, Math.abs(Integer.valueOf(diffstr)));
                 }
                 else if(Integer.valueOf(theDay.substring(5, 7)) == Integer.valueOf(today.substring(5, 7)) && Integer.valueOf(theDay.substring(8, 10)) < Integer.valueOf(today.substring(8, 10))){//月等於 日小於  年+1
                     try{
@@ -96,14 +102,14 @@ public class ModifyMemorialDay extends AppCompatActivity {
                     }
                     long diff = d2.getTime() - d1.getTime();
                     String diffstr = "" + diff/(1000*60*60*24);
-                    init(name, theDay, Math.abs(Integer.valueOf(diffstr)));
+                    init(id,name, theDay, Math.abs(Integer.valueOf(diffstr)));
                 }
             }
         }while(cursor.moveToNext());
     }
 
     //新增單筆紀念日資料
-    public void init(String name, String date, int diff)
+    public void init(int id, final String name, String date, int diff)
     {
         String diffDay = Integer.toString(diff);
         LinearLayout linearLayout1=(LinearLayout)findViewById(R.id.activity_service_select);
@@ -113,11 +119,54 @@ public class ModifyMemorialDay extends AppCompatActivity {
         TextView tv1 = (TextView) view.findViewById(R.id.m_context);
         TextView tv2 = (TextView) view.findViewById(R.id.m_day);
         TextView tv3 = (TextView) view.findViewById(R.id.m_diffTime);
+        View edit = view.findViewById(R.id.edit);
+        View delete = view.findViewById(R.id.delete);
         tv1.setText(name);
         tv2.setText(date);
         tv3.setText(diffDay);
+        edit.setId(id);
+        delete.setId(id);
+
+        final int editID = edit.getId();
+        int deleteID = edit.getId();
+
         linearLayout1.addView(view);
+
+        edit.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                // TODO Auto-generated method stub
+                new AlertDialog.Builder(ModifyMemorialDay.this).setTitle(String.valueOf(editID))
+                        .setTitle("紀念日名稱")
+                        .setView(new EditText(ModifyMemorialDay.this))
+                        .setPositiveButton("确定", null).setNegativeButton("取消", null).show();
+            }
+        });
+
+        delete.setOnClickListener(new Button.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+
+                // TODO Auto-generated method stub
+                new AlertDialog.Builder(ModifyMemorialDay.this)
+                        .setTitle("你確定要刪除:"+name)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(ModifyMemorialDay.this, "已刪除", Toast.LENGTH_LONG)
+                                    .show();
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+
+
+            }
+        });
     }
+
+
 }
 /*改進
 原本是紀念日的藥不同顏色

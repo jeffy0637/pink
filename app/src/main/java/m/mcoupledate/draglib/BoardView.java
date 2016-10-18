@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package m.mcoupledate;
+package m.mcoupledate.draglib;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;

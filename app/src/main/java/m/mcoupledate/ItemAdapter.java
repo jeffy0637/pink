@@ -15,22 +15,24 @@
  */
 
 package m.mcoupledate;
+
 import android.support.v4.util.Pair;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
 import java.util.ArrayList;
 
-public class ItemAdapter extends m.mcoupledate.DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHolder> {
+import m.mcoupledate.draglib.DragItemAdapter;
+
+public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHolder> {
 
     private int mLayoutId;
     private int mGrabHandleId;
@@ -87,7 +89,7 @@ public class ItemAdapter extends m.mcoupledate.DragItemAdapter<Pair<Long, String
     /**
      * 抓到list的各個元素 TextView會在其他地方操作 button直接在這裡觸發事件
      */
-    public class ViewHolder extends m.mcoupledate.DragItemAdapter<Pair<Long, String>, ViewHolder>.ViewHolder {
+    public class ViewHolder extends DragItemAdapter<Pair<Long, String>, ViewHolder>.ViewHolder {
         public ImageButton carIcon;
         public TextView mText;
         public Button menu_button;

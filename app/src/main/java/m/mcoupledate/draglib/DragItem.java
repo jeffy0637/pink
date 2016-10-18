@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package m.mcoupledate;
+package m.mcoupledate.draglib;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;

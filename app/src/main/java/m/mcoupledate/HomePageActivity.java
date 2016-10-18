@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
@@ -34,8 +36,8 @@ public class HomePageActivity extends AppCompatActivity
 
     private String conAPI = "http://140.117.71.216/pinkCon/";
 
-   // private String id = MainActivity.getUserId();
-    private String id = "1763438647274913";
+    private String id = MainActivity.getUserId();
+
     private SQLiteDatabase db = null;
 
     //此TextView是靜態新增的
@@ -92,6 +94,11 @@ public class HomePageActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
+        TextView userId = (TextView) header.findViewById(R.id.userId);
+        userId.setText(id);
+        TextView name = (TextView) header.findViewById(R.id.userName);
+        name.setText("名字");
 
         //靜態
         totalDaysDialog = (TextView) findViewById(R.id.totalDaysDialog);
@@ -286,6 +293,11 @@ public class HomePageActivity extends AppCompatActivity
             startActivity(go2);
 
         } else if (id == R.id.nav_logout) {
+            FacebookSdk.sdkInitialize(getApplicationContext());
+            LoginManager.getInstance().logOut();
+            this.getSharedPreferences("pinkpink", 0).edit().clear().commit();
+            Intent go2 = new Intent(HomePageActivity.this, MainActivity.class);
+            startActivity(go2);
             //登出
 
         } else if (id == R.id.my_attraction) {
@@ -293,7 +305,7 @@ public class HomePageActivity extends AppCompatActivity
             go2.putExtra("sId", "7");
             startActivity(go2);
         } else if (id == R.id.my_restaurant) {
-            Intent go2 = new Intent(HomePageActivity.this, MyRestaurantActivity.class);
+            Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
             startActivity(go2);
         }
 

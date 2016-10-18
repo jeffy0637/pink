@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package m.mcoupledate;
+package m.mcoupledate.draglib;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
@@ -407,7 +407,7 @@ class DragItemRecyclerView extends RecyclerView implements AutoScroller.AutoScro
             @Override
             public void run() {
                 // Sometimes the holder will be null if a holder has not yet been set for the position
-                final RecyclerView.ViewHolder holder = findViewHolderForAdapterPosition(mDragItemPosition);
+                final ViewHolder holder = findViewHolderForAdapterPosition(mDragItemPosition);
                 if (holder != null) {
                     getItemAnimator().endAnimation(holder);
                     mDragItem.endDrag(holder.itemView, new AnimatorListenerAdapter() {

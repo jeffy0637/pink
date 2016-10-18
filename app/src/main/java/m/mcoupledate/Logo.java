@@ -20,8 +20,24 @@ public class Logo extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent().setClass(Logo.this, MainActivity.class));
-                Logo.this.finish();
+                try
+                {
+                    if (Logo.this.getSharedPreferences("pinkpink", 0).getString("mId", null)!=null)
+                    {
+                        startActivity(new Intent(Logo.this, HomePageActivity.class));
+                        Logo.this.finish();
+                    }
+                    else
+                    {
+                        throw new Exception("");
+                    }
+                }
+                catch(Exception e)
+                {
+                    startActivity(new Intent().setClass(Logo.this, MainActivity.class));
+                    Logo.this.finish();
+
+                }
             }
         }, 2000);
     }
