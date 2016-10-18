@@ -4,6 +4,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
 
+//更新後才加的
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
