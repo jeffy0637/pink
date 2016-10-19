@@ -96,7 +96,8 @@
             android:name=".SiteSearchActivity"
             android:label="@string/title_activity_site_search"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".StrokeActivity" />
+        <activity android:name=".StrokeActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".IversonTest" />
     </application>
 
