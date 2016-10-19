@@ -75,7 +75,7 @@ public class MyAttractionActivity extends AppCompatActivity {
     }
 
     private void initDropDownMenu() {
-        final View contentView = getLayoutInflater().inflate(R.layout.activity_site_contentview, null);
+        final View contentView = getLayoutInflater().inflate(R.layout.dropdownmenu_contentview, null);
 
         sites = new JSONArray();
         siteListAdapter = new SiteListAdapter(MyAttractionActivity.this, sites);
@@ -240,7 +240,7 @@ public class MyAttractionActivity extends AppCompatActivity {
     //設置搜尋按鈕
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.site_search, menu);
+        getMenuInflater().inflate(R.menu.topbar_search, menu);
 //        ((Toolbar)findViewById(R.id.action_check)).;
         return true;
     }
@@ -248,7 +248,7 @@ public class MyAttractionActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId()==R.id.searchSites) {
+        if (item.getItemId()==R.id.topbarSearch) {
 
             mDropDownMenu.closeMenu();
 

@@ -2,7 +2,6 @@ package m.mcoupledate.classes;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
@@ -13,9 +12,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,6 +30,31 @@ import m.mcoupledate.R;
 import m.mcoupledate.SiteAttractionActivity;
 import m.mcoupledate.SiteInfo;
 import m.mcoupledate.StrokeActivity;
+
+/**
+ *      用於左側選單，使用時只要 extends NavigationActivity即可
+ *
+ *      執行時若發生錯誤，先檢查AndroidManifest裡，該activity有沒有
+ *      android:theme="@style/AppTheme.NoActionBar
+ *      這個屬性，不行再跟我說
+ *
+ *
+ *      若需用到onBackPressed這條函式(按下手機上的返回鍵時觸發)
+ *      改Override  public Boolean onBackPressedAct() 這條
+ *      若在動作完成後不需再執行其他動作時return true，反則return false
+ *      可參考EditSite或SearchSites
+ *
+ *
+ *      若需要右上角出現圖示，例如搜尋
+ *      自行Override
+ *      public boolean onCreateOptionsMenu(Menu menu)
+ *      public boolean onOptionsItemSelected(MenuItem item)
+ *      若沒有用到的話，把原本activity裏頭的刪掉，因為有些activity預設會有他~~
+ *
+ *
+ *      相關的xml檔的命名都是 navigation_%
+ *      menu內容 -> menu / navigation_directmenu_drawer.xml
+ */
 
 public class NavigationActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,54 +83,57 @@ public class NavigationActivity extends AppCompatActivity
         pref = this.getSharedPreferences("pinkpink", 0);
 
         View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
-        ((TextView) header.findViewById(R.id.userName)).setText(getPref().getString("mName", null));
+        ((TextView) header.findViewById(R.id.userName)).setText(pref.getString("mName", null));
     }
 
     @Override
     public void setContentView(@LayoutRes int layoutId)
     {
-        ((RelativeLayout) findViewById(R.id.contentContainer)).addView(LayoutInflater.from(this).inflate(layoutId, null));
+        View contentView = LayoutInflater.from(this).inflate(layoutId, null);
+        contentView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
+
+        ((RelativeLayout) findViewById(R.id.contentContainer)).addView(contentView);
     }
 
-    public SharedPreferences getPref()
-    {   return pref;    }
-
-    public Editor getPrefEditor()
-    {   return pref.edit();    }
 
 
 
 
     @Override@CallSuper
+    /**
+         *      should not be override!!!!!!!  if want use ->  onBackPressedAct()
+         */
     public void onBackPressed()
     {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        else if (!onBackPressedAct())
             super.onBackPressed();
-        }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.navigation_topbar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        //noinspection SimplifiableIfStatement
-//        if (item.getItemId() == R.id.action_settings) {
-//            return true;
-//        }
-
-        return super.onOptionsItemSelected(item);
-    }
+    public Boolean onBackPressedAct()
+    {   return false;   }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+////        getMenuInflater().inflate(R.menu.navigation_topbar, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//
+//        //noinspection SimplifiableIfStatement
+////        if (item.getItemId() == R.id.action_settings) {
+////            return true;
+////        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

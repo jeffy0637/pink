@@ -82,4 +82,9 @@ public class ListDropDownAdapter extends BaseAdapter {
         this.list = list;
         this.notifyDataSetChanged();
     }
+
+    public String getCheckedItem()
+    {
+        return getItem(checkItemPosition);
+    }
 }

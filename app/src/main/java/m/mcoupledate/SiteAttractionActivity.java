@@ -45,7 +45,7 @@ public class SiteAttractionActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        View contentView = getLayoutInflater().inflate(R.layout.activity_site_contentview, null);
+        View contentView = getLayoutInflater().inflate(R.layout.dropdownmenu_contentview, null);
         mDropDownMenu.setDropDownMenu(Arrays.asList(headers), initViewData(), contentView);
         init();
         //该监听回调只监听默认类型，如果是自定义view请自行设置，参照demo
@@ -123,7 +123,7 @@ public class SiteAttractionActivity extends AppCompatActivity {
     //設置搜尋按鈕
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.site_search, menu);
+        getMenuInflater().inflate(R.menu.topbar_search, menu);
         return true;
     }
 
