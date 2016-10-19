@@ -8,7 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class StrokeActivity extends AppCompatActivity {
+import m.mcoupledate.classes.NavigationActivity;
+
+public class StrokeActivity extends NavigationActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
