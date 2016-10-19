@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="pinkCon">http://140.117.71.216/pinkCon/</string>
+
     <string name="app_name">mcoupledate</string>
     <string name="facebook_app_id">152132441862956</string>
     <string name="login">登入</string>
@@ -180,4 +183,6 @@
     <!--EditSite InputTimeDialog-->
     <string name="startTimeHint">00:00</string>
     <string name="endTimeHint">23:59</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="title_activity_nav">NavActivity</string>
 </resources>

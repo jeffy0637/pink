@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<m.mcoupledate.classes.LockableScrollView
+<m.mcoupledate.classes.customView.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
@@ -512,7 +512,7 @@
 
 
 
-        <m.mcoupledate.classes.ResponsiveGridView
+        <m.mcoupledate.classes.customView.ResponsiveGridView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/uploadPics"
@@ -563,14 +563,14 @@
             android:background="@color/white"
             android:visibility="gone">
 
-            <m.mcoupledate.classes.ResponsiveGridView
+            <m.mcoupledate.classes.customView.ResponsiveGridView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selectCityOptions"
                 android:numColumns="3"
                 android:visibility="gone" />
 
-            <m.mcoupledate.classes.ResponsiveGridView
+            <m.mcoupledate.classes.customView.ResponsiveGridView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selectAreaOptions"
@@ -589,7 +589,7 @@
             android:visibility="gone">
 
 
-            <m.mcoupledate.classes.ResponsiveGridView
+            <m.mcoupledate.classes.customView.ResponsiveGridView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selectTimeOptions"
@@ -597,14 +597,14 @@
                 android:visibility="gone" />
 
 
-            <m.mcoupledate.classes.ResponsiveGridView
+            <m.mcoupledate.classes.customView.ResponsiveGridView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selectFoodKindOptions"
                 android:numColumns="3"
                 android:visibility="gone" />
 
-            <m.mcoupledate.classes.ResponsiveGridView
+            <m.mcoupledate.classes.customView.ResponsiveGridView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/selectCountryOptions"
@@ -671,4 +671,4 @@
     </RelativeLayout>
 
 
-</m.mcoupledate.classes.LockableScrollView>
+</m.mcoupledate.classes.customView.LockableScrollView>

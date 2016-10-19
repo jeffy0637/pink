@@ -1,4 +1,4 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

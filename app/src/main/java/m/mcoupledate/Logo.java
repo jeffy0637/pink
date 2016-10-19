@@ -36,7 +36,6 @@ public class Logo extends AppCompatActivity {
                 {
                     startActivity(new Intent().setClass(Logo.this, MainActivity.class));
                     Logo.this.finish();
-
                 }
             }
         }, 2000);

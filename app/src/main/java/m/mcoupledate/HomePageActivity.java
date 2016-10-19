@@ -5,22 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
@@ -30,9 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import m.mcoupledate.classes.NavigationActivity;
 
-public class HomePageActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+
+public class HomePageActivity extends NavigationActivity {
 
     private String conAPI = "http://140.117.71.216/pinkCon/";
 
@@ -81,24 +72,6 @@ public class HomePageActivity extends AppCompatActivity
         mBottomBar.mapColorForTab(0, ContextCompat.getColor(this, R.color.colorAccent));
         mBottomBar.mapColorForTab(1, 0xFF5D4037);
         mBottomBar.mapColorForTab(2, "#7B1FA2");
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
-        TextView userId = (TextView) header.findViewById(R.id.userId);
-        userId.setText(id);
-        TextView name = (TextView) header.findViewById(R.id.userName);
-        name.setText("名字");
 
         //靜態
         totalDaysDialog = (TextView) findViewById(R.id.totalDaysDialog);
@@ -216,7 +189,7 @@ public class HomePageActivity extends AppCompatActivity
         String diffDay = Integer.toString(diff);
         LinearLayout linearLayout1=(LinearLayout)findViewById(R.id.activity_service_select);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        View view =LayoutInflater.from(this).inflate(R.layout.mday_data, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.mday_data, null);
         view.setLayoutParams(lp);
         TextView tv1 = (TextView) view.findViewById(R.id.mContext);
         TextView tv2 = (TextView) view.findViewById(R.id.mTime);
@@ -227,90 +200,5 @@ public class HomePageActivity extends AppCompatActivity
         linearLayout1.addView(view);
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home_page, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-
-        if (id == R.id.nav_memberData) {
-            // 設定從這個活動跳至 home 的活動
-            Intent intent = new Intent(HomePageActivity.this, MemberData.class);
-            // 開始跳頁
-            startActivity(intent);
-        } else if (id == R.id.nav_memorialDay) {
-            // 設定從這個活動跳至 home 的活動
-            Intent intent = new Intent(HomePageActivity.this, ModifyMemorialDay.class);
-            // 開始跳頁
-            startActivity(intent);
-
-        } else if (id == R.id.homepage) {
-            // 設定從這個活動跳至 home 的活動
-            Intent intent = new Intent(HomePageActivity.this, HomePageActivity.class);
-            // 開始跳頁
-            startActivity(intent);
-
-        }else if (id == R.id.nav_myTravle) {
-            Intent go2 = new Intent(HomePageActivity.this, SiteAttractionActivity.class);
-            startActivity(go2);
-
-        } else if (id == R.id.nav_travleEdit) {
-            Intent go2 = new Intent(HomePageActivity.this, EditSite.class);
-            go2.putExtra("siteType", "r");
-            startActivity(go2);
-
-        } else if (id == R.id.nav_logout) {
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            LoginManager.getInstance().logOut();
-            this.getSharedPreferences("pinkpink", 0).edit().clear().commit();
-            Intent go2 = new Intent(HomePageActivity.this, MainActivity.class);
-            startActivity(go2);
-            //登出
-
-        } else if (id == R.id.my_attraction) {
-            Intent go2 = new Intent(HomePageActivity.this, SiteInfo.class);
-            go2.putExtra("sId", "7");
-            startActivity(go2);
-        } else if (id == R.id.my_restaurant) {
-            Intent go2 = new Intent(HomePageActivity.this, StrokeActivity.class);
-            startActivity(go2);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }

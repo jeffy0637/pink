@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements
                             @Override
                             public void onCompleted(final JSONObject object, GraphResponse response) {
 
+                                Log.d("HFLOGIN", "SUCCESS");
                                 //使用者ID
                                 id = object.optString("id");
 
@@ -163,6 +164,8 @@ public class MainActivity extends AppCompatActivity implements
                                         new Response.ErrorListener() {
                                             @Override
                                             public void onErrorResponse(VolleyError error) {
+
+//                                                Log.d("HFLOGIN", error.getMessage());
                                                 //mDialog.setText(error.getMessage()+"-----"+error.toString());
                                             }
                                         }){

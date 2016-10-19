@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
-import m.mcoupledate.classes.SiteListAdapter;
+import m.mcoupledate.classes.adapters.SiteListAdapter;
 
 public class MyAttractionActivity extends AppCompatActivity {
 

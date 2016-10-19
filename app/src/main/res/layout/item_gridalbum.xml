@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <m.mcoupledate.classes.SquareImageView
+    <m.mcoupledate.classes.customView.SquareImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/pic"

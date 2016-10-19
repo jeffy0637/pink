@@ -1,9 +1,10 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.mapClasses;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
 import java.util.List;
@@ -103,6 +104,6 @@ public class MultiDrawable extends Drawable {
 
     @Override
     public int getOpacity() {
-        return 0;
+        return PixelFormat.TRANSPARENT;
     }
 }

@@ -1,30 +1,53 @@
 package m.mcoupledate.classes;
 
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
-import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import m.mcoupledate.R;
+import m.mcoupledate.classes.mapClasses.ClusterSite;
+import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
 
 /**
  * Created by user on 2016/10/8.
  */
-public class ClusterMapFragmentActivity extends FragmentActivity implements
+public class PinkClusterMapFragmentActivity extends NavigationActivity implements
+        OnMapReadyCallback,
         ClusterManager.OnClusterClickListener<ClusterSite>,
         ClusterManager.OnClusterInfoWindowClickListener<ClusterSite>,
         ClusterManager.OnClusterItemClickListener<ClusterSite>,
         ClusterManager.OnClusterItemInfoWindowClickListener<ClusterSite>
 {
-    public Context context;
+//    public Context context;
     public GoogleMap mMap;
 
     public ClusterManager<ClusterSite> mClusterManager;
+
+    private String pinkCon;
+
+
 
     public WorkaroundMapFragment getMapFragment(@IdRes int mapId)
     {
@@ -39,10 +62,9 @@ public class ClusterMapFragmentActivity extends FragmentActivity implements
         return mapFragment;
     }
 
-
-    public void setUpClusterMap(Context context, GoogleMap mMap)
+    @Override@CallSuper
+    public void onMapReady(GoogleMap mMap)
     {
-        this.context = context;
         this.mMap = mMap;
 
         LatLng y = new LatLng(23.9036873,121.0793705);  // 預設台灣
@@ -53,7 +75,7 @@ public class ClusterMapFragmentActivity extends FragmentActivity implements
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
 
-        mClusterManager = new ClusterManager<ClusterSite>(context, mMap);
+        mClusterManager = new ClusterManager<ClusterSite>(this, mMap);
 
 //        mClusterManager.setRenderer(new ClusterSiteRenderer(context, mMap, mClusterManager));
 
@@ -76,6 +98,66 @@ public class ClusterMapFragmentActivity extends FragmentActivity implements
             mClusterManager.cluster();
     }
 
+    public void setTheSiteMarker(LatLng inputLatLng, String title, Marker inputMarker)
+    {
+        if (inputMarker!=null)
+            inputMarker.remove();
+
+        float zoomLevel = 0;
+        if (mMap.getCameraPosition().zoom<(mMap.getMaxZoomLevel()-8))
+            zoomLevel = mMap.getMaxZoomLevel()-8;
+        else
+            zoomLevel = mMap.getCameraPosition().zoom;
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(inputLatLng, zoomLevel));
+        try
+        {
+            inputMarker = mMap.addMarker(new MarkerOptions().position(inputLatLng).title(title).icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
+            inputMarker.showInfoWindow();
+        }
+        catch (Exception e)
+        {}
+    }
+
+
+    public void loadPinkClusterSites(RequestQueue mQueue)
+    {
+        pinkCon = this.getResources().getString(R.string.pinkCon);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, pinkCon+"pinkClusterMap_getPinkSites.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try
+                        {
+                            JSONArray jArr = new JSONArray(response);
+                            JSONObject o;
+
+                            Bitmap bitmap = BitmapFactory.decodeResource(PinkClusterMapFragmentActivity.this.getResources(), R.drawable.couple);
+                            for (int a=0; a<jArr.length(); ++a)
+                            {
+                                o = jArr.getJSONObject(a);
+
+                                addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), bitmap), true);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.d("HFLoadPinkSites", e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("HFLoadPinkSites", error.getMessage());
+                    }
+                });
+
+        mQueue.add(stringRequest);
+    }
+
 
 
 
@@ -84,7 +166,7 @@ public class ClusterMapFragmentActivity extends FragmentActivity implements
     {
         // Show a toast with some info when the cluster is clicked.
         String firstName = cluster.getItems().iterator().next().name;
-        Toast.makeText(context,  firstName+"和"+(cluster.getSize()-1)+"個景點AA", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,  firstName+"和"+(cluster.getSize()-1)+"個景點", Toast.LENGTH_SHORT).show();
 
         // Zoom in the cluster. Need to create LatLngBounds and including all the cluster items
         // inside of bounds, then animate to center of the bounds.
@@ -122,11 +204,11 @@ public class ClusterMapFragmentActivity extends FragmentActivity implements
     public void onClusterItemInfoWindowClick(ClusterSite clusterSite) {
         try
         {
-            Toast.makeText(context, clusterSite.name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, clusterSite.name, Toast.LENGTH_SHORT).show();
         }
         catch(Exception e)
         {
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

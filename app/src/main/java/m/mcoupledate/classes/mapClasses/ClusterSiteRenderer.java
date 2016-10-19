@@ -1,4 +1,4 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.mapClasses;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -36,7 +36,7 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
     private Context context;
     private GoogleMap mMap;
 
-    public ClusterSiteRenderer(Context context, GoogleMap mMap, ClusterManager<m.mcoupledate.classes.ClusterSite> mClusterManager) {
+    public ClusterSiteRenderer(Context context, GoogleMap mMap, ClusterManager<ClusterSite> mClusterManager) {
 
         super(context, mMap, mClusterManager);
         this.context = context;
@@ -68,7 +68,7 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
      *  地點render前
      */
     @Override
-    protected void onBeforeClusterItemRendered(m.mcoupledate.classes.ClusterSite site, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(ClusterSite site, MarkerOptions markerOptions) {
         // Draw a single person.
         // Set the info window to show their name.
         mImageView.setImageBitmap(site.pic);
@@ -80,21 +80,21 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
      *  群集render前
      */
     @Override
-    protected void onBeforeClusterRendered(Cluster<m.mcoupledate.classes.ClusterSite> cluster, MarkerOptions markerOptions) {
+    protected void onBeforeClusterRendered(Cluster<ClusterSite> cluster, MarkerOptions markerOptions) {
         // Draw multiple people.
         // Note: this method runs on the UI thread. Don't spend too much time in here (like in this example).
         List<Drawable> profilePhotos = new ArrayList<Drawable>(Math.min(4, cluster.getSize()));
         int width = mDimension;
         int height = mDimension;
 
-        for (m.mcoupledate.classes.ClusterSite p : cluster.getItems()) {
+        for (ClusterSite p : cluster.getItems()) {
             // Draw 4 at most.
             if (profilePhotos.size() == 4) break;
             Drawable drawable = new BitmapDrawable(null, p.pic);
             drawable.setBounds(0, 0, width, height);
             profilePhotos.add(drawable);
         }
-        m.mcoupledate.classes.MultiDrawable multiDrawable = new m.mcoupledate.classes.MultiDrawable(profilePhotos, cluster.getSize());
+        MultiDrawable multiDrawable = new MultiDrawable(profilePhotos, cluster.getSize());
         multiDrawable.setBounds(0, 0, width, height);
 
         mClusterImageView.setImageDrawable(multiDrawable);
@@ -105,7 +105,7 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
         {
             String clusterTitles = "";
 
-            for (m.mcoupledate.classes.ClusterSite c : cluster.getItems())
+            for (ClusterSite c : cluster.getItems())
                 clusterTitles = clusterTitles + c.name + "\n";
 
             markerOptions.title(clusterTitles);

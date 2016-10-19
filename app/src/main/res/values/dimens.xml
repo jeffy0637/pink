@@ -26,4 +26,5 @@
 
     <!--EditSite inputTimeDialog-->
     <dimen name="dialog_sign_size">15sp</dimen>
+
 </resources>

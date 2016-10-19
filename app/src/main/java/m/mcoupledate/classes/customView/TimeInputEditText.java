@@ -1,4 +1,4 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.customView;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -37,10 +37,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,15 +45,13 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import m.mcoupledate.classes.ClusterMapFragmentActivity;
-import m.mcoupledate.classes.ClusterSite;
-import m.mcoupledate.classes.CommentAdapter;
-import m.mcoupledate.classes.RecyclerAlbumAdapter;
-import m.mcoupledate.classes.WorkaroundMapFragment;
+import m.mcoupledate.classes.adapters.CommentAdapter;
+import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
+import m.mcoupledate.classes.adapters.RecyclerAlbumAdapter;
+import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
 import m.mcoupledate.funcs.PinkErrorHandler;
 
-public class SiteInfo extends ClusterMapFragmentActivity implements
-        OnMapReadyCallback {
+public class SiteInfo extends PinkClusterMapFragmentActivity{
 
     SharedPreferences pref;
 
@@ -192,11 +187,11 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap mMap)
+    {
+        super.onMapReady(mMap);
 
-        mMap = googleMap;
-
-        setUpClusterMap(SiteInfo.this, mMap);
+        this.mMap = mMap;
 
         initSiteInfoFromMariDB();
 
@@ -233,10 +228,23 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
 
 
                             String time = "";
-                            String[] weekDays = {"一", "二", "三", "四", "五", "六", "日"};
-                            for(int i = 0 ; i < o.getJSONArray("business_hours").length() ; i++)
+                            String[] weekDayNames = {"一", "二", "三", "四", "五", "六", "日"};
+                            int nowDay = 0;
+
+                            JSONArray businessHours = o.getJSONArray("business_hours");
+                            for(int i = 0 ; i < businessHours.length() ; i++)
                             {
-                                time += "("+ weekDays[i] +")  " + o.getJSONArray("business_hours").getJSONObject(i).optString("start_time") + "-" + o.getJSONArray("business_hours").getJSONObject(i).optString("end_time")+"\n";
+                                JSONObject aPeriod = businessHours.getJSONObject(i);
+
+                                if (nowDay!=aPeriod.optInt("day"))
+                                {
+                                    time += "("+ weekDayNames[(aPeriod.optInt("day")-1)] +")  " + aPeriod.optString("start_time") + " ~ " + aPeriod.optString("end_time")+"\n";
+                                    nowDay = aPeriod.optInt("day");
+                                }
+                                else
+                                {
+                                    time += " 　    " + aPeriod.optString("start_time") + " ~ " + aPeriod.optString("end_time")+"\n";
+                                }
                             }
                             siteCol.get("time").setText(time);
 
@@ -326,11 +334,10 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
 //                            mMap..animateCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
 
+                            setTheSiteMarker(siteLatLng, site.optString("sName"), null);
+//                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
 
-                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
-
-                            markClusterSites();
 
 
                             allCommentsAdapter = new CommentAdapter(SiteInfo.this, o.optJSONArray("allComments"));
@@ -359,6 +366,9 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
                 });
 
         mRequestQueue.add(stringRequest);
+
+
+        loadPinkClusterSites(mRequestQueue);
     }
 
     /**
@@ -396,51 +406,6 @@ public class SiteInfo extends ClusterMapFragmentActivity implements
             --picNum;
         }
     }
-
-
-    public void markClusterSites()
-    {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, pinkCon+"getAroundSites.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("HFMAPSITERESPONSE", response);
-                        try
-                        {
-                            JSONArray jArr = new JSONArray(response);
-                            JSONObject o;
-
-                            for (int a=0; a<jArr.length(); ++a)
-                            {
-                                o = jArr.getJSONObject(a);
-
-                                if (a==(jArr.length()-1))
-                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), true);
-                                else
-                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), false);
-
-//                                if (a==(jArr.length()-1))
-//                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), true);
-//                                else
-//                                    addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName")), false);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Log.d("HFFF", e.getMessage());
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.d("HFFF", error.getMessage());
-                    }
-                });
-
-        mRequestQueue.add(stringRequest);
-    }
-
 
 
     private void submitComment(final String text, final float personLove, final String editType)

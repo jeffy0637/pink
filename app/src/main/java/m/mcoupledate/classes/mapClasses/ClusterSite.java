@@ -1,4 +1,4 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.mapClasses;
 
 import android.content.Context;
 import android.graphics.Bitmap;

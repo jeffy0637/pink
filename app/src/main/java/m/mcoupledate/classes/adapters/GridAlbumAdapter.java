@@ -1,4 +1,4 @@
-package m.mcoupledate.classes;
+package m.mcoupledate.classes.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import m.mcoupledate.R;
+import m.mcoupledate.classes.customView.SquareImageView;
 
 /**
  * Created by user on 2016/9/26.

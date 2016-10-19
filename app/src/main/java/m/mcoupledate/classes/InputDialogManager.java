@@ -2,6 +2,7 @@ package m.mcoupledate.classes;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -20,8 +21,7 @@ public class InputDialogManager
 
         protected View dialogContent;
         public AlertDialog dialog;
-
-        protected HashMap<String, Object> vars = new HashMap<String, Object>();
+        public HashMap<String, Object> vars = new HashMap<String, Object>();
 
 
         public InputDialogManager(Context context, @LayoutRes int layoutId, String dialogTitle)
@@ -41,24 +41,34 @@ public class InputDialogManager
 
         protected void onCancel() {}
 
+        public View dialogFindViewById(@IdRes int id)
+        {
+            return dialogContent.findViewById(id);
+        }
+
 
         public void initDialog(String dialogTitle)
         {
             dialog = new AlertDialog.Builder(context)
                     .setTitle(dialogTitle)
                     .setView(this.dialogContent)
-                    .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("關閉", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
                         }
                     })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("清除", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i)
                         {
                             onCancel();
                         }
                     }).create();
+        }
+
+        public class Actioner
+        {
+            public void act(Object... args){}
         }
 }
