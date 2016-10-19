@@ -53,7 +53,8 @@ import m.mcoupledate.StrokeActivity;
  *
  *
  *      相關的xml檔的命名都是 navigation_%
- *      menu內容 -> menu / navigation_directmenu_drawer.xml
+ *      修改menu內容 -> menu / navigation_directmenu_drawer.xml
+ *      修改相關的導向 -> 這個java檔最下面的onNavigationItemSelected
  */
 
 public class NavigationActivity extends AppCompatActivity
