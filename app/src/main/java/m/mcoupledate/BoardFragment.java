@@ -37,7 +37,15 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import m.mcoupledate.draglib.BoardView;
 import m.mcoupledate.draglib.DragItem;
@@ -71,6 +79,7 @@ public class BoardFragment extends Fragment {
             @Override
             public void onItemDragStarted(int column, int row) {
                 Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
+                //對firebase的這筆資料做鎖定
             }
 
             @Override
@@ -84,6 +93,9 @@ public class BoardFragment extends Fragment {
             @Override
             public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
                 if (fromColumn != toColumn || fromRow != toRow) {
+                    //對firebase的這筆資料做更新
+                    long day = toColumn;
+                    long order = toRow;
                     Toast.makeText(mBoardView.getContext(), "End - column: " + toColumn + " row: " + toRow, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -97,10 +109,38 @@ public class BoardFragment extends Fragment {
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Board");
 
-        addColumnList();
-        addColumnList();
-        addColumnList();
-        addColumnList();
+        //在特定行程加入天數與其景點
+        Firebase.setAndroidContext(mBoardView.getContext());//this用mBoardView.getContext()取代
+        final String url = "https://couple-project.firebaseio.com/travel";
+        final String tId = "12345";
+        new Firebase(url).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                    addColumnList();
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -143,58 +183,94 @@ public class BoardFragment extends Fragment {
     }
 
     private void addColumnList() {
-        //這段用來動態新增list
-        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        final int addItems = 15;
-        for (int i = 0; i < addItems; i++) {
-            long id = sCreatedItems++;
-            mItemArray.add(new Pair<>(id, "景點名稱"));
-        }
-        //這段用來header的景點數計算 天數計算還有問題
-        final int column = mColumns;
-        final View header = View.inflate(getActivity(), R.layout.column_header, null);
-        final ItemAdapter listAdapter = new ItemAdapter(header, mItemArray, R.layout.column_item, R.id.item_layout, true);
-        ((TextView) header.findViewById(R.id.text)).setText("第" + (mColumns + 1) + "天");
-        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-        header.setOnClickListener(new View.OnClickListener() {
-            //這段是新增新的景點(點擊header)
+        //加入景點
+        Firebase.setAndroidContext(mBoardView.getContext());//this用mBoardView.getContext()取代
+        final String url = "https://couple-project.firebaseio.com/travel";
+        final String tId = "12345";
+        new Firebase(url).addChildEventListener(new ChildEventListener() {
             @Override
-            public void onClick(View v) {
-                long id = sCreatedItems++;
-                //Pair item = new Pair<>(id, "Test " + id);
-                Pair item = new Pair<>(id, "景點名稱");
-                mBoardView.addItem(column, mItemArray.size(), item, true);
-
-                //mBoardView.moveItem(4, 0, 0, true);
-                //mBoardView.removeItem(column, 0);
-                //mBoardView.moveItem(0, 0, 1, 3, false);
-                //mBoardView.replaceItem(0, 0, item1, true);
-                //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
-                ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-            }
-        });
-        //長按header輸入要刪除的景點(應該改成整列清除)
-        header.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //final EditText choose = new EditText(mBoardView.getContext());
-                new AlertDialog.Builder(mBoardView.getContext())
-                        .setTitle("刪除整天行程")
-                        //.setView(choose)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                    long numberOfDay = dataSnapshot.child("site").getChildrenCount();
+                    for(int i = 0 ; i < numberOfDay ; i++){
+                        long eachNumberOfDay = dataSnapshot.child("site").child("day" + (i + 1)).getChildrenCount();
+                        //這段用來動態新增list
+                        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
+                        final int addItems = (int)eachNumberOfDay;
+                        for (int j = 0; j < addItems; j++) {
+                            long id = sCreatedItems++;
+                            mItemArray.add(new Pair<>(id, "景點名稱"));
+                        }
+                        //這段用來header的景點數計算 天數計算還有問題
+                        final int column = mColumns;
+                        final View header = View.inflate(getActivity(), R.layout.column_header, null);
+                        final ItemAdapter listAdapter = new ItemAdapter(header, mItemArray, R.layout.column_item, R.id.item_layout, true);
+                        ((TextView) header.findViewById(R.id.text)).setText("第" + (mColumns + 1) + "天");
+                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                        header.setOnClickListener(new View.OnClickListener() {
+                            //這段是新增新的景點(點擊header)
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                while (mItemArray.size() != 0){
-                                    mBoardView.removeItem(column, 0);
-                                }
+                            public void onClick(View v) {
+                                long id = sCreatedItems++;
+                                //Pair item = new Pair<>(id, "Test " + id);
+                                Pair item = new Pair<>(id, "景點名稱");
+                                mBoardView.addItem(column, mItemArray.size(), item, true);
+
+                                //mBoardView.moveItem(4, 0, 0, true);
+                                //mBoardView.removeItem(column, 0);
+                                //mBoardView.moveItem(0, 0, 1, 3, false);
+                                //mBoardView.replaceItem(0, 0, item1, true);
+                                //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
                                 ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
                             }
-                        }).show();
-                return true;//true為結束長按動作後不再執行短按
+                        });
+                        //長按header輸入要刪除的景點(應該改成整列清除)
+                        header.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                //final EditText choose = new EditText(mBoardView.getContext());
+                                new AlertDialog.Builder(mBoardView.getContext())
+                                        .setTitle("刪除整天行程")
+                                        //.setView(choose)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                while (mItemArray.size() != 0){
+                                                    mBoardView.removeItem(column, 0);
+                                                }
+                                                ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                            }
+                                        }).show();
+                                return true;//true為結束長按動作後不再執行短按
+                            }
+                        });
+                        mBoardView.addColumnList(listAdapter, header, false);
+                        mColumns++;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
             }
         });
-        mBoardView.addColumnList(listAdapter, header, false);
-        mColumns++;
+
     }
 
     private static class MyDragItem extends DragItem {
