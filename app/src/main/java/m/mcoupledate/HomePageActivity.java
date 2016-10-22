@@ -25,8 +25,6 @@ import m.mcoupledate.classes.NavigationActivity;
 
 public class HomePageActivity extends NavigationActivity {
 
-    private String conAPI = "http://140.117.71.216/pinkCon/";
-
     private String id = MainActivity.getUserId();
 
     private SQLiteDatabase db = null;

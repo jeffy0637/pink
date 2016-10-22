@@ -1,12 +1,18 @@
 package  m.mcoupledate;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -20,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,23 +38,20 @@ import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.DropDownMenu.DropDownMenu;
 import m.mcoupledate.classes.DropDownMenu.ListDropDownAdapter;
 import m.mcoupledate.classes.adapters.SiteListAdapter;
-import m.mcoupledate.funcs.PinkErrorHandler;
+import m.mcoupledate.funcs.PinkCon;
 
 
 public class SearchSites extends Fragment
 {
-    public static final int SITETYPE_ATTRACTION = 0, SITETYPE_RESTAURANT = 1;
-    public static final int SEARCHTYPE_BROWSE = 0, SEARCHTYPE_MYLIKES = 1;
+    public static final int SITETYPE_ATTRACTION = 8341, SITETYPE_RESTAURANT = 8342;
+    public static final int SEARCHTYPE_BROWSE = 8341, SEARCHTYPE_MYLIKES = 8342;
 
     private int searchType, siteType;
 
-    private View rootView;
-
     SharedPreferences pref;
-    SharedPreferences.Editor prefEditor;
 
     RequestQueue mQueue;
-    String pinkCon = "http://140.117.71.216/pinkCon/";
+    private Snackbar initErrorBar;
 
 
     private ListView siteListView;
@@ -55,19 +60,18 @@ public class SearchSites extends Fragment
 
 
     public String select_city = "";
-    public String select_area = "";
 
     private ArrayList<String> headers = new ArrayList<String>();
-//    String[] city, area;
-    List<String[]> tabOptions = new ArrayList<String[]>();
 
 
     List<HashMap<String, Object>> menuOption = null;
 
 
     DropDownMenu mDropDownMenu;
+    private View contentView;
 
-    private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2;
+    private View rootView;
+
 
     public static SearchSites newInstance(int searchType, int siteType)
     {
@@ -95,6 +99,7 @@ public class SearchSites extends Fragment
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區"}));
         else if  (siteType==SITETYPE_RESTAURANT)
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區", "時段", "種類", "口味"}));
+
     }
 
     @Override
@@ -111,9 +116,9 @@ public class SearchSites extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         pref = this.getActivity().getSharedPreferences("pinkpink", 0);
-        prefEditor = pref.edit();
 
         mQueue = Volley.newRequestQueue(this.getActivity());
+        initErrorBar = PinkCon.getInitErrorSnackBar(rootView, PinkCon.INIT_FAIL, this.getActivity());
 
         mDropDownMenu= (DropDownMenu) getView().findViewById( R.id.dropDownMenu);
         initDropDownMenu();
@@ -121,17 +126,26 @@ public class SearchSites extends Fragment
 
     private void initDropDownMenu()
     {
-        final View contentView = getActivity().getLayoutInflater().inflate(R.layout.dropdownmenu_contentview, null);
+        contentView = getActivity().getLayoutInflater().inflate(R.layout.dropdownmenu_contentview, null);
 
         sites = new JSONArray();
         siteListAdapter = new SiteListAdapter(SearchSites.this.getActivity(), sites);
         siteListView = (ListView) contentView.findViewById(R.id.siteListView);
         siteListView.setAdapter(siteListAdapter);
+        siteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent intent = new Intent(SearchSites.this.getActivity(), SiteInfo.class);
+                intent.putExtra("sId", siteListAdapter.getSiteId(position));
+                startActivity(intent);
+            }
+        });
 
-        initTabOption(contentView);
+        initTabOption();
 
         //该监听回调只监听默认类型，如果是自定义view请自行设置，参照demo
-        mDropDownMenu.addMenuSelectListener(new m.mcoupledate.classes.DropDownMenu.DropDownMenu.OnDefultMenuSelectListener() {
+        mDropDownMenu.addMenuSelectListener(new DropDownMenu.OnDefultMenuSelectListener() {
             @Override
             public void onSelectDefaultMenu(int index, int pos, String clickstr) {
 //                String end = null;
@@ -156,20 +170,18 @@ public class SearchSites extends Fragment
         mDropDownMenu.setListRefresher(
                 new DropDownMenu.ListRefresher() {
                     @Override
-                    public void refresh(JSONArray jArr)
-                    {
+                    public void refresh(JSONArray jArr) throws JSONException {
                         siteListAdapter.changeData(jArr);
                     }
                 }
-
         );
-        mDropDownMenu.setDynamicSearch(this.getActivity(), searchType, siteType);
+        mDropDownMenu.setDynamicSearcher(getDynamicSearcher());
     }
 
 
-    private void initTabOption(final View contentView)
+    public void initTabOption()
     {
-        String url = pinkCon+"searchSites_initTabOptions.php?opt="+siteType;
+        String url = PinkCon.URL +"searchSites_initTabOptions.php?opt="+siteType;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -194,8 +206,10 @@ public class SearchSites extends Fragment
 
                             mDropDownMenu.setDropDownMenu(headers, menuOption, contentView);
 
-                        } catch (Exception e) {
-//                            Log.d("HF2345", e.getMessage());
+                        } catch (Exception e)
+                        {
+                            if (!initErrorBar.isShown())
+                                initErrorBar.show();
                         }
 
                     }
@@ -204,14 +218,8 @@ public class SearchSites extends Fragment
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        PinkErrorHandler.retryConnect(rootView, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view)
-                            {
-                                initTabOption(contentView);
-//                                startActivity(SiteInfo.this.getIntent());
-                            }
-                        });
+                        if (!initErrorBar.isShown())
+                            initErrorBar.show();
                     }
                 });
 
@@ -238,7 +246,7 @@ public class SearchSites extends Fragment
 
     private void refreshTabOption(final String cityName)
     {
-        String url = pinkCon+"searchSites_getAreaTabOptions.php?city="+cityName;
+        String url = PinkCon.URL +"searchSites_getAreaTabOptions.php?city="+cityName;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -268,7 +276,13 @@ public class SearchSites extends Fragment
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("HF2", error.getMessage());
+                        PinkCon.retryConnect(rootView, PinkCon.CONNECT_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   refreshTabOption(cityName);  }
+                            });
                     }
                 });
 
@@ -295,26 +309,40 @@ public class SearchSites extends Fragment
     {
         mDropDownMenu.closeMenu();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"searchSites_searchByClasses.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"searchSites_searchByClasses.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-                        Log.d("HFSEARCHBYCLASS", response);
                         try
                         {
                             sites = new JSONArray(response);
                             siteListAdapter.changeData(sites);
                         }
                         catch (JSONException e)
-                        {   }
+                        {
+                            PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        searchByClasses();
+                                    }
+                                });
+                        }
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // 失敗後的動作
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    searchByClasses();
+                                }
+                            });
                     }
                 }){
             @Override
@@ -334,8 +362,6 @@ public class SearchSites extends Fragment
                     map.put("time", ((ListDropDownAdapter)mDropDownMenu.adapterMap.get(2)).getCheckedItem());
                     map.put("food_kind", ((ConstellationAdapter)mDropDownMenu.adapterMap.get(3)).getCheckedListJSONString());
                     map.put("country", ((ConstellationAdapter)mDropDownMenu.adapterMap.get(4)).getCheckedListJSONString());
-
-                    Log.d("HFCOUNTRYANS", ((ConstellationAdapter)mDropDownMenu.adapterMap.get(4)).getCheckedListJSONString());
                 }
 
                 return map;
@@ -344,5 +370,71 @@ public class SearchSites extends Fragment
 
         mQueue.add(stringRequest);
     }
+
+    private DropDownMenu.DynamicSearcher getDynamicSearcher()
+    {
+        return new DropDownMenu.DynamicSearcher()
+        {
+            @Override
+            public TextWatcher getSearcher(final EditText searchBar, final DropDownMenu.ListRefresher listRefresher)
+            {
+                return new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count)
+                    {
+                        String query = searchBar.getText().toString().replace(" ", "%");
+                        String spacePattern = "^[%]*$";
+
+                        if (query.matches(spacePattern))
+                            return ;
+
+                        String url = null;
+                        try {
+                            url = PinkCon.URL +"searchSites_searchByText.php?searchType="+searchType+"&siteType="+siteType+"&mId="+pref.getString("mId", "anyone")+"&query="+ URLEncoder.encode(query, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            return ;
+                        }
+
+                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                                new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+//                                        Log.d("HF~r", response);
+
+                                        try {
+                                            listRefresher.refresh(new JSONArray(response));
+                                        } catch (JSONException e) {
+                                            //  do nothing
+                                        }
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error)
+                                    {
+                                        PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
+                                            new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    searchByClasses();
+                                                }
+                                            });
+                                    }
+                                });
+                        mQueue.add(stringRequest);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+                };
+            };
+
+        };
+    }
+
 }
 

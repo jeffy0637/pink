@@ -11,11 +11,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -45,18 +45,18 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import m.mcoupledate.classes.adapters.CommentAdapter;
 import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
+import m.mcoupledate.classes.adapters.CommentAdapter;
 import m.mcoupledate.classes.adapters.RecyclerAlbumAdapter;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
-import m.mcoupledate.funcs.PinkErrorHandler;
+import m.mcoupledate.funcs.PinkCon;
 
 public class SiteInfo extends PinkClusterMapFragmentActivity{
 
     SharedPreferences pref;
 
-    private String pinkCon = "http://140.117.71.216/pinkCon/";
-    private RequestQueue mRequestQueue;
+    private RequestQueue mQueue;
+    private Snackbar initErrorBar;
 
     private String sId, mId, picId;
     private String siteTypeName;
@@ -75,7 +75,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
 
     Button editLikeBtn, addTravelBtn;
-    TextView edit;
+    TextView editSiteBtn;
 
 
     private ScrollView scrollView;
@@ -100,7 +100,8 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         pref = this.getSharedPreferences("pinkpink", 0);
         mId = pref.getString("mId", null);
 
-        mRequestQueue = Volley.newRequestQueue(this);
+        mQueue = Volley.newRequestQueue(this);
+        initErrorBar = PinkCon.getInitErrorSnackBar(getRootView(), PinkCon.INIT_FAIL, this);
 
         sId = this.getIntent().getStringExtra("sId");
 
@@ -145,8 +146,8 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
             }
         });
 
-        edit = (TextView)findViewById(R.id.want_edit);
-        edit.setOnClickListener(new View.OnClickListener() {
+        editSiteBtn = (TextView)findViewById(R.id.editSiteBtn);
+        editSiteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {
@@ -203,7 +204,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
      */
     private void initSiteInfoFromMariDB(){
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon +"siteInfo_initSiteInfo.php?sId="+sId+"&mId="+mId,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"siteInfo_initSiteInfo.php?sId="+sId+"&mId="+mId,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -291,7 +292,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                                         public void onClick(DialogInterface dialog, int which)
                                         {
                                             if (ifCommented)
-                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "edit");
+                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "editSiteBtn");
                                             else
                                                 submitComment(commentText.getText().toString(), commentRBar.getRating(), "new");
                                         }
@@ -343,32 +344,27 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                             allCommentsAdapter = new CommentAdapter(SiteInfo.this, o.optJSONArray("allComments"));
                             allComments = (ListView) findViewById(R.id.allComments);
                             allComments.setAdapter(allCommentsAdapter);
-
                         }
-                        catch (Exception e) {
-                            Log.d("HFFF", e.getMessage());
+                        catch (Exception e)
+                        {
+                            if (!initErrorBar.isShown())
+                                initErrorBar.show();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        PinkErrorHandler.retryConnect(scrollView, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view)
-                            {
-                                initSiteInfoFromMariDB();
-//                                startActivity(SiteInfo.this.getIntent());
-                            }
-                        });
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        if (!initErrorBar.isShown())
+                            initErrorBar.show();
                     }
                 });
 
-        mRequestQueue.add(stringRequest);
+        mQueue.add(stringRequest);
 
 
-        loadPinkClusterSites(mRequestQueue);
+        loadPinkClusterSites(mQueue, null);
     }
 
     /**
@@ -381,7 +377,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
         while (picNum>0)
         {
-            String url = pinkCon + "images/sitePic/" + id + (char)(seq) +".jpg";
+            String url = PinkCon.URL + "images/sitePic/" + id + (char)(seq) +".jpg";
 //            Log.d("sitePicUrl", url);
             Glide.with(SiteInfo.this)
                     .load(url)
@@ -395,9 +391,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                               }
                               @Override
                               public void onLoadFailed(Exception e, Drawable errorDrawable)
-                              {
-                                  Log.d("HFGLIDEERROR", e.getMessage());
-                              }
+                              {     }
 
                           }
                     );
@@ -410,7 +404,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
     private void submitComment(final String text, final float personLove, final String editType)
     {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"siteInfo_editComment.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"siteInfo_editComment.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -430,7 +424,13 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-//                        Log.d("HFSUBMITCOMMENTERROR", error.getMessage());
+                        PinkCon.retryConnect(getRootView(), PinkCon.SUBMIT_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   submitComment(text, personLove, editType);  }
+                            });
                     }
                 }){
             @Override
@@ -448,7 +448,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
             }
         };
 
-        mRequestQueue.add(stringRequest);
+        mQueue.add(stringRequest);
 
     }
 
@@ -464,7 +464,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
     private void editLike()
     {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"siteInfo_editMyLike.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"siteInfo_editMyLike.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -487,7 +487,13 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-//                        Log.d("HF", error.getMessage());
+                        PinkCon.retryConnect(getRootView(), PinkCon.CONNECT_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   editLike();  }
+                            });
                     }
                 }){
             @Override
@@ -506,7 +512,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
             }
         };
 
-        mRequestQueue.add(stringRequest);
+        mQueue.add(stringRequest);
     }
 
 

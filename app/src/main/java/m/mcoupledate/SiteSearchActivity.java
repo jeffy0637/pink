@@ -23,13 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import m.mcoupledate.classes.NavigationActivity;
+import m.mcoupledate.classes.adapters.PinkFragmentPagerAdapter;
 
 public class SiteSearchActivity extends NavigationActivity implements
         ViewPager.OnPageChangeListener,
         View.OnClickListener
 {
 
-    private ViewPager myViewPager;
+    private ViewPager mViewPager;
     private List fragmentList;
     private ImageView line_tab; // tab选项卡的下划线
     private boolean isScrolling = false; // 手指是否在滑动
@@ -80,6 +81,7 @@ public class SiteSearchActivity extends NavigationActivity implements
         mBottomBar.mapColorForTab(2, "#7B1FA2");
 
 
+
         initView();
         initLineImage();
     }
@@ -95,25 +97,30 @@ public class SiteSearchActivity extends NavigationActivity implements
 
     public void initView(){
 
-        myViewPager = (ViewPager) findViewById(R.id.myViewPager);
+        mViewPager = (ViewPager) findViewById(R.id.myViewPager);
 
+        int initSearchType;
+        if (this.getIntent().getIntExtra("searchType", -1)==SearchSites.SEARCHTYPE_MYLIKES)
+            initSearchType = SearchSites.SEARCHTYPE_MYLIKES;
+        else
+            initSearchType = SearchSites.SEARCHTYPE_BROWSE;
 
         fragmentList = new ArrayList<Fragment>();
-        fragmentList.add(SearchSites.newInstance(SearchSites.SEARCHTYPE_BROWSE, SearchSites.SITETYPE_ATTRACTION));
-        fragmentList.add(SearchSites.newInstance(SearchSites.SEARCHTYPE_BROWSE, SearchSites.SITETYPE_RESTAURANT));
+        fragmentList.add(SearchSites.newInstance(initSearchType, SearchSites.SITETYPE_ATTRACTION));
+        fragmentList.add(SearchSites.newInstance(initSearchType, SearchSites.SITETYPE_RESTAURANT));
 
 
-        MyFragmentAdapter myFragmentAdapter = new MyFragmentAdapter(getSupportFragmentManager(), fragmentList);
-        myViewPager.setAdapter(myFragmentAdapter);
+        PinkFragmentPagerAdapter pinkFragmentPagerAdapter = new PinkFragmentPagerAdapter(getSupportFragmentManager(), fragmentList);
+        mViewPager.setAdapter(pinkFragmentPagerAdapter);
 
         tv_tab0 = (TextView) findViewById(R.id.tab0);
         tv_tab1 = (TextView) findViewById(R.id.tab1);
-        myViewPager.setCurrentItem(0);
+        mViewPager.setCurrentItem(0);
         tv_tab0.setTextColor(Color.parseColor("#F7CAC9"));
         tv_tab1.setTextColor(Color.parseColor("#FFFFFF"));
         tv_tab0.setOnClickListener(this);
         tv_tab1.setOnClickListener(this);
-        myViewPager.setOnPageChangeListener(this);
+        mViewPager.setOnPageChangeListener(this);
 
         line_tab = (ImageView) findViewById(R.id.line_tab);
 
@@ -136,9 +143,9 @@ public class SiteSearchActivity extends NavigationActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.tab0: myViewPager.setCurrentItem(0);
+            case R.id.tab0: mViewPager.setCurrentItem(0);
                 break;
-            case R.id.tab1: myViewPager.setCurrentItem(1);
+            case R.id.tab1: mViewPager.setCurrentItem(1);
                 break;
             default:
                 break;
@@ -203,6 +210,9 @@ public class SiteSearchActivity extends NavigationActivity implements
     private void movePositionX(int toPosition) {
         // TODO Auto-generated method stub
         movePositionX(toPosition, 0);
+//        if (!((SearchSites) fragmentList.get(toPosition)).isTabInit())
+//            ((SearchSites) fragmentList.get(toPosition)).initTabOption();
+
     }
 
 
@@ -223,7 +233,7 @@ public class SiteSearchActivity extends NavigationActivity implements
     public boolean onOptionsItemSelected(MenuItem item)
     {
         if (item.getItemId() == R.id.topbarSearch)
-            ((SearchSites) fragmentList.get(myViewPager.getCurrentItem())).searchByClasses();
+            ((SearchSites) fragmentList.get(mViewPager.getCurrentItem())).searchByClasses();
 
         return super.onOptionsItemSelected(item);
     }

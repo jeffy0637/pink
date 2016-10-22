@@ -1,17 +1,15 @@
 package m.mcoupledate;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -36,6 +34,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import m.mcoupledate.funcs.PinkCon;
+
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener {
 
@@ -46,13 +46,13 @@ public class MainActivity extends AppCompatActivity implements
     private CallbackManager fbCallbackManager;
 
 
-    private String pinkCon = "http://140.117.71.216/pinkCon/";
     RequestQueue mQueue;
-    private StringRequest mStringRequest;
+
+    private View rootView;
+
 
     private final int REQ_FB_LOGIN = 64206;
 
-    private TextView mDialog;
     private ImageButton fbLogin, fbLogout;
 
     //存使用者ID
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements
 
     SQLiteDatabase db = null;
 
-    private Context mContext;
 
     //  初始化頁面和變數設定
     @Override
@@ -80,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements
 //        fbLogout();
 
         mQueue = Volley.newRequestQueue(this);
+
+        rootView = findViewById(R.id.rootView);
 
 
         fbLogin = (ImageButton) findViewById(R.id.fbLogin);
@@ -133,20 +134,20 @@ public class MainActivity extends AppCompatActivity implements
         LoginManager.getInstance().registerCallback(fbCallbackManager, new FacebookCallback<LoginResult>() {
 
             @Override
-            public void onSuccess(LoginResult loginResult) {
+            public void onSuccess(final LoginResult loginResult) {
 
 
                 GraphRequest request = GraphRequest.newMeRequest(
                         loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
                             @Override
-                            public void onCompleted(final JSONObject object, GraphResponse response) {
+                            public void onCompleted(final JSONObject object, final GraphResponse response) {
 
-                                Log.d("HFLOGIN", "SUCCESS");
+//                                Log.d("HFLOGIN", "SUCCESS");
                                 //使用者ID
                                 id = object.optString("id");
 
-                                StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon +"fbLogin.php",
+                                StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"fbLogin.php",
                                         new Response.Listener<String>() {
                                             @Override
                                             public void onResponse(String response) {
@@ -164,9 +165,13 @@ public class MainActivity extends AppCompatActivity implements
                                         new Response.ErrorListener() {
                                             @Override
                                             public void onErrorResponse(VolleyError error) {
-
-//                                                Log.d("HFLOGIN", error.getMessage());
-                                                //mDialog.setText(error.getMessage()+"-----"+error.toString());
+                                                PinkCon.retryConnect(rootView, PinkCon.CONNECT_FAIL, null,
+                                                        new View.OnClickListener()
+                                                        {
+                                                            @Override
+                                                            public void onClick(View view)
+                                                            {   onCompleted(object, response);  }
+                                                        });
                                             }
                                         }){
                                     @Override
@@ -191,13 +196,15 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
-            public void onCancel() {
-                Log.d("HF", "facebook login cancel");
+            public void onCancel()
+            {
+                Toast.makeText(MainActivity.this, "登入失敗", Toast.LENGTH_LONG).show();
+                fbLogout();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                Log.d("HF", "facebook login error - "+exception.getMessage());
+                Toast.makeText(MainActivity.this, "登入失敗", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -219,9 +226,6 @@ public class MainActivity extends AppCompatActivity implements
     {
         LoginManager.getInstance().logOut();
         prefEditor.clear().commit();
-        /*
-                            在此處理F登出後結果
-                */
     }
 
 
@@ -268,11 +272,11 @@ public class MainActivity extends AppCompatActivity implements
      * @param choose 要哪種資料 1.會員 2.紀念日 3.收藏景點 4.收藏行程
      */
     public void insertDataFromMariadbToSQLite(int choose){
-        mContext = this;
-        mQueue = Volley.newRequestQueue(mContext);
+
+        StringRequest stringRequest;
         switch (choose){
             case 1://取得會員 資料並存入sqlite
-                mStringRequest = new StringRequest(Request.Method.POST, pinkCon +"memberData.php",
+                stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"memberData.php",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -302,10 +306,11 @@ public class MainActivity extends AppCompatActivity implements
                         return map;
                     }
                 };
-                mQueue.add(mStringRequest);
+                mQueue.add(stringRequest);
                 break;
+
             case 2://取得紀念日資料並存入sqlite
-                mStringRequest = new StringRequest(Request.Method.POST, pinkCon +"memorialDays.php",
+                stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"memorialDays.php",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -335,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements
                         return map;
                     }
                 };
-                mQueue.add(mStringRequest);
+                mQueue.add(stringRequest);
                 break;
         }
         }
