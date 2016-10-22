@@ -4,7 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
-import android.util.Log;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -29,6 +30,8 @@ import org.json.JSONObject;
 import m.mcoupledate.R;
 import m.mcoupledate.classes.mapClasses.ClusterSite;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
+import m.mcoupledate.funcs.PinkCon;
+
 
 /**
  * Created by user on 2016/10/8.
@@ -44,9 +47,6 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
     public GoogleMap mMap;
 
     public ClusterManager<ClusterSite> mClusterManager;
-
-    private String pinkCon;
-
 
 
     public WorkaroundMapFragment getMapFragment(@IdRes int mapId)
@@ -120,11 +120,9 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
     }
 
 
-    public void loadPinkClusterSites(RequestQueue mQueue)
+    public void loadPinkClusterSites(final RequestQueue mQueue, final Snackbar initErrorBar)
     {
-        pinkCon = this.getResources().getString(R.string.pinkCon);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, pinkCon+"pinkClusterMap_getPinkSites.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, PinkCon.URL+"pinkClusterMap_getPinkSites.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -143,7 +141,13 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
                         }
                         catch (Exception e)
                         {
-                            Log.d("HFLoadPinkSites", e.getMessage());
+                            PinkCon.retryConnect(getRootView(), PinkCon.LOAD_PINKSITES_FAIL, initErrorBar,
+                                new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
+                                    {   loadPinkClusterSites(mQueue, initErrorBar);  }
+                                });
                         }
                     }
                 },
@@ -151,7 +155,13 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("HFLoadPinkSites", error.getMessage());
+                        PinkCon.retryConnect(getRootView(), PinkCon.LOAD_PINKSITES_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   loadPinkClusterSites(mQueue, initErrorBar);  }
+                            });
                     }
                 });
 
@@ -208,7 +218,7 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
         }
         catch(Exception e)
         {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

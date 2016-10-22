@@ -4,7 +4,7 @@ package m.mcoupledate.classes.DropDownMenu;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
-import android.text.Editable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
@@ -24,18 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +40,6 @@ import m.mcoupledate.R;
  */
 public class DropDownMenu extends LinearLayout {
 
-    private EditText searchBar;
     //顶部菜单布局
     private LinearLayout tabMenuView;
     //底部容器，包含popupMenuViews，maskView
@@ -81,9 +72,7 @@ public class DropDownMenu extends LinearLayout {
 
     public HashMap<Integer, Object> adapterMap = new HashMap<Integer, Object>();
 
-
-    private RequestQueue mQueue;
-    private String pinkCon = "http://140.117.71.216/pinkCon/";
+    public EditText searchBar;
 
 
 //    public interface SearchBarTextChangedListenerSetter {
@@ -109,7 +98,6 @@ public class DropDownMenu extends LinearLayout {
     public DropDownMenu(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        mQueue = Volley.newRequestQueue(context);
 
         setOrientation(VERTICAL);
 
@@ -128,13 +116,25 @@ public class DropDownMenu extends LinearLayout {
         menuUnselectedIcon = a.getResourceId(R.styleable.DropDownMenu_ddmenuUnselectedIcon, menuUnselectedIcon);
         a.recycle();
 
-        //初始化tabMenuView并添加到tabMenuView
-        searchBar = new EditText(context);
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        searchBar.setLayoutParams(params);
-        searchBar.setHint("搜尋景點");
-        searchBar.setBackgroundColor(menuBackgroundColor);
-        addView(searchBar, 0);
+
+        //初始化tabMenuView并添加到tabMenuView
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setLayoutParams(params);
+        linearLayout.setBackgroundColor(menuBackgroundColor);
+        linearLayout.setPadding(12, 0, 0, 0);
+        searchBar = new EditText(context);
+        searchBar.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        searchBar.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+        Button clearBtn = new Button(context);
+        clearBtn.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        clearBtn.setText("✕");
+        clearBtn.setTextSize(18f);
+        clearBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+        clearBtn.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) { searchBar.setText(""); } });
+        linearLayout.addView(searchBar, 0);
+        linearLayout.addView(clearBtn, 1);
+        addView(linearLayout, 0);
 
         View searchUnderLine = new View(getContext());
         searchUnderLine.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpTpPx(1.0f)));
@@ -451,68 +451,32 @@ public class DropDownMenu extends LinearLayout {
 
 
 
-    public void setDynamicSearch(final Context context, int searchType, int siteType)
+    public void setDynamicSearcher(DynamicSearcher dynamicSearcher)
     {
-        searchBar.addTextChangedListener( new TextWatcher()
-        {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
-            {
-                String query = searchBar.getText().toString().replace(" ", "%");
-                String spacePattern = "^[%]*$";
+        searchBar.addTextChangedListener(dynamicSearcher.getSearcher(searchBar, listRefresher));
+//        if (searchType== SearchSites.SITETYPE_ATTRACTION)
+//            searchBar.setHint("搜尋景點");
+//        else
+//            searchBar.setHint("搜尋餐廳");
 
-                if (query.matches(spacePattern))
-                    return ;
 
-                String url = null;
-                try {
-                    url = pinkCon+"searchSites.php?type=like&opt=a&mId=1150514441660964&query="+URLEncoder.encode(query, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-
-                                Log.d("HF~r", response);
-
-                                try {
-                                    listRefresher.refresh(new JSONArray(response));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d("HF", error.getMessage());
-                            }
-                        });
-                mQueue.add(stringRequest);
-
-            }
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            @Override
-            public void afterTextChanged(Editable editable) {}
-        });
     }
 
 
 
     public interface ListRefresher
     {
-        void refresh(JSONArray jArr);
+        void refresh(JSONArray jArr) throws JSONException;
     }
     private ListRefresher listRefresher;
     public void setListRefresher(ListRefresher listRefresher) {
         this.listRefresher = listRefresher;
     }
 
+    public interface DynamicSearcher
+    {
+        TextWatcher getSearcher(EditText searchBar, ListRefresher listRefresher);
+    }
 
 
 }

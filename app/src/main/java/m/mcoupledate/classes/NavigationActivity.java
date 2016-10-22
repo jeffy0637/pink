@@ -26,9 +26,9 @@ import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;
 import m.mcoupledate.ModifyMemorialDay;
+import m.mcoupledate.MyLike;
 import m.mcoupledate.R;
-import m.mcoupledate.SiteAttractionActivity;
-import m.mcoupledate.SiteInfo;
+import m.mcoupledate.SearchSites;
 import m.mcoupledate.StrokeActivity;
 
 /**
@@ -39,7 +39,7 @@ import m.mcoupledate.StrokeActivity;
  *      這個屬性，不行再跟我說
  *
  *
- *      若需用到onBackPressed這條函式(按下手機上的返回鍵時觸發)
+ *      若需用到onBackPressed這條函式(按下手機上的返回鍵時觸發) (不要Override這條!!)
  *      改Override  public Boolean onBackPressedAct() 這條
  *      若在動作完成後不需再執行其他動作時return true，反則return false
  *      可參考EditSite或SearchSites
@@ -62,10 +62,13 @@ public class NavigationActivity extends AppCompatActivity
 
     private DrawerLayout drawer;
 
+    private RelativeLayout rootView;
+
     private SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.navigation_template);
 
@@ -81,6 +84,8 @@ public class NavigationActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        rootView = (RelativeLayout) findViewById(R.id.contentContainer);
+
         pref = this.getSharedPreferences("pinkpink", 0);
 
         View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
@@ -93,8 +98,11 @@ public class NavigationActivity extends AppCompatActivity
         View contentView = LayoutInflater.from(this).inflate(layoutId, null);
         contentView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
 
-        ((RelativeLayout) findViewById(R.id.contentContainer)).addView(contentView);
+        rootView.addView(contentView);
     }
+
+    public RelativeLayout getRootView()
+    {   return rootView;    }
 
 
 
@@ -159,7 +167,7 @@ public class NavigationActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_myTravle:
-                intent = new Intent(this, SiteAttractionActivity.class);
+                intent = new Intent(this, StrokeActivity.class);
                 break;
 
             case R.id.nav_travleEdit:
@@ -172,13 +180,14 @@ public class NavigationActivity extends AppCompatActivity
                 LoginManager.getInstance().logOut();
                 this.getSharedPreferences("pinkpink", 0).edit().clear().commit();
                 intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                 //登出
                 break;
 
             case R.id.my_attraction:
-                intent = new Intent(this, SiteInfo.class);
-                intent.putExtra("sId", "7");
+                intent = new Intent(this, MyLike.class);
+                intent.putExtra("searchType", SearchSites.SEARCHTYPE_MYLIKES);
                 break;
 
             case R.id.my_restaurant:

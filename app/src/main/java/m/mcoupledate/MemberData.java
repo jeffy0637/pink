@@ -313,7 +313,8 @@ public class MemberData extends AppCompatActivity
     /**
      * 將修改的資料放入MariaDB
      */
-    public void insertIntoMariaDB(final String name, final int gender, final String birthday, final String relationship){//要給inner class用要加final
+    public void insertIntoMariaDB(final String name, final int gender, final String birthday, final String relationship)
+    {
         mContext = this;
         mRequestQueue = Volley.newRequestQueue(mContext);
         mStringRequest = new StringRequest(Request.Method.POST, conAPI+"updateMemberData.php",
@@ -333,7 +334,7 @@ public class MemberData extends AppCompatActivity
 
                 map.put("User", id);
                 map.put("Name", name);
-                map.put("Gender", ""+gender);//轉成String
+                map.put("Gender", String.valueOf(gender));
                 map.put("Birthday", birthday);
                 map.put("Relationship", relationship);
                 return map;

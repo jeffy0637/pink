@@ -1,4 +1,4 @@
-package m.mcoupledate;
+package m.mcoupledate.classes.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,9 +10,9 @@ import java.util.List;
  * Created by user on 2016/9/28.
  */
 
-public class MyFragmentAdapter extends FragmentPagerAdapter {
+public class PinkFragmentPagerAdapter extends FragmentPagerAdapter {
     private List<Fragment> fragmentList;
-    public MyFragmentAdapter(FragmentManager fm, List fragmentList) {
+    public PinkFragmentPagerAdapter(FragmentManager fm, List fragmentList) {
         super(fm);
         // TODO Auto-generated constructor stub this.
         this.fragmentList = fragmentList;

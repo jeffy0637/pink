@@ -422,32 +422,34 @@
         </FrameLayout>
 
 
-        <ListView
+        <m.mcoupledate.classes.customView.ResponsiveListView
             android:layout_width="match_parent"
-            android:layout_height="600dp"
+            android:layout_height="wrap_content"
             android:id="@+id/allComments" />
 
         <LinearLayout
             android:id="@+id/edit"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="覺得景點資訊不夠完整嗎?"
                 android:textSize="15dp"
                 android:id="@+id/editQ"
+                android:layout_weight="1"
                 android:layout_gravity="center" />
 
-            <TextView
-                android:layout_width="match_parent"
+            <Button
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="點此修改"
+                android:text="修改"
                 android:textSize="15dp"
-                android:id="@+id/want_edit"
+                android:id="@+id/editSiteBtn"
+                android:layout_weight="1"
                 android:layout_gravity="center" />
 
         </LinearLayout>

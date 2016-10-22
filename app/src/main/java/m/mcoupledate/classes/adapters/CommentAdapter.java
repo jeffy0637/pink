@@ -30,16 +30,25 @@ public class CommentAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private JSONArray sites;
 
-    private String pinkCon = "http://140.117.71.216/pinkCon/";
 
 
     public CommentAdapter (Context context, JSONArray sites)
     {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
-        this.sites = sites;
+        if (sites==null)
+        {
+            Log.d("HFCOMMENTNULL", "QQ");
+            try {
+                this.sites = new JSONArray("[]");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+            this.sites = sites;
 
-        Log.d("HFSITEJSON", sites.toString() + " = = = " + sites.length());
+//        Log.d("HFSITEJSON", sites.toString() + " = = = " + sites.length());
     }
 
     @Override
@@ -68,7 +77,7 @@ public class CommentAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.item_comment, null);
 
         JSONObject o = (JSONObject)getItem(position);
-        Log.d("HFCOMMENTJSON", o.toString());
+//        Log.d("HFCOMMENTJSON", o.toString());
 
         ((TextView) convertView.findViewById(R.id.mName)).setText(o.optString("name"));
         ((TextView) convertView.findViewById(R.id.text)).setText(o.optString("text"));

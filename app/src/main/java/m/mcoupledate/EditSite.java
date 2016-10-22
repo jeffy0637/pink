@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -70,30 +71,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
-import m.mcoupledate.classes.adapters.GridAlbumAdapter;
 import m.mcoupledate.classes.InputDialogManager;
+import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
+import m.mcoupledate.classes.adapters.GridAlbumAdapter;
 import m.mcoupledate.classes.customView.LockableScrollView;
 import m.mcoupledate.classes.customView.ResponsiveGridView;
 import m.mcoupledate.classes.customView.TimeInputEditText;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
 import m.mcoupledate.funcs.AuthChecker6;
-import m.mcoupledate.funcs.PinkErrorHandler;
+import m.mcoupledate.funcs.PinkCon;
 
 public class EditSite extends PinkClusterMapFragmentActivity implements
         GoogleMap.OnMapLongClickListener,
         View.OnClickListener {
 
     SharedPreferences pref;
-    SharedPreferences.Editor prefEditor;
 
     private LockableScrollView scrollView;
 
     private GoogleMap mMap;
 
     RequestQueue mQueue;
-    String pinkCon = "http://140.117.71.216/pinkCon/";
+    private Snackbar initErrorBar;
 
     Intent intent;
     Boolean ifEditting = false;
@@ -142,7 +142,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     private String strImage;
 
     //php位置
-    private String upLoadServerUri = pinkCon + "uploadPicture.php";
     private ProgressDialog dialog = null;
     private int serverResponseCode = 0;
 
@@ -159,9 +158,14 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_site);
 
+        intent = this.getIntent();
+        siteType = intent.getStringExtra("siteType");
+
+        mQueue = Volley.newRequestQueue(this);
+        initErrorBar = PinkCon.getInitErrorSnackBar(getRootView(), PinkCon.INIT_FAIL, this);
+
 
         pref = this.getSharedPreferences("pinkpink", 0);
-        prefEditor = pref.edit();
 
         scrollView = (LockableScrollView) findViewById(R.id.scrollView);
 
@@ -174,11 +178,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         });
 
         mapFragment.getMapAsync(this);
-
-        mQueue = Volley.newRequestQueue(this);
-
-        intent = this.getIntent();
-        siteType = intent.getStringExtra("siteType");
 
 
         title = (TextView) findViewById(R.id.title);
@@ -248,11 +247,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         {
             //  設定當地址欄內文字改變時，跟google place api要求建議字句
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2)
             {
 
-//                if (searchSuggestionStatus==USER_TYPING) // 但若是由程式改變的話則不要求
-//                {
                 String query = searchMapQuery.getText().toString().replace(" ", "+");
                 Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
 
@@ -292,12 +289,19 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                         },
                         new Response.ErrorListener() {
                             @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(EditSite.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
+                            public void onErrorResponse(VolleyError error)
+                            {
+                                PinkCon.retryConnect(getRootView(), PinkCon.SEARCH_FAIL, initErrorBar,
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            onTextChanged(charSequence, i,  i1, i2);
+                                        }
+                                    });
                             }
                         });
                 mQueue.add(stringRequest);
-//                }
             }
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -343,13 +347,13 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         siteClassCity.put("text", (TextView) findViewById(R.id.selectCity));
         siteClassCity.put("options", (ResponsiveGridView) findViewById(R.id.selectCityOptions));
         siteClassViews.put(SITECLASS_CITY, siteClassCity);
-        setClassOptions(SITECLASS_CITY, ConstellationAdapter.RADIO, null);
+        setClassOptionsData(SITECLASS_CITY, ConstellationAdapter.RADIO, null);
 
         HashMap<String, View> siteClassArea = new HashMap<String, View>();
         siteClassArea.put("text", (TextView) findViewById(R.id.selectArea));
         siteClassArea.put("options", (ResponsiveGridView) findViewById(R.id.selectAreaOptions));
         siteClassViews.put(SITECLASS_AREA, siteClassArea);
-        setClassOptions(SITECLASS_AREA, ConstellationAdapter.RADIO, "city=不限");
+        setClassOptionsData(SITECLASS_AREA, ConstellationAdapter.RADIO, "city=不限");
 
         if (siteType.compareTo("r")==0)
         {
@@ -359,19 +363,19 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             siteClassTime.put("text", (TextView) findViewById(R.id.selectTime));
             siteClassTime.put("options", (ResponsiveGridView) findViewById(R.id.selectTimeOptions));
             siteClassViews.put(SITECLASS_TIME, siteClassTime);
-            setClassOptions(SITECLASS_TIME, ConstellationAdapter.RADIO, null);
+            setClassOptionsData(SITECLASS_TIME, ConstellationAdapter.RADIO, null);
 
             HashMap<String, View> siteClassFoodKind = new HashMap<String, View>();
             siteClassFoodKind.put("text", (TextView) findViewById(R.id.selectFoodKind));
             siteClassFoodKind.put("options", (ResponsiveGridView) findViewById(R.id.selectFoodKindOptions));
             siteClassViews.put(SITECLASS_FOODKIND, siteClassFoodKind);
-            setClassOptions(SITECLASS_FOODKIND, ConstellationAdapter.CHECK, null);
+            setClassOptionsData(SITECLASS_FOODKIND, ConstellationAdapter.CHECK, null);
 
             HashMap<String, View> siteClassCountry = new HashMap<String, View>();
             siteClassCountry.put("text", (TextView) findViewById(R.id.selectCountry));
             siteClassCountry.put("options", (ResponsiveGridView) findViewById(R.id.selectCountryOptions));
             siteClassViews.put(SITECLASS_COUNTRY, siteClassCountry);
-            setClassOptions(SITECLASS_COUNTRY, ConstellationAdapter.CHECK, null);
+            setClassOptionsData(SITECLASS_COUNTRY, ConstellationAdapter.CHECK, null);
         }
 
 
@@ -471,7 +475,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                 LatLng y = new LatLng(location.getLatitude(), location.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(y, 6));
-                Log.d("HFNOWPLACE", y.toString());
+//                Log.d("HFNOWPLACE", y.toString());
             }
         };
         mapChecker.checkMapMyLocation(mMap);
@@ -482,12 +486,12 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             ifEditting = true;
             initEdittedSite(intent.getStringExtra("sId"));
         }
-        loadPinkClusterSites(mQueue);
+        loadPinkClusterSites(mQueue, initErrorBar);
     }
 
 
     @Override
-    public void onMapLongClick(LatLng latLng)
+    public void onMapLongClick(final LatLng latLng)
     {
         setTheSiteMarker(latLng, null, inputMarker);
 
@@ -507,14 +511,14 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             input.get("sName").setText("");
                             input.get("address").setText("");
                         }
-
-
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(EditSite.this, error.getMessage()+"-----"+error.toString()+"--vvv", Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        input.get("sName").setText("");
+                        input.get("address").setText("");
                     }
                 });
 
@@ -610,9 +614,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
 
 
-    //  使用者點擊搜尋按鈕時，將其位置定位至mMap
-    //  或選擇建議時，同時導至該建議的點
-    private void searchMapLocatePlace(String query)
+    //  選擇建議時，同時導至該建議的點
+    private void searchMapLocatePlace(final String query)
     {
         Uri uri = Uri.parse("https://maps.googleapis.com/maps/api/place/textsearch/json?input=" + query + "&language=zh-TW&components=country:tw&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg");
 
@@ -640,13 +643,29 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                 Toast.makeText(EditSite.this, "查無結果", Toast.LENGTH_SHORT).show();
                             }
 
-                        } catch (JSONException e) { e.printStackTrace(); }
+                        } catch (JSONException e)
+                        {
+                            PinkCon.retryConnect(getRootView(), PinkCon.SEARCH_FAIL, initErrorBar,
+                                new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
+                                    {   searchMapLocatePlace(query);  }
+                                });
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(EditSite.this, error.getMessage() + "-----" + error.toString() + "--vvv", Toast.LENGTH_LONG).show();
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        PinkCon.retryConnect(getRootView(), PinkCon.SEARCH_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   searchMapLocatePlace(query);  }
+                            });
                     }
                 });
 
@@ -667,7 +686,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         final String Px = String.valueOf(inputMarker.getPosition().longitude);
 
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon+"editSite_editSite.php",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"editSite_editSite.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -702,7 +721,13 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("HFSUBMITERROR", error.getMessage());
+                        PinkCon.retryConnect(getRootView(), PinkCon.SUBMIT_FAIL, initErrorBar,
+                            new View.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(View view)
+                                {   submit();  }
+                            });
                     }
                 }){
             @Override
@@ -727,7 +752,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                 try {
                     map.put("business_hours", timeInputDialogManager.getInputsData());
-                    Log.d("HFBUSINESSHOURSCONTENT", timeInputDialogManager.getInputsData());
+//                    Log.d("HFBUSINESSHOURSCONTENT", timeInputDialogManager.getInputsData());
                 } catch (JSONException e){
                     Log.d("HFSUBMITBUSINESSHOURS", e.getMessage());
                 }
@@ -737,9 +762,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     map.put("time", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
                     map.put("country", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
                     map.put("food_kind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
-                    Log.d("HFPOSTTESTtime", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
-                    Log.d("HFPOSTTESTcountry", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
-                    Log.d("HFPOSTTESTfoodkind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
+//                    Log.d("HFPOSTTESTtime", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
+//                    Log.d("HFPOSTTESTcountry", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
+//                    Log.d("HFPOSTTESTfoodkind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
                 }
 
                 if (ifEditting==false)
@@ -748,7 +773,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 }
                 else
                 {
-                    map.put("editType", "edit");
+                    map.put("editType", "editSiteBtn");
                     map.put("sId", intent.getStringExtra("sId"));
                 }
 
@@ -793,9 +818,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     }
 
 
-    private void setClassOptions(final int siteClass, final int selectType, String param)
+    private void setClassOptionsData(final int siteClass, final int selectType, final String param)
     {
-        final String url = pinkCon+"getSiteClasses.php?opt="+siteClass+"&"+param;
+        final String url = PinkCon.URL+"getSiteClasses.php?opt="+siteClass+"&"+param;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -815,12 +840,15 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             ConstellationAdapter cAdapter = siteClassesAdapters.get(siteClass);
 
                             if (cAdapter==null)
-                                initClassOptions(siteClass, selectType, options);
+                                setClassOptionsView(siteClass, selectType, options);
                             else
                                 cAdapter.changeData(options);
 
-                        } catch (JSONException e) {
-                            Log.d("HFJSON", e.getMessage());
+                        }
+                        catch (JSONException e)
+                        {
+                            if (!initErrorBar.isShown())
+                                initErrorBar.show();
                         }
                     }
                 },
@@ -828,9 +856,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-
-                        Log.d("HF1031", url);
-//                        Log.d("HF2", error.getMessage());
+                        Log.d("HFSETDATA", "1");
+                        if (!initErrorBar.isShown())
+                            initErrorBar.show();
                     }
                 });
 
@@ -838,7 +866,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     }
 
 
-    private void initClassOptions(final int siteClass, int selectType, List options)
+    private void setClassOptionsView(final int siteClass, int selectType, List options)
     {
         final ConstellationAdapter cAdapter = new ConstellationAdapter(this, options, selectType);
         siteClassesAdapters.put(siteClass, cAdapter);
@@ -853,7 +881,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 cAdapter.setCheckItem(position);
                 if (siteClass==SITECLASS_CITY)
                 {
-                    setClassOptions(SITECLASS_AREA, 0, "city="+cAdapter.getItem(position));
+                    setClassOptionsData(SITECLASS_AREA, 0, "city="+cAdapter.getItem(position));
 
                 }
             }
@@ -881,18 +909,18 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         selectClass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("HFCONTAINERID", String.valueOf(optionTabsContainer.getId()));
+//                Log.d("HFCONTAINERID", String.valueOf(optionTabsContainer.getId()));
 
                 if (optionTabsContainer.getVisibility()!=View.VISIBLE)
                 {
-                    Log.d("HFCONTAINERACTION", "1");
+//                    Log.d("HFCONTAINERACTION", "1");
                     optionTabsContainer.setVisibility(View.VISIBLE);
                     selectClassOptions.setVisibility(View.VISIBLE);
                     optionTabsContainer.startAnimation(optionsIn);
                 }
                 else if (selectClassOptions.getVisibility()!=View.VISIBLE)
                 {
-                    Log.d("HFCONTAINERACTION", "2");
+//                    Log.d("HFCONTAINERACTION", "2");
 
                     int a = 0;
                     while (true)
@@ -909,7 +937,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 }
                 else// if (selectClassOptions.getVisibility()==View.VISIBLE)
                 {
-                    Log.d("HFCONTAINERACTION", "3");
+//                    Log.d("HFCONTAINERACTION", "3");
                     selectClassOptions.startAnimation(optionsOut);
                 }
             }
@@ -918,7 +946,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
     private void initEdittedSite(final String sId)
     {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, pinkCon +"editSite_initEdittedSite.php?sId="+sId,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"editSite_initEdittedSite.php?sId="+sId,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -947,7 +975,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                         weekDayInputs[0][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
                                         weekDayInputs[0][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
                                         ++businessHoursIndex;
-                                        Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
+//                                        Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
 
                                         if (nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day") && businessHoursIndex < businessHours.length()) {
                                             weekDayInputs[1][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
@@ -968,7 +996,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             }
                             catch(Exception e)
                             {
-                                Log.d("HFTIMEEXCEPTION", e.getMessage());
+                                throw new Exception();
                             }
 
                             LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
@@ -980,8 +1008,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                             while(picNum>0)
                             {
-                                String url = pinkCon + "images/sitePic/" + o.getJSONArray("diffSite").getJSONObject(0).optString("picId") + (char)(seq) +".jpg";
-                                Log.d("sitePicUrl", url);
+                                String url = PinkCon.URL + "images/sitePic/" + o.getJSONArray("diffSite").getJSONObject(0).optString("picId") + (char)(seq) +".jpg";
+//                                Log.d("sitePicUrl", url);
                                 Glide.with(EditSite.this)
                                         .load(url)
                                         .asBitmap()
@@ -995,7 +1023,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                                   @Override
                                                   public void onLoadFailed(Exception e, Drawable errorDrawable)
                                                   {
-                                                      Log.d("HFGLIDEERROR", e.getMessage());
+                                                      // do nothing
                                                   }
 
                                               }
@@ -1007,25 +1035,20 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             }
 
                         }
-                        catch (Exception e) {
-                            Log.d("HFFF", e.getMessage());
+                        catch (Exception e)
+                        {
+                            if (!initErrorBar.isShown())
+                                initErrorBar.show();
                         }
-
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        PinkErrorHandler.retryConnect(scrollView, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view)
-                            {
-                                initEdittedSite(sId);
-//                                startActivity(SiteInfo.this.getIntent());
-                            }
-                        });
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        if (!initErrorBar.isShown())
+                            initErrorBar.show();
                     }
                 });
 
@@ -1241,7 +1264,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 //宣告權限 android 6 以上的要這個
                 //不知道6之下的版本需不需要這個 不需要可能要判斷版本再進來
                 FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                URL url = new URL(upLoadServerUri);
+                URL url = new URL(PinkCon.URL + "uploadPicture.php");
 
                 // Open a HTTP  connection to  the URL
                 conn = (HttpURLConnection) url.openConnection();
