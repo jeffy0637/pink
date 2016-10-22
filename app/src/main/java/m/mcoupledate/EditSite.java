@@ -595,12 +595,17 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     }
 
     @Override
-    public void onBackPressed()
+    public Boolean onBackPressedAct()
     {
         if (searchMapMask.getVisibility()==View.VISIBLE)
+        {
             searchMapMask.setVisibility(View.GONE);
-
-        super.onBackPressed();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 

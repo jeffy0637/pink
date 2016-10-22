@@ -8,8 +8,9 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,13 +22,15 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SiteSearchActivity extends AppCompatActivity implements
-        ViewPager.OnPageChangeListener,
-        View.OnClickListener {
+import m.mcoupledate.classes.NavigationActivity;
 
-    private List<View> pageList;
+public class SiteSearchActivity extends NavigationActivity implements
+        ViewPager.OnPageChangeListener,
+        View.OnClickListener
+{
+
     private ViewPager myViewPager;
-    private View page1, page2, page3; // ViewPager包含的页面
+    private List fragmentList;
     private ImageView line_tab; // tab选项卡的下划线
     private boolean isScrolling = false; // 手指是否在滑动
     private boolean isBackScrolling = false; // 手指离开后的回弹
@@ -36,7 +39,6 @@ public class SiteSearchActivity extends AppCompatActivity implements
     private TextView tv_tab0, tv_tab1, tv_tab2; // 3个选项卡
     private int moveOne = 0; // 下划线移动一个选项卡
     private BottomBar mBottomBar;
-    private String id = MainActivity.getUserId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class SiteSearchActivity extends AppCompatActivity implements
         mBottomBar.mapColorForTab(1, 0xFF5D4037);
         mBottomBar.mapColorForTab(2, "#7B1FA2");
 
+
         initView();
         initLineImage();
     }
@@ -89,31 +92,15 @@ public class SiteSearchActivity extends AppCompatActivity implements
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    private void initLineImage() {
-        // TODO Auto-generated method stub
-        /** * 获取屏幕的宽度 */
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int screenW = dm.widthPixels;
-        /** * 重新设置下划线的宽度 */
-        ViewGroup.LayoutParams lp = line_tab.getLayoutParams();
-        lp.width = screenW / 2;
-        line_tab.setLayoutParams(lp);
-        moveOne = lp.width;
-        // 滑动一个页面的距离
-    }
-
 
     public void initView(){
 
         myViewPager = (ViewPager) findViewById(R.id.myViewPager);
 
-        SearchAttraction searchAttraction = new SearchAttraction();
-        SearchRestaurant searchRestaurant = new SearchRestaurant();
 
-        List<Fragment> fragmentList = new ArrayList<Fragment>();
-        fragmentList.add(searchAttraction);
-        fragmentList.add(searchRestaurant);
+        fragmentList = new ArrayList<Fragment>();
+        fragmentList.add(SearchSites.newInstance(SearchSites.SEARCHTYPE_BROWSE, SearchSites.SITETYPE_ATTRACTION));
+        fragmentList.add(SearchSites.newInstance(SearchSites.SEARCHTYPE_BROWSE, SearchSites.SITETYPE_RESTAURANT));
 
 
         MyFragmentAdapter myFragmentAdapter = new MyFragmentAdapter(getSupportFragmentManager(), fragmentList);
@@ -130,6 +117,20 @@ public class SiteSearchActivity extends AppCompatActivity implements
 
         line_tab = (ImageView) findViewById(R.id.line_tab);
 
+    }
+
+    private void initLineImage() {
+        // TODO Auto-generated method stub
+        /** * 获取屏幕的宽度 */
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int screenW = dm.widthPixels;
+        /** * 重新设置下划线的宽度 */
+        ViewGroup.LayoutParams lp = line_tab.getLayoutParams();
+        lp.width = screenW / 2;
+        line_tab.setLayoutParams(lp);
+        moveOne = lp.width;
+        // 滑动一个页面的距离
     }
 
     @Override
@@ -202,6 +203,29 @@ public class SiteSearchActivity extends AppCompatActivity implements
     private void movePositionX(int toPosition) {
         // TODO Auto-generated method stub
         movePositionX(toPosition, 0);
+    }
+
+
+    @Override
+    public Boolean onBackPressedAct()
+    {
+        return ((SearchSites) fragmentList.get(0)).onBackPressedAct();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.topbar_search, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.topbarSearch)
+            ((SearchSites) fragmentList.get(myViewPager.getCurrentItem())).searchByClasses();
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

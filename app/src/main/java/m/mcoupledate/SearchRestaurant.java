@@ -62,10 +62,9 @@ public class SearchRestaurant extends Fragment {
     private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2;
 
     @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        View view = inflater.inflate(R.layout.page2, container, false);
+        View view = inflater.inflate(R.layout.frament_search_site, container, false);
         return view;
     }
 
@@ -82,7 +81,7 @@ public class SearchRestaurant extends Fragment {
     }
 
     private void initDropDownMenu() {
-        final View contentView = getActivity().getLayoutInflater().inflate(R.layout.activity_site_contentview, null);
+        final View contentView = getActivity().getLayoutInflater().inflate(R.layout.dropdownmenu_contentview, null);
 
         sites = new JSONArray();
         siteListAdapter = new SiteListAdapter(SearchRestaurant.this.getActivity(), sites);
@@ -247,7 +246,7 @@ public class SearchRestaurant extends Fragment {
     //設置搜尋按鈕
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getActivity().getMenuInflater().inflate(R.menu.site_search, menu);
+        getActivity().getMenuInflater().inflate(R.menu.topbar_search, menu);
 //        ((Toolbar)findViewById(R.id.action_check)).;
         return true;
     }
@@ -255,7 +254,7 @@ public class SearchRestaurant extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId()==R.id.searchSites) {
+        if (item.getItemId()==R.id.topbarSearch) {
 
             mDropDownMenu.closeMenu();
 

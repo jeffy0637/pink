@@ -23,7 +23,6 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -40,8 +39,6 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import m.mcoupledate.R;
 
@@ -137,7 +134,6 @@ public class DropDownMenu extends LinearLayout {
         searchBar.setLayoutParams(params);
         searchBar.setHint("搜尋景點");
         searchBar.setBackgroundColor(menuBackgroundColor);
-        searchBar.addTextChangedListener(getTextWatcher(context));
         addView(searchBar, 0);
 
         View searchUnderLine = new View(getContext());
@@ -162,8 +158,6 @@ public class DropDownMenu extends LinearLayout {
         containerView = new FrameLayout(context);
         containerView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         addView(containerView, 4);
-
-
     }
 
     public interface OnDefultMenuSelectListener {
@@ -457,22 +451,18 @@ public class DropDownMenu extends LinearLayout {
 
 
 
-    private TextWatcher getTextWatcher(final Context context)
+    public void setDynamicSearch(final Context context, int searchType, int siteType)
     {
-        return new TextWatcher()
+        searchBar.addTextChangedListener( new TextWatcher()
         {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
             {
                 String query = searchBar.getText().toString().replace(" ", "%");
+                String spacePattern = "^[%]*$";
 
-                Matcher m = Pattern.compile("^[%]*$").matcher(query);
-
-                if (m.find())
-                {
-                    Toast.makeText(context, "space", Toast.LENGTH_SHORT).show();
+                if (query.matches(spacePattern))
                     return ;
-                }
 
                 String url = null;
                 try {
@@ -509,7 +499,7 @@ public class DropDownMenu extends LinearLayout {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void afterTextChanged(Editable editable) {}
-        };
+        });
     }
 
 
