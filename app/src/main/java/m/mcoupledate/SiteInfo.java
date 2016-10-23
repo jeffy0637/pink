@@ -11,11 +11,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -56,7 +56,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     SharedPreferences pref;
 
     private RequestQueue mQueue;
-    private Snackbar initErrorBar;
+    private PinkCon.InitErrorBar initErrorBar;
 
     private String sId, mId, picId;
     private String siteTypeName;
@@ -209,21 +209,23 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                     @Override
                     public void onResponse(String response)
                     {
+                        Log.d("HFSITE", "siteInfo_initSiteInfo.php?sId="+sId+"&mId="+mId);
+                        Log.d("HFSITE", response);
+
                         try {
                             final JSONObject o = new JSONObject(response);
 
                             final JSONObject site = o.getJSONArray("site").getJSONObject(0);
 
                             String[] siteColName = {"sName", "area", "address", "description", "phone", "website", "transportation", "activity", "note"};
-                            for (String colName : siteColName)
-                            {
+                            for (String colName : siteColName) {
                                 String content;
-                                if (colName.compareTo("area")==0)
+                                if (colName.compareTo("area") == 0)
                                     content = site.optString("city") + site.optString("area");//合併城市跟區域
                                 else
                                     content = site.optString(colName);
 
-                                if (content!=null && content.compareTo("null")!=0)
+                                if (content != null && content.compareTo("null") != 0)
                                     siteCol.get(colName).setText(content);
                             }
 
@@ -310,7 +312,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                                 }});
 
 
-                            if (o.optString("myComment").compareTo("null")==0)
+                            if (o.optJSONArray("myComment").length()==0)
                             {
                                 ifCommented = false;
                             }
@@ -318,7 +320,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                             {
                                 ifCommented = true;
 
-                                JSONObject myComment = new JSONObject(o.optString("myComment"));
+                                JSONObject myComment = o.optJSONArray("myComment").optJSONObject(0);
                                 setCommentContent((float) myComment.optDouble("person_love"), myComment.optString("text"));
                             }
 
@@ -335,30 +337,25 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 //                            mMap..animateCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siteLatLng, (mMap.getMaxZoomLevel()-8)));
 
-                            setTheSiteMarker(siteLatLng, site.optString("sName"), null);
+                            setTheSiteMarker(siteLatLng, site.optString("sName"));
 //                            mMap.addMarker(new MarkerOptions().position(siteLatLng).title(site.optString("sName"))
 //                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
-
-
 
                             allCommentsAdapter = new CommentAdapter(SiteInfo.this, o.optJSONArray("allComments"));
                             allComments = (ListView) findViewById(R.id.allComments);
                             allComments.setAdapter(allCommentsAdapter);
+
+
+
                         }
                         catch (Exception e)
-                        {
-                            if (!initErrorBar.isShown())
-                                initErrorBar.show();
-                        }
+                        {    initErrorBar.show("HFINITSITEA", e.getMessage());   }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error)
-                    {
-                        if (!initErrorBar.isShown())
-                            initErrorBar.show();
-                    }
+                    {    initErrorBar.show("HFINITSITE", error.getMessage());   }
                 });
 
         mQueue.add(stringRequest);

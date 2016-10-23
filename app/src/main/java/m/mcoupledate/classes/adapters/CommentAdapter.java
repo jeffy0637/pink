@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ public class CommentAdapter extends BaseAdapter {
         this.mInflater = LayoutInflater.from(context);
         if (sites==null)
         {
-            Log.d("HFCOMMENTNULL", "QQ");
             try {
                 this.sites = new JSONArray("[]");
             } catch (JSONException e) {

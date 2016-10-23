@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Title"
-            android:id="@+id/title"
+            android:id="@+id/siteTitle"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -36,7 +36,7 @@
             android:id="@+id/hr"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/title" />
+            android:layout_below="@+id/siteTitle" />
 
 
         <FrameLayout
@@ -203,7 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/cityAreaInputBtn"
-                    android:src="@drawable/edit"
+                    android:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
             </FrameLayout>
         </LinearLayout>
@@ -330,7 +330,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/timeInputBtn"
-                    android:src="@drawable/edit"
+                    android:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
             </FrameLayout>
         </LinearLayout>
@@ -339,10 +339,11 @@
         <LinearLayout
             android:id="@+id/layout_newsite_trans"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/info_layout_height"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/layout_newsite_time"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:minHeight="@dimen/info_layout_height">
 
             <FrameLayout
                 android:id="@+id/left_layout_newsite_trans"
@@ -444,10 +445,11 @@
         <LinearLayout
             android:id="@+id/layout_newsite_activity"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/info_layout_height"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/layout_newsite_website"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:minHeight="@dimen/info_layout_height">
 
             <FrameLayout
                 android:id="@+id/left_layout_newsite_activity"
@@ -479,10 +481,11 @@
         <LinearLayout
             android:id="@+id/layout_newsite_note"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/info_layout_height"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/layout_newsite_activity"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:minHeight="@dimen/info_layout_height">
 
             <FrameLayout
                 android:id="@+id/left_layout_newsite_note"
@@ -535,7 +538,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/uploadPic_album"
-                android:src="@drawable/album" />
+                android:srcCompat="@drawable/album" />
 
 
             <ImageButton
@@ -543,7 +546,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/uploadPic_camera"
-                android:src="@drawable/camera" />
+                android:srcCompat="@drawable/camera" />
 
             <ImageButton
                 android:layout_width="wrap_content"

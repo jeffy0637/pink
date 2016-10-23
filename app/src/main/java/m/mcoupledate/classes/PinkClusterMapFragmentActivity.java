@@ -1,10 +1,9 @@
 package m.mcoupledate.classes;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,10 +24,12 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import m.mcoupledate.R;
+import m.mcoupledate.SiteInfo;
 import m.mcoupledate.classes.mapClasses.ClusterSite;
+import m.mcoupledate.classes.mapClasses.ClusterSiteInfoWindowAdapter;
+import m.mcoupledate.classes.mapClasses.ClusterSiteRenderer;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
 import m.mcoupledate.funcs.PinkCon;
 
@@ -47,6 +48,8 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
     public GoogleMap mMap;
 
     public ClusterManager<ClusterSite> mClusterManager;
+
+    private Marker theSiteMarker = null;
 
 
     public WorkaroundMapFragment getMapFragment(@IdRes int mapId)
@@ -77,17 +80,19 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
 
         mClusterManager = new ClusterManager<ClusterSite>(this, mMap);
 
-//        mClusterManager.setRenderer(new ClusterSiteRenderer(context, mMap, mClusterManager));
+        mClusterManager.setRenderer(new ClusterSiteRenderer(this, mMap, mClusterManager));
 
-        mMap.setOnMarkerClickListener(mClusterManager);
         mMap.setOnCameraIdleListener(mClusterManager);
-        //mMap.setOnInfoWindowClickListener(mClusterManager); //  當點擊資訊視窗時引發事件
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setOnInfoWindowClickListener(mClusterManager);
+        mMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
 
         // 當點擊群集時引發事件
         mClusterManager.setOnClusterClickListener(this);
         mClusterManager.setOnClusterInfoWindowClickListener(this);
         mClusterManager.setOnClusterItemClickListener(this);
         mClusterManager.setOnClusterItemInfoWindowClickListener(this);
+        mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new ClusterSiteInfoWindowAdapter(this, this.getIntent().getBooleanExtra("ifNeedAroundsInfo", true)));
     }
 
     public void addClusterMarker(ClusterSite clusterSite, Boolean ifCluster)
@@ -98,10 +103,10 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
             mClusterManager.cluster();
     }
 
-    public void setTheSiteMarker(LatLng inputLatLng, String title, Marker inputMarker)
+    public void setTheSiteMarker(LatLng inputLatLng, String title)
     {
-        if (inputMarker!=null)
-            inputMarker.remove();
+        if (theSiteMarker !=null)
+            theSiteMarker.remove();
 
         float zoomLevel = 0;
         if (mMap.getCameraPosition().zoom<(mMap.getMaxZoomLevel()-8))
@@ -112,15 +117,20 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(inputLatLng, zoomLevel));
         try
         {
-            inputMarker = mMap.addMarker(new MarkerOptions().position(inputLatLng).title(title).icon(BitmapDescriptorFactory.fromResource(R.drawable.thesite)));
-            inputMarker.showInfoWindow();
+            theSiteMarker = mMap.addMarker(new MarkerOptions().position(inputLatLng).title(title).icon(BitmapDescriptorFactory.fromResource(R.drawable.map_thesite)));
+            theSiteMarker.showInfoWindow();
         }
         catch (Exception e)
         {}
     }
 
+    protected Marker getTheSite()
+    {
+        return theSiteMarker;
+    }
 
-    public void loadPinkClusterSites(final RequestQueue mQueue, final Snackbar initErrorBar)
+
+    public void loadPinkClusterSites(final RequestQueue mQueue, final PinkCon.InitErrorBar initErrorBar)
     {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, PinkCon.URL+"pinkClusterMap_getPinkSites.php",
                 new Response.Listener<String>() {
@@ -129,14 +139,13 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
                         try
                         {
                             JSONArray jArr = new JSONArray(response);
-                            JSONObject o;
 
-                            Bitmap bitmap = BitmapFactory.decodeResource(PinkClusterMapFragmentActivity.this.getResources(), R.drawable.couple);
                             for (int a=0; a<jArr.length(); ++a)
                             {
-                                o = jArr.getJSONObject(a);
-
-                                addClusterMarker(new ClusterSite(new LatLng(o.optDouble("Py"), o.optDouble("Px")), o.optString("sName"), bitmap), true);
+                                if ((a%35)==34 || a==(jArr.length()-1))
+                                    addClusterMarker(new ClusterSite(jArr.getJSONObject(a)), true);
+                                else
+                                    addClusterMarker(new ClusterSite(jArr.getJSONObject(a)), false);
                             }
                         }
                         catch (Exception e)
@@ -211,14 +220,14 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
     }
 
     @Override
-    public void onClusterItemInfoWindowClick(ClusterSite clusterSite) {
-        try
-        {
-            Toast.makeText(this, clusterSite.name, Toast.LENGTH_SHORT).show();
-        }
-        catch(Exception e)
-        {
-//            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+    public void onClusterItemInfoWindowClick(ClusterSite clusterSite)
+    {
+        if (!this.getIntent().getBooleanExtra("ifNeedAroundsInfo", true))
+            return;
+
+        Intent intent = new Intent(this, SiteInfo.class);
+        intent.putExtra("sId", clusterSite.sId);
+        intent.putExtra("ifNeedAroundsInfo", false);
+        startActivity(intent);
     }
 }

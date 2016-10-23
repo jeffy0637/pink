@@ -77,7 +77,7 @@ public class SiteListAdapter extends BaseAdapter {
 
 
         try {
-            ((TextView) convertView.findViewById(R.id.title)).setText(o.optString("sName"));
+            ((TextView) convertView.findViewById(R.id.siteTitle)).setText(o.optString("sName"));
             ((TextView) convertView.findViewById(R.id.location)).setText(o.optString("address"));
 
 

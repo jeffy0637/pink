@@ -3,6 +3,7 @@ package m.mcoupledate.funcs;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -18,31 +19,66 @@ public class PinkCon
 
     public static final String URL = "http://140.117.71.216/pinkCon/";
 
-    public static void retryConnect(View rootView, String msg, Snackbar initErrorBar, View.OnClickListener onClickListener)
+    public static void retryConnect(View rootView, String msg, InitErrorBar initErrorBar, View.OnClickListener onClickListener)
     {
         if ((initErrorBar!=null && !initErrorBar.isShown()) || initErrorBar==null)
             Snackbar.make(rootView, msg, Snackbar.LENGTH_INDEFINITE).setAction("再試一次", onClickListener).show();
     }
 
-    public static Snackbar getInitErrorSnackBar(View rootView, String msg, final Activity activity)
+    public static InitErrorBar getInitErrorSnackBar(View rootView, String msg, final Activity activity)
     {
-        return Snackbar.make(rootView, msg, Snackbar.LENGTH_INDEFINITE).setAction("重新整理", new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
+        return new InitErrorBar(
+                Snackbar.make(rootView, msg, Snackbar.LENGTH_INDEFINITE).setAction("重新整理", new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+
+                        Intent reloadIntent = activity.getIntent();
+                        if (reloadIntent!=null)
+                            reloadIntent.setClass(activity, activity.getClass());
+                        else
+                            reloadIntent = new Intent(activity, activity.getClass());
+
+                        reloadIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        activity.overridePendingTransition(0, 0);
+                        activity.startActivity(reloadIntent);
+                        activity.finish();
+                    }
+                })
+        );
+    }
+
+    public static class InitErrorBar
+    {
+        private Snackbar snackbar;
+
+        public InitErrorBar(Snackbar snackbar)
+        {   this.snackbar = snackbar;   }
+
+        public void show(String errorTitle, String errorMsg)
+        {
+            if (!snackbar.isShown())
+                snackbar.show();
+
+            try
+            {   Log.d(errorTitle, errorMsg);    }
+            catch (Exception e)
             {
-
-                Intent reloadIntent = activity.getIntent();
-                if (reloadIntent!=null)
-                    reloadIntent.setClass(activity, activity.getClass());
-                else
-                    reloadIntent = new Intent(activity, activity.getClass());
-
-                reloadIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                activity.overridePendingTransition(0, 0);
-                activity.startActivity(reloadIntent);
-                activity.finish();
+                Log.d("HFcannotPrintError", errorTitle);
             }
-        });
+        }
+
+        public void show()
+        {
+            if (!snackbar.isShown())
+                snackbar.show();
+        }
+
+        protected Boolean isShown()
+        {
+            return snackbar.isShown();
+        }
     }
 
 

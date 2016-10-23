@@ -3,7 +3,6 @@ package  m.mcoupledate;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -51,7 +50,7 @@ public class SearchSites extends Fragment
     SharedPreferences pref;
 
     RequestQueue mQueue;
-    private Snackbar initErrorBar;
+    private PinkCon.InitErrorBar initErrorBar;
 
 
     private ListView siteListView;
@@ -207,20 +206,14 @@ public class SearchSites extends Fragment
                             mDropDownMenu.setDropDownMenu(headers, menuOption, contentView);
 
                         } catch (Exception e)
-                        {
-                            if (!initErrorBar.isShown())
-                                initErrorBar.show();
-                        }
+                        {    initErrorBar.show();   }
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error)
-                    {
-                        if (!initErrorBar.isShown())
-                            initErrorBar.show();
-                    }
+                    {    initErrorBar.show();   }
                 });
 
         mQueue.add(stringRequest);

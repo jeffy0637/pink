@@ -18,7 +18,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.StatFs;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -52,7 +51,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,7 +91,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     private GoogleMap mMap;
 
     RequestQueue mQueue;
-    private Snackbar initErrorBar;
+    private PinkCon.InitErrorBar initErrorBar;
 
     Intent intent;
     Boolean ifEditting = false;
@@ -118,7 +116,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     ArrayAdapter<String> searchMapAdapter;
     ArrayList<String> searchMapSuggestions;
 
-    private Marker inputMarker = null;
 
     private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2, SITECLASS_TIME = 3, SITECLASS_FOODKIND = 4, SITECLASS_COUNTRY = 5;
     private SparseArray<HashMap<String, View>> siteClassViews = new SparseArray<HashMap<String, View>>();
@@ -180,7 +177,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         mapFragment.getMapAsync(this);
 
 
-        title = (TextView) findViewById(R.id.title);
+        title = (TextView) findViewById(R.id.siteTitle);
         title.setText(siteType);
 
 
@@ -493,7 +490,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     @Override
     public void onMapLongClick(final LatLng latLng)
     {
-        setTheSiteMarker(latLng, null, inputMarker);
+        setTheSiteMarker(latLng, null);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://maps.googleapis.com/maps/api/geocode/json?latlng="+String.valueOf(latLng.latitude)+","+String.valueOf(latLng.longitude)+"&result_type=street_address&language=zh-TW&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg",
                 new Response.Listener<String>() {
@@ -636,7 +633,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                 JSONObject placeLocation = place.getJSONObject("geometry").getJSONObject("location");
                                 LatLng placeLatLng = new LatLng(placeLocation.optDouble("lat"), placeLocation.optDouble("lng"));
 
-                                setTheSiteMarker(placeLatLng, place.optString("name"), inputMarker);
+                                setTheSiteMarker(placeLatLng, place.optString("name"));
                             }
                             else
                             {
@@ -682,8 +679,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         if (checkForm(input)==false)
             return ;
 
-        final String Py = String.valueOf(inputMarker.getPosition().latitude);
-        final String Px = String.valueOf(inputMarker.getPosition().longitude);
+        final String Py = String.valueOf(getTheSite().getPosition().latitude);
+        final String Px = String.valueOf(getTheSite().getPosition().longitude);
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"editSite_editSite.php",
@@ -804,7 +801,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             }
         }
 
-        if (inputMarker == null)
+        if (getTheSite() == null)
         {
             status = false;
             msg += "\n並在地圖上選擇地點";
@@ -846,20 +843,13 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                         }
                         catch (JSONException e)
-                        {
-                            if (!initErrorBar.isShown())
-                                initErrorBar.show();
-                        }
+                        {   initErrorBar.show("HFsetClassesError", e.getMessage());    }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error)
-                    {
-                        Log.d("HFSETDATA", "1");
-                        if (!initErrorBar.isShown())
-                            initErrorBar.show();
-                    }
+                    {    initErrorBar.show("HFsetClassesrror", error.getMessage());   }
                 });
 
         mQueue.add(stringRequest);
@@ -960,7 +950,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             String[] siteColName = {"sName", "description", "address", "phone", "transportation", "email", "website", "activity", "note"};
                             for (String colName : siteColName)
                             {
-                                if (site.optString(colName)!=null)
+                                if (site.optString(colName)!=null && site.optString(colName).compareTo("null")!=0)
                                     input.get(colName).setText(site.optString(colName));
                             }
 
@@ -971,13 +961,13 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                 int nowDay = 0, businessHoursIndex = 0;
                                 for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][]) timeInputDialogManager.vars.get("inputIds")) {
                                     ++nowDay;
-                                    if (nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day") && businessHoursIndex < businessHours.length()) {
+                                    if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
                                         weekDayInputs[0][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
                                         weekDayInputs[0][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
                                         ++businessHoursIndex;
 //                                        Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
 
-                                        if (nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day") && businessHoursIndex < businessHours.length()) {
+                                        if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
                                             weekDayInputs[1][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
                                             weekDayInputs[1][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
                                             ++businessHoursIndex;
@@ -996,11 +986,11 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                             }
                             catch(Exception e)
                             {
-                                throw new Exception();
+                                throw new Exception(e.getMessage());
                             }
 
                             LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
-                            setTheSiteMarker(siteLatLng, site.optString("sName"), inputMarker);
+                            setTheSiteMarker(siteLatLng, site.optString("sName"));
 
 
                             int seq = 97;
@@ -1036,20 +1026,14 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                         }
                         catch (Exception e)
-                        {
-                            if (!initErrorBar.isShown())
-                                initErrorBar.show();
-                        }
+                        {       initErrorBar.show("HFinitEditSite", e.getMessage());    }
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error)
-                    {
-                        if (!initErrorBar.isShown())
-                            initErrorBar.show();
-                    }
+                    {   initErrorBar.show("HFinitEditSiteB", error.getMessage());    }
                 });
 
 

@@ -52,7 +52,7 @@ public class TimeInputEditText extends EditText
                 }
                 else
                 {
-                    if (text.matches(stdTimePattern))
+                    if (text.matches(stdTimePattern) || text.compareTo("")==0)
                     {   }
                     else if (text.matches(noPreZeroTimePattern))
                     {
