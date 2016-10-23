@@ -51,7 +51,7 @@ public class IversonTest extends Activity {
 //                    Firebase siteRef = (dataSnapshot.child("site").child("" + dataSnapshot.child("site").getChildrenCount()).getRef());//上面寫法是為了從要找的節點加入
 //                    //Firebase myFirebaseRef = new Firebase(url);//下面寫法是為了從給定節點加入
 //                    //Firebase siteRef = myFirebaseRef.child("0/site").child("" + dataSnapshot.child("site").getChildrenCount());
-//                    Site site = new Site(2, "這是一個屌地方", 8, 5);
+//                    Site site = new Site(2, "這是一個屌地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
 //                    siteRef.setValue(site);
 
 //                    //在特定行程算出幾天
