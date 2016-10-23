@@ -2,6 +2,7 @@
 
 <m.mcoupledate.classes.customView.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
     android:scrollbars="none"
@@ -203,7 +204,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/cityAreaInputBtn"
-                    android:srcCompat="@drawable/edit"
+                    app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
             </FrameLayout>
         </LinearLayout>
@@ -330,7 +331,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/timeInputBtn"
-                    android:srcCompat="@drawable/edit"
+                    app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
             </FrameLayout>
         </LinearLayout>
@@ -538,7 +539,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/uploadPic_album"
-                android:srcCompat="@drawable/album" />
+                app:srcCompat="@drawable/album" />
 
 
             <ImageButton
@@ -546,7 +547,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:id="@+id/uploadPic_camera"
-                android:srcCompat="@drawable/camera" />
+                app:srcCompat="@drawable/camera" />
 
             <ImageButton
                 android:layout_width="wrap_content"
