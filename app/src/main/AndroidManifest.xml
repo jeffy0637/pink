@@ -64,9 +64,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SiteActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".SiteInfo"
             android:label="景點資訊"
             android:screenOrientation="portrait"
@@ -91,9 +88,13 @@
             android:name=".StrokeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".IversonTest" />
-        <activity android:name=".MyLike"
+        <activity
+            android:name=".MyLike"
             android:label="我的收藏"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TravelMap"
+            android:label="@string/title_activity_travel_map"></activity>
     </application>
 
 </manifest>

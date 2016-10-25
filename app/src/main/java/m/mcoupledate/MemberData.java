@@ -297,7 +297,7 @@ public class MemberData extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_memorialDay) {
 
-        }else if (id == R.id.nav_myTravle) {
+        }else if (id == R.id.nav_myTravel) {
 
         } else if (id == R.id.nav_travleEdit) {
 

@@ -21,6 +21,9 @@ import android.widget.TextView;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import m.mcoupledate.EditSite;
 import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
@@ -30,6 +33,7 @@ import m.mcoupledate.MyLike;
 import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
 import m.mcoupledate.StrokeActivity;
+import m.mcoupledate.TravelMap;
 
 /**
  *      用於左側選單，使用時只要 extends NavigationActivity即可
@@ -162,12 +166,15 @@ public class NavigationActivity extends AppCompatActivity
                 break;
 
             case R.id.homepage:
-                // 設定從這個活動跳至 home 的活動
                 intent = new Intent(this, HomePageActivity.class);
                 break;
 
-            case R.id.nav_myTravle:
-                intent = new Intent(this, StrokeActivity.class);
+            case R.id.nav_myTravel:
+                intent = new Intent(this, TravelMap.class);
+
+                ArrayList<String> routeSites2 = new ArrayList<String>(Arrays.asList("209", "1160", "7", "225", "1"));
+                intent.putExtra("routeSites", routeSites2);
+
                 break;
 
             case R.id.nav_travleEdit:

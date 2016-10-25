@@ -15,7 +15,7 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/page_memorialDay" />
         <item
-            android:id="@+id/nav_myTravle"
+            android:id="@+id/nav_myTravel"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/page_myTravle" />
         <item

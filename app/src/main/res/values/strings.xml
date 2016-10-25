@@ -186,4 +186,5 @@
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="title_activity_nav">NavActivity</string>
     <string name="title_activity_my_like">MyLike</string>
+    <string name="title_activity_travel_map">Map</string>
 </resources>
