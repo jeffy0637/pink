@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -66,17 +66,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.InputDialogManager;
 import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
 import m.mcoupledate.classes.adapters.GridAlbumAdapter;
+import m.mcoupledate.classes.adapters.SelectClassExpandableListAdapter;
 import m.mcoupledate.classes.customView.LockableScrollView;
-import m.mcoupledate.classes.customView.ResponsiveGridView;
 import m.mcoupledate.classes.customView.TimeInputEditText;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
+import m.mcoupledate.funcs.Actioner;
 import m.mcoupledate.funcs.AuthChecker6;
 import m.mcoupledate.funcs.PinkCon;
 
@@ -103,8 +103,10 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
 
     private Map<String, EditText> input;    //  輸入欄位的map
-    private ImageButton cityAreaInputBtn, timeInputBtn;
-    private InputDialogManager cityAreaInputDialogManager, restaurantClassessInputDialogManager, timeInputDialogManager;
+    private ImageButton cityAreaInputBtn, restaurantClassesInputBtn, timeInputBtn;
+    private InputDialogManager[] cityAreaInputDialogManager = new InputDialogManager[1], restaurantClassesInputDialogManager = new InputDialogManager[1];
+    private final int SELECTSITECLASSINPUTDIALOGTYPE_SITEAREA = 0, SELECTSITECLASSINPUTDIALOGTYPE_RESTAURANT = 1;
+    private InputDialogManager timeInputDialogManager;
 
 
     //  搜尋地圖
@@ -115,11 +117,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
     ArrayAdapter<String> searchMapAdapter;
     ArrayList<String> searchMapSuggestions;
-
-
-    private final int SITECLASS_CITY = 1, SITECLASS_AREA = 2, SITECLASS_TIME = 3, SITECLASS_FOODKIND = 4, SITECLASS_COUNTRY = 5;
-    private SparseArray<HashMap<String, View>> siteClassViews = new SparseArray<HashMap<String, View>>();
-    private HashMap<Integer, ConstellationAdapter> siteClassesAdapters = new HashMap<Integer, ConstellationAdapter>();
 
 
     private InputMethodManager keyboard;
@@ -339,52 +336,69 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
 
 
+        final ArrayList<HashMap<String, Object>> classesCityArea = new ArrayList<HashMap<String, Object>>();
 
-        HashMap<String, View> siteClassCity = new HashMap<String, View>();
-        siteClassCity.put("text", (TextView) findViewById(R.id.selectCity));
-        siteClassCity.put("options", (ResponsiveGridView) findViewById(R.id.selectCityOptions));
-        siteClassViews.put(SITECLASS_CITY, siteClassCity);
-        setClassOptionsData(SITECLASS_CITY, ConstellationAdapter.RADIO, null);
+        HashMap<String, Object> classCity = new HashMap<String, Object>();
+        classCity.put("classType", SelectClassExpandableListAdapter.SELECTCLASS_CITY);
+        classCity.put("optionSelectType", ConstellationAdapter.RADIO);
+        classesCityArea.add(classCity);
 
-        HashMap<String, View> siteClassArea = new HashMap<String, View>();
-        siteClassArea.put("text", (TextView) findViewById(R.id.selectArea));
-        siteClassArea.put("options", (ResponsiveGridView) findViewById(R.id.selectAreaOptions));
-        siteClassViews.put(SITECLASS_AREA, siteClassArea);
-        setClassOptionsData(SITECLASS_AREA, ConstellationAdapter.RADIO, "city=不限");
+        HashMap<String, Object> classArea = new HashMap<String, Object>();
+        classArea.put("classType", SelectClassExpandableListAdapter.SELECTCLASS_AREA);
+        classArea.put("optionSelectType", ConstellationAdapter.RADIO);
+        classesCityArea.add(classArea);
+
+        initSelectSiteClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_SITEAREA, cityAreaInputDialogManager, classesCityArea, (TextView) findViewById(R.id.valueText_cityArea),
+                new Actioner(){
+                    @Override
+                    public void act(Object... args)
+                    {
+                        cityAreaInputBtn = (ImageButton) findViewById(R.id.cityAreaInputBtn);
+                        cityAreaInputBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                cityAreaInputDialogManager[0].dialog.show();
+                            }
+                        });
+                    }
+                });
+
 
         if (siteType.compareTo("r")==0)
         {
-            ((LinearLayout) findViewById(R.id.selectSiteClass_restaurantText)).setVisibility(View.VISIBLE);
+            final ArrayList<HashMap<String, Object>> classesRestaurant = new ArrayList<HashMap<String, Object>>();
 
-            HashMap<String, View> siteClassTime = new HashMap<String, View>();
-            siteClassTime.put("text", (TextView) findViewById(R.id.selectTime));
-            siteClassTime.put("options", (ResponsiveGridView) findViewById(R.id.selectTimeOptions));
-            siteClassViews.put(SITECLASS_TIME, siteClassTime);
-            setClassOptionsData(SITECLASS_TIME, ConstellationAdapter.RADIO, null);
+            HashMap<String, Object> classTime = new HashMap<String, Object>();
+            classTime.put("classType", SelectClassExpandableListAdapter.SELECTCLASS_TIME);
+            classTime.put("optionSelectType", ConstellationAdapter.CHECK);
+            classesRestaurant.add(classTime);
 
-            HashMap<String, View> siteClassFoodKind = new HashMap<String, View>();
-            siteClassFoodKind.put("text", (TextView) findViewById(R.id.selectFoodKind));
-            siteClassFoodKind.put("options", (ResponsiveGridView) findViewById(R.id.selectFoodKindOptions));
-            siteClassViews.put(SITECLASS_FOODKIND, siteClassFoodKind);
-            setClassOptionsData(SITECLASS_FOODKIND, ConstellationAdapter.CHECK, null);
+            HashMap<String, Object> classFoodKind = new HashMap<String, Object>();
+            classFoodKind.put("classType", SelectClassExpandableListAdapter.SELECTCLASS_FOODKIND);
+            classFoodKind.put("optionSelectType", ConstellationAdapter.CHECK);
+            classesRestaurant.add(classFoodKind);
 
-            HashMap<String, View> siteClassCountry = new HashMap<String, View>();
-            siteClassCountry.put("text", (TextView) findViewById(R.id.selectCountry));
-            siteClassCountry.put("options", (ResponsiveGridView) findViewById(R.id.selectCountryOptions));
-            siteClassViews.put(SITECLASS_COUNTRY, siteClassCountry);
-            setClassOptionsData(SITECLASS_COUNTRY, ConstellationAdapter.CHECK, null);
+            HashMap<String, Object> classCountry = new HashMap<String, Object>();
+            classCountry.put("classType", SelectClassExpandableListAdapter.SELECTCLASS_COUNTRY);
+            classCountry.put("optionSelectType", ConstellationAdapter.CHECK);
+            classesRestaurant.add(classCountry);
+
+            initSelectSiteClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_RESTAURANT, restaurantClassesInputDialogManager, classesRestaurant, (TextView) findViewById(R.id.valueText_restaurantClasses),
+                    new Actioner(){
+                        @Override
+                        public void act(Object... args)
+                        {
+                            restaurantClassesInputBtn = (ImageButton) findViewById(R.id.restaurantClassesInputBtn);
+                            restaurantClassesInputBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    restaurantClassesInputDialogManager[0].dialog.show();
+                                }
+                            });
+                        }
+                    });
         }
 
-
-        cityAreaInputDialogManager = new InputDialogManager(EditSite.this, R.layout.dialog_content_select_city_area_classes, "區域類別");
-
-        cityAreaInputBtn = (ImageButton) findViewById(R.id.cityAreaInputBtn);
-        cityAreaInputBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cityAreaInputDialogManager.dialog.show();
-            }
-        });
 
 
 
@@ -718,7 +732,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        PinkCon.retryConnect(getRootView(), PinkCon.SUBMIT_FAIL, initErrorBar,
+                        PinkCon.retryConnect(getRootView(), PinkCon.SUBMIT_FAIL, initErrorBar, "HFSUBMITERR", error.getMessage(),
                             new View.OnClickListener()
                             {
                                 @Override
@@ -741,28 +755,31 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 map.put("Py", Py);
                 map.put("Px", Px);
                 map.put("activity", input.get("activity").getText().toString());
-                map.put("city", siteClassesAdapters.get(SITECLASS_CITY).getCheckedListJSONArray().optString(0));
-                map.put("area", siteClassesAdapters.get(SITECLASS_AREA).getCheckedListJSONArray().optString(0));
                 map.put("creator", pref.getString("mId", null));
                 map.put("note", input.get("note").getText().toString());
                 map.put("siteType", siteType);
 
-                try {
+                try
+                {
+
+                    map.put("city", cityAreaInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_CITY)).optString(0));
+                    map.put("area",  cityAreaInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_AREA)).optString(0));
                     map.put("business_hours", timeInputDialogManager.getInputsData());
-//                    Log.d("HFBUSINESSHOURSCONTENT", timeInputDialogManager.getInputsData());
-                } catch (JSONException e){
+
+                    if (siteType.compareTo("r")==0)
+                    {
+                        map.put("time", restaurantClassesInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_TIME)).optString(0));
+                        map.put("food_kind", restaurantClassesInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_FOODKIND)).toString());
+                        map.put("country", restaurantClassesInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_COUNTRY)).toString());
+                    }
+
+                }
+                catch (JSONException e)
+                {
                     Log.d("HFSUBMITBUSINESSHOURS", e.getMessage());
                 }
 
-                if (siteType.compareTo("r")==0)
-                {
-                    map.put("time", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
-                    map.put("country", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
-                    map.put("food_kind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
-//                    Log.d("HFPOSTTESTtime", siteClassesAdapters.get(SITECLASS_TIME).getCheckedListJSONArray().optString(0));
-//                    Log.d("HFPOSTTESTcountry", siteClassesAdapters.get(SITECLASS_COUNTRY).getCheckedListJSONString());
-//                    Log.d("HFPOSTTESTfoodkind", siteClassesAdapters.get(SITECLASS_FOODKIND).getCheckedListJSONString());
-                }
+
 
                 if (ifEditting==false)
                 {
@@ -814,125 +831,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
     }
 
-
-    private void setClassOptionsData(final int siteClass, final int selectType, final String param)
-    {
-        final String url = PinkCon.URL+"getSiteClasses.php?opt="+siteClass+"&"+param;
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        try {
-
-                            JSONArray jArr = new JSONArray(response);
-                            List options = new ArrayList<String>();
-
-
-                            for (int a=0; a<jArr.length(); ++a)
-                                options.add(jArr.getJSONObject(a).optString("oName"));
-
-
-                            ConstellationAdapter cAdapter = siteClassesAdapters.get(siteClass);
-
-                            if (cAdapter==null)
-                                setClassOptionsView(siteClass, selectType, options);
-                            else
-                                cAdapter.changeData(options);
-
-                        }
-                        catch (JSONException e)
-                        {   initErrorBar.show("HFsetClassesError", e.getMessage());    }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error)
-                    {    initErrorBar.show("HFsetClassesrror", error.getMessage());   }
-                });
-
-        mQueue.add(stringRequest);
-    }
-
-
-    private void setClassOptionsView(final int siteClass, int selectType, List options)
-    {
-        final ConstellationAdapter cAdapter = new ConstellationAdapter(this, options, selectType);
-        siteClassesAdapters.put(siteClass, cAdapter);
-
-        TextView selectClass = (TextView) siteClassViews.get(siteClass).get("text");
-        final ResponsiveGridView selectClassOptions = (ResponsiveGridView) siteClassViews.get(siteClass).get("options");
-
-        selectClassOptions.setAdapter(cAdapter);
-        selectClassOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                cAdapter.setCheckItem(position);
-                if (siteClass==SITECLASS_CITY)
-                {
-                    setClassOptionsData(SITECLASS_AREA, 0, "city="+cAdapter.getItem(position));
-
-                }
-            }
-        });
-
-
-        final LinearLayout optionTabsContainer = (LinearLayout) selectClassOptions.getParent();
-
-        final Animation optionsIn = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_in);
-        final Animation optionsOut = AnimationUtils.loadAnimation(EditSite.this, R.anim.fade_out);
-
-        optionsOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
-            @Override
-            public void onAnimationEnd(Animation animation)
-            {
-                selectClassOptions.setVisibility(View.GONE);
-                optionTabsContainer.setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
-
-        selectClass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Log.d("HFCONTAINERID", String.valueOf(optionTabsContainer.getId()));
-
-                if (optionTabsContainer.getVisibility()!=View.VISIBLE)
-                {
-//                    Log.d("HFCONTAINERACTION", "1");
-                    optionTabsContainer.setVisibility(View.VISIBLE);
-                    selectClassOptions.setVisibility(View.VISIBLE);
-                    optionTabsContainer.startAnimation(optionsIn);
-                }
-                else if (selectClassOptions.getVisibility()!=View.VISIBLE)
-                {
-//                    Log.d("HFCONTAINERACTION", "2");
-
-                    int a = 0;
-                    while (true)
-                    {
-                        if (optionTabsContainer.getChildAt(a)==null)
-                            break;
-
-                        optionTabsContainer.getChildAt(a).setVisibility(View.GONE);
-                        ++a;
-                    }
-
-                    selectClassOptions.setVisibility(View.VISIBLE);
-                    selectClassOptions.startAnimation(optionsIn);
-                }
-                else// if (selectClassOptions.getVisibility()==View.VISIBLE)
-                {
-//                    Log.d("HFCONTAINERACTION", "3");
-                    selectClassOptions.startAnimation(optionsOut);
-                }
-            }
-        });
-    }
 
     private void initEdittedSite(final String sId)
     {
@@ -1039,6 +937,156 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
         mQueue.add(stringRequest);
 
+    }
+
+    private void initSelectSiteClassesInputDialogManager(final int selectSiteClassInputDialogType, final InputDialogManager[] inputDialogManager, final ArrayList<HashMap<String, Object>> classes, final TextView valueTextView, final Actioner setBtnActioner)
+    {
+        String url = PinkCon.URL+"editSite_getSiteClasses.php?classes=";
+        for (HashMap<String, Object> aClass : classes)
+        {
+            if (((int) aClass.get("classType"))!=SelectClassExpandableListAdapter.SELECTCLASS_AREA)
+                url += String.valueOf(((int) aClass.get("classType")))+",";
+        }
+
+        final SelectClassExpandableListAdapter[] selectClassExpandableListAdapter = new SelectClassExpandableListAdapter[1];
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        try {
+
+                            JSONObject o = new JSONObject(response);
+
+                            for (HashMap<String, Object> aClass : classes)
+                            {
+                                ArrayList<String> options = new ArrayList<String>();
+
+                                JSONArray optionsJArr = o.optJSONArray(String.valueOf((int) aClass.get("classType")));
+                                if (optionsJArr!=null)
+                                {
+                                    for (int a=0; a<optionsJArr.length(); ++a)
+                                        options.add(optionsJArr.getJSONObject(a).optString("oName"));
+                                }
+
+                                aClass.put("classOptions", options);
+                            }
+
+                            inputDialogManager[0] = new InputDialogManager(EditSite.this, R.layout.dialog_select_siteclasses, "選擇類別"){
+                                @Override
+                                protected void initContent()
+                                {
+                                    vars.put("selectSiteClassInputDialogType", selectSiteClassInputDialogType);
+                                    ExpandableListView selectSiteClassesForm = (ExpandableListView) dialogFindViewById(R.id.selectSiteClassesForm);
+
+                                    selectClassExpandableListAdapter[0] = new SelectClassExpandableListAdapter(EditSite.this, classes){
+                                        @Override
+                                        protected void refreshOptions(int classType, ConstellationAdapter rGridViewAdapter, String param)
+                                        {
+                                            if (classType==SelectClassExpandableListAdapter.SELECTCLASS_CITY)
+                                                refreshArea(rGridViewAdapter, param);
+                                        }
+                                    };
+
+                                    selectSiteClassesForm.setAdapter(selectClassExpandableListAdapter[0]);
+
+                                }
+                                @Override
+                                public JSONObject getInputsJSONObj() throws JSONException
+                                {
+                                    return selectClassExpandableListAdapter[0].getClassesJSONObj();
+                                }
+                                @Override
+                                protected void onConfirm()
+                                {
+                                    try
+                                    {
+                                        JSONObject inputData = getInputsJSONObj();
+                                        String valueText = "";
+
+                                        if (((int) vars.get("selectSiteClassInputDialogType"))==SELECTSITECLASSINPUTDIALOGTYPE_SITEAREA)
+                                        {
+                                            valueText += inputData.getJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_CITY)).optString(0) + " / ";
+                                            valueText += inputData.getJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_AREA)).optString(0);
+                                        }
+                                        else
+                                        {
+                                            int[] selectClasses = {SelectClassExpandableListAdapter.SELECTCLASS_TIME, SelectClassExpandableListAdapter.SELECTCLASS_FOODKIND, SelectClassExpandableListAdapter.SELECTCLASS_COUNTRY};
+                                            for (int SELECTCLASS : selectClasses)
+                                            {
+                                                JSONArray aClassVals = inputData.getJSONArray(String.valueOf(SELECTCLASS));
+                                                for (int a = 0; a < aClassVals.length(); ++a)
+                                                    valueText += aClassVals.optString(a) + " ";
+
+                                                valueText += " / ";
+                                            }
+                                            valueText = valueText.substring(0, (valueText.length()-3));
+                                        }
+
+                                        valueTextView.setText(valueText);
+                                    }
+                                    catch (JSONException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                @Override
+                                public void onCancel()
+                                {
+                                    valueTextView.setText("");
+                                }
+                            };
+
+                            setBtnActioner.act();
+                        }
+                        catch (JSONException e)
+                        {   initErrorBar.show("HFsetClassesError", e.getMessage());    }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {    initErrorBar.show("HFsetClassesrror", error.getMessage());   }
+                });
+
+        mQueue.add(stringRequest);
+    }
+
+    private void refreshArea(final ConstellationAdapter rGridViewAdapter, String param)
+    {
+        String url = PinkCon.URL+"editSite_getSiteClasses.php?classes="+SelectClassExpandableListAdapter.SELECTCLASS_AREA+"&city="+param;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        try {
+
+                            JSONArray areaOptionsJArr = new JSONObject(response).optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_AREA));
+
+                            ArrayList<String> options = new ArrayList<String>();
+                            for (int a=0; a<areaOptionsJArr.length(); ++a)
+                                options.add(areaOptionsJArr.getJSONObject(a).optString("oName"));
+
+                            rGridViewAdapter.changeData(options);
+                        }
+                        catch (JSONException e)
+                        {
+//                            initErrorBar.show("HFsetClassesError", e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+//                        initErrorBar.show("HFsetClassesrror", error.getMessage());
+                    }
+                });
+
+        mQueue.add(stringRequest);
     }
 
 

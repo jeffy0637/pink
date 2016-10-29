@@ -94,7 +94,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".TravelMap"
-            android:label="@string/title_activity_travel_map"></activity>
+            android:label="@string/title_activity_travel_map" />
     </application>
 
 </manifest>

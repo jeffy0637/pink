@@ -8,7 +8,9 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -36,8 +38,16 @@ public class InputDialogManager
 
         protected void initContent() {}
 
-        public String getInputsData() throws JSONException
-        {   return "";      }
+    public String getInputsData() throws JSONException
+    {   return "";      }
+
+    public JSONArray getInputsJSONArr() throws JSONException
+    {   return new JSONArray();      }
+
+    public JSONObject getInputsJSONObj() throws JSONException
+    {   return new JSONObject();      }
+
+        protected void onConfirm() {}
 
         protected void onCancel() {}
 
@@ -56,6 +66,7 @@ public class InputDialogManager
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
+                            onConfirm();
                         }
                     })
                     .setNeutralButton("清除", new DialogInterface.OnClickListener() {
@@ -67,7 +78,7 @@ public class InputDialogManager
                     }).create();
         }
 
-        public class Actioner
+        public static class Actioner
         {
             public void act(Object... args){}
         }

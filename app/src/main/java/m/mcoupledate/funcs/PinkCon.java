@@ -25,6 +25,14 @@ public class PinkCon
             Snackbar.make(rootView, msg, Snackbar.LENGTH_INDEFINITE).setAction("再試一次", onClickListener).show();
     }
 
+    public static void retryConnect(View rootView, String msg, InitErrorBar initErrorBar, String errTitle, String errMsg, View.OnClickListener onClickListener)
+    {
+        Log.d(errTitle, errMsg);
+
+        if ((initErrorBar!=null && !initErrorBar.isShown()) || initErrorBar==null)
+            Snackbar.make(rootView, msg, Snackbar.LENGTH_INDEFINITE).setAction("再試一次", onClickListener).show();
+    }
+
     public static InitErrorBar getInitErrorSnackBar(View rootView, String msg, final Activity activity)
     {
         return new InitErrorBar(
@@ -62,7 +70,12 @@ public class PinkCon
                 snackbar.show();
 
             try
-            {   Log.d(errorTitle, errorMsg);    }
+            {
+                if (errorMsg!=null && errorMsg.compareTo("")!=0)
+                    Log.d(errorTitle, errorMsg);
+                else
+                    Log.d(errorTitle, "nullMessage");
+            }
             catch (Exception e)
             {
                 Log.d("HFcannotPrintError", errorTitle);

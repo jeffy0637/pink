@@ -168,14 +168,15 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!--address-->
+        <!--city & area-->
         <LinearLayout
             android:id="@+id/layout_newsite_city_area"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/info_layout_height"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/layout_newsite_address"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:minHeight="@dimen/info_layout_height">
 
             <FrameLayout
                 android:id="@+id/left_layout_newsite_city_area"
@@ -192,12 +193,13 @@
                 android:id="@+id/right_layout_newsite_city_area"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:text="高雄市 鹽埕區"
-                    android:id="@+id/city_area"
+                    android:text="選擇地區分類"
+                    android:id="@+id/valueText_cityArea"
                     android:layout_gravity="center"/>
 
                 <ImageButton
@@ -206,59 +208,51 @@
                     android:id="@+id/cityAreaInputBtn"
                     app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
+
             </FrameLayout>
         </LinearLayout>
 
+        <!--restaurant classes-->
         <LinearLayout
+            android:id="@+id/layout_newsite_restaurant_classes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectSiteClass_allSiteText"
-            android:layout_below="@+id/layout_newsite_city_area">
+            android:layout_below="@+id/layout_newsite_city_area"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:minHeight="@dimen/info_layout_height">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_weight="1"
-                android:text="@string/select_region_dialog_title_city"
-                android:id="@+id/selectCity" />
+            <FrameLayout
+                android:id="@+id/left_layout_newsite_restaurant_classes"
+                android:layout_width="@dimen/info_left_layout_width"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/ic_newsite_restaurant_classes"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/location"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+            <FrameLayout
+                android:id="@+id/right_layout_restaurant_classes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_weight="1"
-                android:text="@string/select_region_dialog_title_area"
-                android:id="@+id/selectArea" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:text="選擇餐廳分類"
+                    android:id="@+id/valueText_restaurantClasses"
+                    android:layout_gravity="center"/>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/selectSiteClass_restaurantText"
-            android:layout_below="@+id/selectSiteClass_allSiteText"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_weight="1"
-                android:text="@string/select_region_dialog_title_time"
-                android:id="@+id/selectTime" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_weight="1"
-                android:text="@string/select_region_dialog_title_catagory"
-                android:id="@+id/selectFoodKind" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_weight="1"
-                android:text="@string/selectCountry"
-                android:id="@+id/selectCountry" />
-
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/restaurantClassesInputBtn"
+                    app:srcCompat="@drawable/edit"
+                    android:background="#00ffffff" />
+            </FrameLayout>
         </LinearLayout>
 
         <!--phone-->
@@ -266,7 +260,7 @@
             android:id="@+id/layout_newsite_phone"
             android:layout_width="match_parent"
             android:layout_height="@dimen/info_layout_height"
-            android:layout_below="@+id/selectSiteClass_restaurantText"
+            android:layout_below="@+id/layout_newsite_restaurant_classes"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true">
 
@@ -324,6 +318,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
+                    android:text="營業時間"
                     android:id="@+id/time"
                     android:layout_gravity="center"/>
 
@@ -555,66 +550,6 @@
                 android:layout_weight="1"
                 android:id="@+id/submit"
                 android:src="@android:drawable/ic_input_add" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/selectSiteClass_allSiteOptions"
-            android:layout_below="@+id/selectSiteClass_allSiteText"
-            android:background="@color/white"
-            android:visibility="gone">
-
-            <m.mcoupledate.classes.customView.ResponsiveGridView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectCityOptions"
-                android:numColumns="3"
-                android:visibility="gone" />
-
-            <m.mcoupledate.classes.customView.ResponsiveGridView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectAreaOptions"
-                android:numColumns="3"
-                android:visibility="gone" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/selectSiteClass_restaurantOptions"
-            android:layout_below="@+id/selectSiteClass_restaurantText"
-            android:background="@color/white"
-            android:visibility="gone">
-
-
-            <m.mcoupledate.classes.customView.ResponsiveGridView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectTimeOptions"
-                android:numColumns="3"
-                android:visibility="gone" />
-
-
-            <m.mcoupledate.classes.customView.ResponsiveGridView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectFoodKindOptions"
-                android:numColumns="3"
-                android:visibility="gone" />
-
-            <m.mcoupledate.classes.customView.ResponsiveGridView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/selectCountryOptions"
-                android:numColumns="3"
-                android:visibility="gone" />
-
         </LinearLayout>
 
 
