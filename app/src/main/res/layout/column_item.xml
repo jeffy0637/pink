@@ -36,6 +36,7 @@
         card_view:cardElevation="2dp"
         card_view:cardPreventCornerOverlap="true"
         card_view:cardUseCompatPadding="true">
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,6 +53,8 @@
                 android:weightSum="1">
 
                 <ImageButton
+                    android:src="@drawable/ic_car"
+                    android:background="@color/transparent"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:id="@+id/carIcon" />
@@ -61,30 +64,84 @@
             <LinearLayout
                 android:id="@+id/ll"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/info_layout_height"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="12dp"
+                android:padding="10dp"
                 android:layout_below="@+id/lll">
+                    <LinearLayout
+                        android:id="@+id/firstPart"
+                        android:layout_width="@dimen/info_left_layout_width"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+                        <TextView
+                            android:id="@+id/startTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="10dp"
+                            android:text="0:00"
+                            android:textSize="@dimen/content_txt_size_small"
+                            android:gravity="center"/>
+                        <ImageView
+                            android:id="@+id/icon_step"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_pin"
+                            android:gravity="center"/>
+                        <TextView
+                            android:id="@+id/endTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="10dp"
+                            android:gravity="center"
+                            android:text="0:00"
+                            android:textSize="@dimen/content_txt_size_small"/>
 
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginRight="12dp"
-                    android:src="@drawable/ic_launcher"/>
+                    </LinearLayout>
+
 
                 <TextView
-                    android:id="@+id/text"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:text="test"
-                    android:textSize="16sp"/>
-
-                <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Menu"
-                    android:id="@+id/menu_button" />
+                    android:layout_height="wrap_content" />
+
+                <RelativeLayout
+                    android:id="@+id/rightPart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/circle_corner_layout">
+                    <LinearLayout
+                        android:id="@+id/secondPart"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:layout_margin="@dimen/default_margin">
+
+                        <TextView
+                            android:id="@+id/site_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/site_name"
+                            android:textSize="@dimen/content_txt_size_big" />
+
+                        <TextView
+                            android:id="@+id/site_address"
+                            android:text="@string/site_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:layout_width="@dimen/icon_size"
+                        android:layout_height="@dimen/icon_size"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_more"
+                        android:background="@color/transparent"
+                        android:text="Menu"
+                        android:id="@+id/menu_button"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"/>
+
+                </RelativeLayout>
 
             </LinearLayout>
         </RelativeLayout>
