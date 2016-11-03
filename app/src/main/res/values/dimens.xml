@@ -24,4 +24,7 @@
     <dimen name="txt_size_super_big">50sp</dimen>
     <!--icon_size-->
     <dimen name="icon_size">25dp</dimen>
+
+    <!--EditSite inputTimeDialog-->
+    <dimen name="dialog_sign_size">15sp</dimen>
 </resources>
