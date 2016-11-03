@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -18,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -28,6 +30,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -55,8 +58,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private ImageButton fbLogin, fbLogout;
 
+    private JSONArray drawnPlaceTopics = new JSONArray();
+
+
+
     //存使用者ID
-    private static String id;
+    private static String mId;
 
     SQLiteDatabase db = null;
 
@@ -137,26 +144,37 @@ public class MainActivity extends AppCompatActivity implements
             public void onSuccess(final LoginResult loginResult) {
 
 
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
+                final GraphRequest request = GraphRequest.newGraphPathRequest(loginResult.getAccessToken(), "me?fields=id,name,gender,birthday&locale=zh_TW",
+                        new GraphRequest.Callback() {
                             @Override
-                            public void onCompleted(final JSONObject object, final GraphResponse response) {
+                            public void onCompleted(final GraphResponse response)
+                            {
+                                final JSONObject fbUser = response.getJSONObject();
 
-//                                Log.d("HFLOGIN", "SUCCESS");
-                                //使用者ID
-                                id = object.optString("id");
+                                mId = fbUser.optString("id");
 
-                                StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"fbLogin.php",
+                                StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"login_fbLogin.php",
                                         new Response.Listener<String>() {
                                             @Override
                                             public void onResponse(String response) {
 
                                                 checkSQLiteTable();
 
-                                                prefEditor.putString("mId", id);
-                                                prefEditor.putString("mName", object.optString("name"));
+                                                prefEditor.putString("mId", mId);
+                                                prefEditor.putString("mName", fbUser.optString("name"));
                                                 prefEditor.commit();
+
+                                                try
+                                                {
+                                                    JSONObject drawTaggedPlacesDetail = new JSONObject(response);
+
+                                                    if (drawTaggedPlacesDetail.optBoolean("ifNeedDraw"))
+                                                        drawTaggedPlaces(loginResult.getAccessToken(), drawTaggedPlacesDetail.optString("lastLoginDate"));
+
+                                                }
+                                                catch (JSONException e)
+                                                {   e.printStackTrace();    }
+
 
                                                 startActivity(new Intent(MainActivity.this, HomePageActivity.class));
                                                 MainActivity.this.finish();
@@ -170,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements
                                                         {
                                                             @Override
                                                             public void onClick(View view)
-                                                            {   onCompleted(object, response);  }
+                                                            {   onCompleted(response);  }
                                                         });
                                             }
                                         }){
@@ -178,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
                                     protected Map<String, String> getParams() throws AuthFailureError {
                                         Map<String, String> map = new HashMap<String, String>();
 
-                                        map.put("fbUser", object.toString());
+                                        map.put("fbUser", fbUser.toString());
 
                                         return map;
                                     }
@@ -186,13 +204,7 @@ public class MainActivity extends AppCompatActivity implements
                                 mQueue.add(stringRequest);
                             }
                         });
-
-                Bundle params = new Bundle();
-                params.putString("fields", "id,name,gender,birthday,likes{id,name,about,description,location{latitude,longitude,street},phone,public_transit,emails,website,category},tagged_places{place{id,name,about,description,location{latitude,longitude,street},phone,public_transit,emails,website,category}}");
-                params.putString("locale", "zh_TW");
-                request.setParameters(params);
                 request.executeAsync();
-
             }
 
             @Override
@@ -205,10 +217,118 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onError(FacebookException exception) {
                 Toast.makeText(MainActivity.this, "登入失敗", Toast.LENGTH_LONG).show();
+                Log.d("HFLOGINFAIL", exception.getMessage());
             }
         });
 
     }
+
+
+    private void drawTaggedPlaces(AccessToken accessToken, final String lastLoginDate)
+    {
+        final Response.Listener nextURLListener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                try
+                {
+                    processNext(new JSONObject(response), lastLoginDate, this);
+                }
+                catch (JSONException e)
+                {   e.printStackTrace();    }
+            }
+        };
+
+//        Response.ErrorListener nextURLErrorListener;
+
+        GraphRequest request = GraphRequest.newGraphPathRequest(accessToken, "/me?fields=tagged_places{created_time,place{id,name,category,category_list{id}}}&locale=zh_TW",
+                new GraphRequest.Callback()
+                {
+                    @Override
+                    public void onCompleted(GraphResponse response)
+                    {
+                        processNext(response.getJSONObject().optJSONObject("tagged_places"), lastLoginDate, nextURLListener);
+                    }
+                });
+
+        request.executeAsync();
+    }
+
+    private void processNext(JSONObject taggedPlaces, String lastLoginDate, Response.Listener nextURLListener)
+    {
+
+        try
+        {
+            JSONArray places = taggedPlaces.optJSONArray("data");
+
+            for (int a=0; a<places.length(); ++a)
+            {
+//                if (places.getJSONObject(a).optString("created_time").substring(0, 10).compareTo("2004-12-26")<0)
+                if (places.getJSONObject(a).optString("created_time").substring(0, 10).compareTo(lastLoginDate)<0)
+                {
+                    saveTaggedPlaceTopics();
+                    return ;
+                }
+
+                drawnPlaceTopics.put(places.optJSONObject(a).optJSONObject("place").optJSONArray("category_list"));
+            }
+
+
+            String nextURL = taggedPlaces.optJSONObject("paging").optString("next").replace("\\", "");
+
+            if (nextURL.compareTo("")!=0)
+            {
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, nextURL, nextURLListener, null);
+                mQueue.add(stringRequest);
+            }
+            else
+            {
+                saveTaggedPlaceTopics();
+            }
+        }
+        catch (Exception e)
+        {   Log.d("HFNextErr", e.getMessage());    }
+
+    }
+
+    private void saveTaggedPlaceTopics()
+    {
+        Log.d("HFdrawedPlaceTopics", drawnPlaceTopics.toString());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"login_saveTaggedPlaceTopics.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        Log.d("HFsaveResponse", response);
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        PinkCon.retryConnect(rootView, PinkCon.SUBMIT_FAIL, null,
+//                                new View.OnClickListener()
+//                                {
+//                                    @Override
+//                                    public void onClick(View view)
+//                                    {   saveTaggedPlaceTopics();    }
+//                                });
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("mId", mId);
+                map.put("drawnPlaceTopics", drawnPlaceTopics.toString());
+
+                return map;
+            }
+        };
+        mQueue.add(stringRequest);
+    }
+
 
 
 
@@ -234,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements
     //給其他頁面要求使用者id
     @Deprecated
     public static String getUserId(){
-        return id;
+        return mId;
     }
 
     /**
@@ -286,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements
                                     for (int a=0; a<jArr.length(); ++a) {
                                         o = jArr.getJSONObject(a);
                                         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-                                        db.execSQL("INSERT INTO member values('"+id+"', '"+o.getString("name")+"', '"+o.getInt("gender")+"', '"+o.getString("birthday")+"', '"+o.getString("relationship_date")+"')");
+                                        db.execSQL("INSERT INTO member values('"+ mId +"', '"+o.getString("name")+"', '"+o.getInt("gender")+"', '"+o.getString("birthday")+"', '"+o.getString("relationship_date")+"')");
                                         db.close();
                                     }
                                 }
@@ -302,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> map = new HashMap<String, String>();
-                        map.put("User", id);
+                        map.put("User", mId);
                         return map;
                     }
                 };
@@ -336,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> map = new HashMap<String, String>();
-                        map.put("User", id);
+                        map.put("User", mId);
                         return map;
                     }
                 };
