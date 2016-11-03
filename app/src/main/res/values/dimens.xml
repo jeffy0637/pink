@@ -9,8 +9,8 @@
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
-    <dimen name="map_custom_profile_image">20dp</dimen>
-    <dimen name="map_custom_profile_padding">0.5dp</dimen>
+    <dimen name="map_custom_profile_image">50dp</dimen>
+    <dimen name="map_custom_profile_padding">2dp</dimen>
 
     <dimen name="default_margin">5dp</dimen>
     <dimen name="info_layout_height">75dp</dimen>
@@ -21,10 +21,7 @@
     <dimen name="content_txt_size_big">18sp</dimen>
     <dimen name="content_txt_size_medium">14sp</dimen>
     <dimen name="content_txt_size_small">9sp</dimen>
+    <dimen name="txt_size_super_big">50sp</dimen>
     <!--icon_size-->
     <dimen name="icon_size">25dp</dimen>
-
-    <!--EditSite inputTimeDialog-->
-    <dimen name="dialog_sign_size">15sp</dimen>
-
 </resources>
