@@ -24,8 +24,8 @@ import java.util.Date;
 public class ModifyMemorialDay extends AppCompatActivity {
 
     private SQLiteDatabase db = null;
-    private String conAPI = "http://140.117.71.216/pinkCon/";
 
+    private String mId;
 
 
     @Override
@@ -33,17 +33,19 @@ public class ModifyMemorialDay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_memorial_day);
 
+        mId = this.getSharedPreferences("pinkpink", 0).getString("mId", null);
         printMemorialDays();
     }
 
     //印出紀念日們(新版)
     public void printMemorialDays() {
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-        Cursor cursor = db.rawQuery("select * from memorialday",null);
+        Cursor cursor = db.rawQuery("SELECT * FROM memorialday WHERE _id='"+mId+"'",null);
         cursor.moveToFirst();
         do{
             if(cursor.getCount() != 0){
-                int id = Integer.parseInt(cursor.getString(0));
+//                int id = Integer.parseInt(cursor.getString(0));
+                int id = Integer.parseInt("1234");
                 String name = cursor.getString(1);
                 String theDay = cursor.getString(2);
                 DateFormat stringFormatter = new SimpleDateFormat("yyyy-MM-dd");//要轉成String的

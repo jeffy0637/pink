@@ -153,31 +153,54 @@ public class MainActivity extends AppCompatActivity implements
 
                                 mId = fbUser.optString("id");
 
+                                if (fbUser.optString("birthday", null)==null)
+                                {
+                                    try
+                                    {   fbUser.put("birthday", "01/01/1994");   }
+                                    catch (JSONException e)
+                                    {   e.printStackTrace();    }
+                                }
+                                Log.d("HFfbUser", fbUser.toString());
+
+
                                 StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"login_fbLogin.php",
                                         new Response.Listener<String>() {
                                             @Override
-                                            public void onResponse(String response) {
-
+                                            public void onResponse(String response)
+                                            {
                                                 checkSQLiteTable();
+                                                checkUserInSQLite();
 
                                                 prefEditor.putString("mId", mId);
                                                 prefEditor.putString("mName", fbUser.optString("name"));
                                                 prefEditor.commit();
 
+//                                                Log.d("HFresponse", response);
                                                 try
                                                 {
-                                                    JSONObject drawTaggedPlacesDetail = new JSONObject(response);
+                                                    JSONObject result = new JSONObject(response);
 
-                                                    if (drawTaggedPlacesDetail.optBoolean("ifNeedDraw"))
-                                                        drawTaggedPlaces(loginResult.getAccessToken(), drawTaggedPlacesDetail.optString("lastLoginDate"));
+                                                    if (result.optBoolean("ifNeedDraw"))
+                                                        drawTaggedPlaces(loginResult.getAccessToken(), result.optString("lastLoginDate"));
 
+                                                    if (result.optBoolean("ifNewMember"))
+                                                    {
+                                                        Intent intent = new Intent(MainActivity.this, MemberData.class);
+                                                        intent.putExtra("newMemberName", fbUser.optString("name"));
+                                                        intent.putExtra("newMemberBirthday", fbUser.optString("birthday"));
+                                                        startActivity(intent);
+                                                    }
+                                                    else
+                                                    {
+                                                        startActivity(new Intent(MainActivity.this, HomePageActivity.class));
+                                                    }
+                                                    Toast.makeText(MainActivity.this, "登入成功", Toast.LENGTH_LONG).show();
+
+                                                    MainActivity.this.finish();
                                                 }
                                                 catch (JSONException e)
                                                 {   e.printStackTrace();    }
 
-
-                                                startActivity(new Intent(MainActivity.this, HomePageActivity.class));
-                                                MainActivity.this.finish();
                                             }
                                         },
                                         new Response.ErrorListener() {
@@ -197,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements
                                         Map<String, String> map = new HashMap<String, String>();
 
                                         map.put("fbUser", fbUser.toString());
-
                                         return map;
                                     }
                                 };
@@ -216,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(MainActivity.this, "登入失敗", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "登入失敗，請重新登入", Toast.LENGTH_LONG).show();
                 Log.d("HFLOGINFAIL", exception.getMessage());
             }
         });
@@ -293,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void saveTaggedPlaceTopics()
     {
-        Log.d("HFdrawedPlaceTopics", drawnPlaceTopics.toString());
+//        Log.d("HFdrawedPlaceTopics", drawnPlaceTopics.toString());
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"login_saveTaggedPlaceTopics.php",
                 new Response.Listener<String>() {
@@ -352,116 +374,96 @@ public class MainActivity extends AppCompatActivity implements
 
 
     //給其他頁面要求使用者id
-    @Deprecated
-    public static String getUserId(){
-        return mId;
-    }
+//    @Deprecated
+//    public static String getUserId(){
+//        return mId;
+//    }
 
     /**
      * 判斷SQLite有沒有存在資料庫
      */
-    public void checkSQLiteTable(){
-
+    private void checkSQLiteTable()
+    {
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-        Cursor cursor = db.rawQuery("SELECT * FROM sqlite_master WHERE type='table' AND name='member'", null);
-        if(cursor.getCount() == 0){
-            //沒有member資料表 要創建
+
+        //  檢查兩個table(member, memorialDay)是否已建立
+        Cursor checkTableCursor;
+
+        checkTableCursor = db.rawQuery("SELECT * FROM sqlite_master WHERE type='table' AND name='member'", null);
+        if(checkTableCursor.getCount() == 0)
             db.execSQL("CREATE TABLE member(_id varchar(255) primary key , name varchar(255), gender INTEGER, birthday varchar(255), relationship_date varchar(255))");
-            db.close();
-            //從資料庫匯入
-            insertDataFromMariadbToSQLite(1);
-        }
+        checkTableCursor.close();
+
+        checkTableCursor = db.rawQuery("SELECT * FROM sqlite_master WHERE type='table' AND name='memorialday'", null);
+        if(checkTableCursor.getCount() == 0)
+            db.execSQL("CREATE TABLE memorialday(_id varchar(255) , eventName varchar(255) , eventDate varchar(255), PRIMARY KEY(_id,eventName, eventDate))");
+        checkTableCursor.close();
+
+        db.close();
+    }
+
+
+    private void checkUserInSQLite()
+    {
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-        Cursor cursor2 = db.rawQuery("SELECT * FROM sqlite_master WHERE type='table' AND name='memorialday'", null);
-        if(cursor2.getCount() == 0){
-            //沒有memorialday資料表 要創建
-            db.execSQL("CREATE TABLE memorialday(_id INTEGER primary key autoincrement, eventName varchar(255) , eventDate varchar(255))");
-            db.close();
-            //從資料庫匯入
-            insertDataFromMariadbToSQLite(2);
+
+        Cursor userCursor = db.rawQuery("SELECT * FROM member WHERE _id='"+mId+"'", null);
+        if (userCursor.getCount()>0)
+        {
+            userCursor.close();
+            return ;
         }
 
-        /*if(第一次近來或會員資料空缺)
-        Intent intent = new Intent(MainActivity.this, MemberData.class);
-        startActivity(intent);*/
+        userCursor.close();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, PinkCon.URL +"login_getMemberDataAndMemorialDays.php?mId="+mId,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        try
+                        {
+                            JSONObject result = new JSONObject(response);
+                            JSONObject user = result.optJSONObject("memberData");
+                            JSONArray memorialDays = result.optJSONArray("memorialDays");
+
+
+                            //  memberData
+                            db.execSQL("INSERT INTO member VALUES('"+ mId +"', '"+user.optString("name")+"', '"+user.optInt("gender")+"', '"+user.optString("birthday")+"', '"+user.optString("relationship_date")+"')");
+
+
+                            //  memorialDays
+                            String sql = "INSERT INTO memorialday VALUES";
+                            for (int a=0; a<memorialDays.length(); a++)
+                            {
+                                JSONObject aMemorialDay = memorialDays.getJSONObject(a);
+
+                                sql += "('"+mId+"', '"+aMemorialDay.optString("eventName")+"', '"+aMemorialDay.optString("eventDate")+"'),";
+                            }
+                            sql = sql.substring(0, (sql.length()-1));
+
+                            if (memorialDays.length()>0)
+                                db.execSQL(sql);
+
+
+                            db.close();
+                        }
+                        catch (Exception e)
+                        {}
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {}
+                });
+
+        mQueue.add(stringRequest);
 
     }
 
-    /**
-     * 從資料撈資料並存入對應SQLite table
-     * @param choose 要哪種資料 1.會員 2.紀念日 3.收藏景點 4.收藏行程
-     */
-    public void insertDataFromMariadbToSQLite(int choose){
 
-        StringRequest stringRequest;
-        switch (choose){
-            case 1://取得會員 資料並存入sqlite
-                stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"memberData.php",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONArray jArr = new JSONArray(response);
-                                    JSONObject o;
-                                    for (int a=0; a<jArr.length(); ++a) {
-                                        o = jArr.getJSONObject(a);
-                                        db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-                                        db.execSQL("INSERT INTO member values('"+ mId +"', '"+o.getString("name")+"', '"+o.getInt("gender")+"', '"+o.getString("birthday")+"', '"+o.getString("relationship_date")+"')");
-                                        db.close();
-                                    }
-                                }
-                                catch (Exception e) {
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                            }
-                        }){
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> map = new HashMap<String, String>();
-                        map.put("User", mId);
-                        return map;
-                    }
-                };
-                mQueue.add(stringRequest);
-                break;
 
-            case 2://取得紀念日資料並存入sqlite
-                stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"memorialDays.php",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONArray jArr = new JSONArray(response);
-                                    JSONObject o;
-                                    for (int a=0; a<jArr.length(); a++) {
-                                        o = jArr.getJSONObject(a);
-                                        db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
-                                        db.execSQL("INSERT INTO memorialday(eventName, eventDate) values('"+o.getString("eventName")+"',  '"+o.getString("eventDate")+"')");
-                                        db.close();
-                                    }
-                                }
-                                catch (Exception e) {
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                            }
-                        }){
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> map = new HashMap<String, String>();
-                        map.put("User", mId);
-                        return map;
-                    }
-                };
-                mQueue.add(stringRequest);
-                break;
-        }
-        }
 }

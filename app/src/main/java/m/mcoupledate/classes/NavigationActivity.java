@@ -27,13 +27,13 @@ import java.util.Arrays;
 import m.mcoupledate.EditSite;
 import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
-import m.mcoupledate.MemberData;
 import m.mcoupledate.ModifyMemorialDay;
 import m.mcoupledate.MyLike;
 import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
 import m.mcoupledate.StrokeActivity;
 import m.mcoupledate.TravelMap;
+import m.mcoupledate.funcs.SQLiteViewer;
 
 /**
  *      用於左側選單，使用時只要 extends NavigationActivity即可
@@ -92,7 +92,7 @@ public class NavigationActivity extends AppCompatActivity
 
         pref = this.getSharedPreferences("pinkpink", 0);
 
-        View header = navigationView.inflateHeaderView(R.layout.nav_header_home_page);
+        View header = navigationView.inflateHeaderView(R.layout.navigation_header);
         ((TextView) header.findViewById(R.id.userName)).setText(pref.getString("mName", null));
     }
 
@@ -155,18 +155,18 @@ public class NavigationActivity extends AppCompatActivity
         Intent intent = null;
         switch (item.getItemId()) {
 
+            case R.id.homepage:
+                intent = new Intent(this, SQLiteViewer.class);
+                break;
+
             case R.id.nav_memberData:
                 // 設定從這個活動跳至 home 的活動
-                intent = new Intent(this, MemberData.class);
+                intent = new Intent(this, HomePageActivity.class);
                 break;
 
             case R.id.nav_memorialDay:
                 // 設定從這個活動跳至 home 的活動
                 intent = new Intent(this, ModifyMemorialDay.class);
-                break;
-
-            case R.id.homepage:
-                intent = new Intent(this, HomePageActivity.class);
                 break;
 
             case R.id.nav_myTravel:
