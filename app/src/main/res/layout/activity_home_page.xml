@@ -55,7 +55,7 @@
             <m.mcoupledate.classes.customView.ResponsiveListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/memorialDayListView"/>
+                android:id="@+id/memorialDaysListView"/>
 
             <!--<RelativeLayout-->
                 <!--android:id="@+id/mday_in_sv"-->

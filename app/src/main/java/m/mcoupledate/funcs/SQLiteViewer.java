@@ -3,13 +3,13 @@ package m.mcoupledate.funcs;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
 import m.mcoupledate.R;
+import m.mcoupledate.classes.NavigationActivity;
 
-public class SQLiteViewer extends AppCompatActivity
+public class SQLiteViewer extends NavigationActivity
 {
     SQLiteDatabase db;
 
@@ -19,17 +19,20 @@ public class SQLiteViewer extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sqlite_viewer);
 
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);//打開資料庫
-
-
 
         TextView memberText = (TextView) findViewById(R.id.member);
         memberText.setText(getSqlResult("SELECT * FROM member"));
 
-
         TextView memerialDayText = (TextView) findViewById(R.id.memorialDay);
         memerialDayText.setText(getSqlResult("SELECT * FROM memorialday"));
-
 
         db.close();
     }

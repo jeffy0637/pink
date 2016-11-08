@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import m.mcoupledate.EditSite;
-import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;
 import m.mcoupledate.ModifyMemorialDay;
@@ -34,6 +33,7 @@ import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
 import m.mcoupledate.StrokeActivity;
 import m.mcoupledate.TravelMap;
+import m.mcoupledate.funcs.SQLiteViewer;
 
 /**
  *      用於左側選單，使用時只要 extends NavigationActivity即可
@@ -110,6 +110,15 @@ public class NavigationActivity extends AppCompatActivity
 
 
 
+    @Override
+    public void finish()
+    {
+        super.finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
+
+
+
 
 
     @Override@CallSuper
@@ -156,7 +165,7 @@ public class NavigationActivity extends AppCompatActivity
         switch (item.getItemId()) {
 
             case R.id.homepage:
-                intent = new Intent(this, HomePageActivity.class);
+                intent = new Intent(this, SQLiteViewer.class);
                 break;
 
             case R.id.nav_memberData:

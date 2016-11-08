@@ -129,50 +129,58 @@ public class DateInputEditText extends EditText
                 String text = input.getText().toString();
 
                 if (focused)
-                {
                     tempText = text;
-                }
                 else
-                {
-                    text = text.replaceAll(otherMarkPattern, "/");
-                    text = text.replaceAll(slashPattern, "/");
+                    input.setText(patternizeValue(text));
 
-                    String[] splits;
-
-
-                    if (text.matches(ymdStdPattern) || text.compareTo("")==0)
-                    {   }
-                    else if (text.matches(ym1dPattern))
-                    {
-                        splits = text.split("/");
-                        text = splits[0] + "/0" + splits[1] + "/" + splits[2];
-                    }
-                    else if (text.matches(ymd1Pattern))
-                    {
-                        splits = text.split("/");
-                        text = splits[0] + "/" + splits[1] + "/0" + splits[2];
-                    }
-                    else if (text.matches(ym1d1Pattern))
-                    {
-                        splits = text.split("/");
-                        text = splits[0] + "/0" + splits[1] + "/0" + splits[2];
-                    }
-                    else
-                    {
-                        text = tempText;
-                    }
-
-                    input.setText(text);
-
-                }
             }
         });
+    }
+
+    private String patternizeValue(String text)
+    {
+        text = text.replaceAll(otherMarkPattern, "/");
+        text = text.replaceAll(slashPattern, "/");
+
+        String[] splits;
+
+
+        if (text.matches(ymdStdPattern) || text.compareTo("")==0)
+        {   }
+        else if (text.matches(ym1dPattern))
+        {
+            splits = text.split("/");
+            text = splits[0] + "/0" + splits[1] + "/" + splits[2];
+        }
+        else if (text.matches(ymd1Pattern))
+        {
+            splits = text.split("/");
+            text = splits[0] + "/" + splits[1] + "/0" + splits[2];
+        }
+        else if (text.matches(ym1d1Pattern))
+        {
+            splits = text.split("/");
+            text = splits[0] + "/0" + splits[1] + "/0" + splits[2];
+        }
+        else
+        {
+            text = tempText;
+        }
+
+        return text;
     }
 
 
     public String getValue()
     {
-        return input.getText().toString().replace("/", "-");
+        String value = patternizeValue(input.getText().toString());
+        input.setText(value);
+
+        if (value.matches(ymdStdPattern) || value.compareTo("")==0)
+            return value.replace("/", "-");
+        else
+            return null;
+
     }
 
 }

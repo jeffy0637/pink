@@ -20,7 +20,7 @@
         <ImageView
             android:layout_width="53dp"
             android:layout_height="53dp"
-            android:src="@drawable/person"
+            app:srcCompat="@drawable/person"
             android:layout_gravity="bottom" />
 
         <LinearLayout
@@ -70,7 +70,7 @@
         <ImageView
             android:layout_width="53dp"
             android:layout_height="53dp"
-            android:src="@drawable/cake"
+            app:srcCompat="@drawable/cake"
             android:layout_gravity="bottom" />
 
         <LinearLayout
@@ -124,7 +124,7 @@
         <ImageView
             android:layout_width="52dp"
             android:layout_height="52dp"
-            android:src="@drawable/calendar"
+            app:srcCompat="@drawable/calendar"
             android:layout_gravity="bottom" />
 
         <LinearLayout

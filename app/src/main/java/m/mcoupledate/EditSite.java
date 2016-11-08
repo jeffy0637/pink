@@ -998,7 +998,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                     return selectClassExpandableListAdapter[0].getClassesJSONObj();
                                 }
                                 @Override
-                                protected void onConfirm()
+                                protected Boolean onConfirm()
                                 {
                                     try
                                     {
@@ -1030,11 +1030,14 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                     {
                                         e.printStackTrace();
                                     }
+
+                                    return true;
                                 }
                                 @Override
-                                public void onCancel()
+                                public Boolean onCancel()
                                 {
                                     valueTextView.setText("");
+                                    return true;
                                 }
                             };
 
@@ -1178,7 +1181,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             }
 
             @Override
-            protected  void onCancel()
+            protected  Boolean onCancel()
             {
                 for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
                 {
@@ -1188,6 +1191,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                         period[1].setText("");
                     }
                 }
+
+                return true;
             }
 
         };

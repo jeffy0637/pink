@@ -39,19 +39,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:layout_marginEnd="0sp"
-                android:text="FirstDay"
                 android:textColor="#000000"
-                android:id="@+id/m_context"
+                android:id="@+id/mDateName"
                 android:textSize = "18sp"
                 android:layout_marginRight="0sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nov, 11, 2015"
                 android:paddingTop="0sp"
                 android:paddingBottom="0sp"
-                android:id="@+id/m_day"
+                android:id="@+id/mDate"
                 android:textSize="14sp"
                 android:layout_weight="0.27" />
         </LinearLayout>
@@ -65,10 +63,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="250"
                 android:textSize="22sp"
                 android:textColor="#92A8D1"
-                android:id="@+id/m_diffTime"
+                android:id="@+id/diffTime"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.16" />
@@ -96,7 +93,7 @@
                 android:text="edit"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_edit"
-                android:id="@+id/edit"
+                android:id="@+id/editBtn"
                 android:layout_margin="5dp" />
 
             <ImageButton
@@ -105,20 +102,11 @@
                 android:layout_height="@dimen/icon_size"
                 android:text="delete"
                 android:src="@drawable/ic_delete"
-                android:id="@+id/delete"
+                android:id="@+id/deleteBtn"
                 android:layout_margin="5dp" />
         </LinearLayout>
 
 
     </LinearLayout>
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_gravity="center_horizontal">
-        <View
-            android:layout_width="300dp"
-            android:layout_height="0.5dip"
-            android:background="@color/primary"/>
-    </FrameLayout>
+
 </LinearLayout>

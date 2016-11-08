@@ -80,7 +80,7 @@ public class MemberData extends NavigationActivity
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
                     {
-                        dialogSetInputText(birthday, year, monthOfYear, dayOfMonth);
+                        dialogSetDateInputText(birthday, year, monthOfYear, dayOfMonth);
                     }
                 }
                 , birthdayArr[0], (birthdayArr[1]-1), birthdayArr[2]
@@ -101,7 +101,7 @@ public class MemberData extends NavigationActivity
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
                     {
-                        dialogSetInputText(relationshipDate, year, monthOfYear, dayOfMonth);
+                        dialogSetDateInputText(relationshipDate, year, monthOfYear, dayOfMonth);
                     }
                 }
                 , relationshipDateArr[0], (relationshipDateArr[1]-1), relationshipDateArr[2]
@@ -120,10 +120,10 @@ public class MemberData extends NavigationActivity
             @Override
             public void onClick(View v)
             {
-                birthday.clearFocus();
-                relationshipDate.clearFocus();
-
-                updateMemberData(id, birthday.getValue(), relationshipDate.getValue());
+                if (birthday.getValue()!=null && relationshipDate.getValue()!=null)
+                    updateMemberData(id, username.getText().toString(), birthday.getValue(), relationshipDate.getValue());
+                else
+                    Toast.makeText(MemberData.this, "請正確填寫日期", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -137,7 +137,7 @@ public class MemberData extends NavigationActivity
             cancelBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
-                {   MemberData.this.finish();   }
+                {   finish();   }
             });
         }
 
@@ -202,7 +202,7 @@ public class MemberData extends NavigationActivity
         }
     }
 
-    private void dialogSetInputText(DateInputEditText input, int year, int monthOfYear, int dayOfMonth)
+    private void dialogSetDateInputText(DateInputEditText input, int year, int monthOfYear, int dayOfMonth)
     {
         String monthOfYearStr = String.valueOf(monthOfYear+1);
         String dayOfMonthStr = String.valueOf(dayOfMonth);
@@ -373,7 +373,7 @@ public class MemberData extends NavigationActivity
     /**
      * 將修改的資料放入MariaDB
      */
-    private void updateMemberData(final String id, final String birthday, final String relationship)
+    private void updateMemberData(final String id, final String userName, final String birthday, final String relationship)
     {
         mRequestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL + "memberData_updateData.php",
@@ -382,14 +382,14 @@ public class MemberData extends NavigationActivity
                     @Override
                     public void onResponse(String response)
                     {
-                        updateSQLiteDB(id, birthday, relationship);
+                        updateSQLiteDB(id, userName, birthday, relationship);
                         Toast.makeText(MemberData.this, "修改成功", Toast.LENGTH_SHORT).show();
 
                         if (ifNewMember)
-                        {
                             startActivity(new Intent(MemberData.this, HomePageActivity.class));
-                            MemberData.this.finish();
-                        }
+
+                        MemberData.this.finish();
+
 
                     }
                 },
@@ -406,7 +406,7 @@ public class MemberData extends NavigationActivity
                 Map<String, String> map = new HashMap<String, String>();
 
                 map.put("mId", id);
-//                map.put("Name", name);
+                map.put("name", userName);
 //                map.put("Gender", String.valueOf(gender));
                 map.put("Birthday", birthday);
                 map.put("Relationship", relationship);
@@ -417,11 +417,16 @@ public class MemberData extends NavigationActivity
     }
 
 
-    private void updateSQLiteDB(String id, String birthdayStr, String relationshipStr)
+    private void updateSQLiteDB(String id, String userName, String birthday, String relationshipDate)
     {
         //傳資料給SQLite MariaDB
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);//打開SQLite資料庫
-        db.execSQL("UPDATE member SET birthday = '"+birthdayStr+"', relationship_date = '"+relationshipStr+"' WHERE _id = '"+id+"'");
+
+        if (relationshipDate.compareTo("''")!=0)
+            db.execSQL("UPDATE member SET name='"+userName+"',  birthday = '"+birthday+"', relationship_date = '"+relationshipDate+"' WHERE _id = '"+id+"'");
+        else
+            db.execSQL("UPDATE member SET name='"+userName+"', birthday = '"+birthday+"', relationship_date=null WHERE _id = '"+id+"'");
+
         db.close();
     }
 

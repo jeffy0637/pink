@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,20 +20,16 @@ import m.mcoupledate.R;
 
 public class MemorialDaysAdapter extends BaseAdapter
 {
-    private Context context;
     private LayoutInflater mInflater;
     private ArrayList<MemorialDay> memorialDaysList;
-    private String nowDate;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
 
 
-    public MemorialDaysAdapter (Context context, ArrayList<MemorialDay> memorialDaysList, String nowDate)
+    public MemorialDaysAdapter (Context context, ArrayList<MemorialDay> memorialDaysList)
     {
-        this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.memorialDaysList = memorialDaysList;
-        this.nowDate = nowDate;
     }
 
     @Override
@@ -64,18 +58,13 @@ public class MemorialDaysAdapter extends BaseAdapter
         MemorialDay theDay = getItem(position);
 
 
-        ((TextView) convertView.findViewById(R.id.mContext)).setText(theDay.name);
-        ((TextView) convertView.findViewById(R.id.mTime)).setText(theDay.date);
+        ((TextView) convertView.findViewById(R.id.mDateName)).setText(theDay.name);
+        ((TextView) convertView.findViewById(R.id.mDate)).setText(theDay.date);
         ((TextView) convertView.findViewById(R.id.diffTime)).setText(calDiffDays(theDay.date));
 
 
 
         return convertView;
-    }
-
-
-    public void changeData(JSONArray sites)
-    {
     }
 
     private String calDiffDays(String date)
@@ -89,6 +78,13 @@ public class MemorialDaysAdapter extends BaseAdapter
         Date d2 = new Date();
 
         return  String.valueOf((d2.getTime() - d1.getTime()) / (1000*60*60*24));
+    }
+
+
+    public void changeData(ArrayList<MemorialDay> memorialDaysList)
+    {
+        this.memorialDaysList = memorialDaysList;
+        notifyDataSetChanged();
     }
 
 

@@ -31,6 +31,7 @@ public class HomePageActivity extends NavigationActivity {
 
     private TextView totalDays;
     private ResponsiveListView memorialDaysListView;
+    private MemorialDaysAdapter memorialDaysAdapter = null;
 
 
     private BottomBar mBottomBar;
@@ -80,10 +81,10 @@ public class HomePageActivity extends NavigationActivity {
 
 
         totalDays = (TextView) findViewById(R.id.totalDays);
-        memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDayListView);
+        memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDaysListView);
 
-        setTotalDays();
-        loadMemorialDays();
+//        setTotalDays();
+//        loadMemorialDays();
     }
 
     @Override
@@ -93,6 +94,16 @@ public class HomePageActivity extends NavigationActivity {
         //保存BottomBar的状态
         mBottomBar.onSaveInstanceState(outState);
     }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        setTotalDays();
+        loadMemorialDays();
+    }
+
 
     //算總共交往多久(新版)
     public void setTotalDays()
@@ -147,15 +158,23 @@ public class HomePageActivity extends NavigationActivity {
             }
             while (cursor.moveToNext());
         }
-//        memorialDaysList.add(new MemorialDay("21", "2016-12-21"));
-//        memorialDaysList.add(new MemorialDay("22", "2016-12-22"));
-//        memorialDaysList.add(new MemorialDay("23", "2016-12-23"));
-//        memorialDaysList.add(new MemorialDay("24", "2016-12-24"));
-//        memorialDaysList.add(new MemorialDay("25", "2016-12-25"));
-//        memorialDaysList.add(new MemorialDay("26", "2016-12-26"));
-        MemorialDaysAdapter memorialDaysAdapter = new MemorialDaysAdapter(this, memorialDaysList, nowDate);
+        memorialDaysList.add(new MemorialDay("21", "2016-12-21"));
+        memorialDaysList.add(new MemorialDay("22", "2016-12-22"));
+        memorialDaysList.add(new MemorialDay("23", "2016-12-23"));
+        memorialDaysList.add(new MemorialDay("24", "2016-12-24"));
+        memorialDaysList.add(new MemorialDay("25", "2016-12-25"));
+        memorialDaysList.add(new MemorialDay("26", "2016-12-26"));
 
-        memorialDaysListView.setAdapter(memorialDaysAdapter);
+        if (memorialDaysAdapter==null)
+        {
+            memorialDaysAdapter = new MemorialDaysAdapter(this, memorialDaysList);
+            memorialDaysListView.setAdapter(memorialDaysAdapter);
+        }
+        else
+        {
+            memorialDaysAdapter.changeData(memorialDaysList);
+        }
+
 
     }
 

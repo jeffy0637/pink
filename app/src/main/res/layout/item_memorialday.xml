@@ -41,7 +41,7 @@
                 android:layout_marginEnd="0sp"
                 android:text="FirstDay"
                 android:textColor="#000000"
-                android:id="@+id/mContext"
+                android:id="@+id/mDateName"
                 android:textSize = "18sp"
                 android:layout_marginRight="0sp" />
 
@@ -51,7 +51,7 @@
                 android:text="Nov, 11, 2015"
                 android:paddingTop="0sp"
                 android:paddingBottom="0sp"
-                android:id="@+id/mTime"
+                android:id="@+id/mDate"
                 android:textSize="14sp"
                 android:layout_weight="0.27" />
         </LinearLayout>
