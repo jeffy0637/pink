@@ -140,6 +140,9 @@ public class SearchSites extends Fragment
                 startActivity(intent);
             }
         });
+        setInitSiteList();
+
+
 
         initTabOption();
 
@@ -278,6 +281,49 @@ public class SearchSites extends Fragment
                             });
                     }
                 });
+
+        mQueue.add(stringRequest);
+    }
+
+    private void setInitSiteList()
+    {
+        String url;
+        if (searchType==SEARCHTYPE_BROWSE)
+            url = PinkCon.URL +"searchSites_initSiteList_recommended.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
+        else
+            url = PinkCon.URL +"searchSites_initSiteList_allMyLike.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response)
+                {
+                    Log.d("HFresponse", response);
+                    try
+                    {
+                        siteListAdapter.changeData(new JSONArray(response));
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error)
+                {
+//                    PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
+//                            new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View view) {
+//                                    searchByClasses();
+//                                }
+//                            });
+                }
+            });
 
         mQueue.add(stringRequest);
     }
