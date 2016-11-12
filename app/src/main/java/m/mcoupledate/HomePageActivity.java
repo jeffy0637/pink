@@ -29,8 +29,8 @@ public class HomePageActivity extends NavigationActivity {
     private SQLiteDatabase db = null;
 
 
-    private TextView totalDays;
-    private ResponsiveListView memorialDaysListView;
+    private TextView totalDays = null;
+    private ResponsiveListView memorialDaysListView = null;
     private MemorialDaysAdapter memorialDaysAdapter = null;
 
 
@@ -80,8 +80,6 @@ public class HomePageActivity extends NavigationActivity {
 
 
 
-        totalDays = (TextView) findViewById(R.id.totalDays);
-        memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDaysListView);
 
 //        setTotalDays();
 //        loadMemorialDays();
@@ -99,6 +97,12 @@ public class HomePageActivity extends NavigationActivity {
     protected void onResume()
     {
         super.onResume();
+
+        if (totalDays==null)
+            totalDays = (TextView) findViewById(R.id.totalDays);
+
+        if (memorialDaysListView==null)
+           memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDaysListView);
 
         setTotalDays();
         loadMemorialDays();

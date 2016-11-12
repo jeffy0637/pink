@@ -27,4 +27,8 @@
 
     <!--EditSite inputTimeDialog-->
     <dimen name="dialog_sign_size">15sp</dimen>
+
+    <!--height-->
+    <dimen name="travellist_height">120dp</dimen>
+
 </resources>

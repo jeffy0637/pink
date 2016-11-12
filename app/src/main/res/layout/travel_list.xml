@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/travel1"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/travellist_height"
+        android:layout_margin="@dimen/default_margin"
+        android:background="@drawable/days_background"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/travel_name"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:textSize="@dimen/content_txt_size_big"
+            android:text="travel_one"
+            android:textColor="#000"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/travel_date"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="travel_one_date"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="#000"
+            android:layout_gravity="center_horizontal|bottom"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/travel3"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/travellist_height"
+        android:layout_margin="@dimen/default_margin"
+        android:background="@drawable/days_background"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/travel_name_3"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:textSize="@dimen/content_txt_size_big"
+            android:text="travel_two"
+            android:textColor="#000"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/travel_date_3"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="travel_two_date"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="#000"
+            android:layout_gravity="center_horizontal|bottom"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/travel2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/travellist_height"
+        android:layout_margin="@dimen/default_margin"
+        android:background="@drawable/days_background"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/travel_name_2"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:textSize="@dimen/content_txt_size_big"
+            android:text="travel_three"
+            android:textColor="#000"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/travel_date_2"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="travel_three_date"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="#000"
+            android:layout_gravity="center_horizontal|bottom"/>
+    </FrameLayout>
+
+</LinearLayout>

@@ -29,9 +29,9 @@ import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;
 import m.mcoupledate.ModifyMemorialDay;
 import m.mcoupledate.MyLike;
+import m.mcoupledate.MyTrip;
 import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
-import m.mcoupledate.StrokeActivity;
 import m.mcoupledate.TravelMap;
 import m.mcoupledate.funcs.SQLiteViewer;
 
@@ -206,8 +206,13 @@ public class NavigationActivity extends AppCompatActivity
                 intent.putExtra("searchType", SearchSites.SEARCHTYPE_MYLIKES);
                 break;
 
-            case R.id.my_restaurant:
-                intent = new Intent(this, StrokeActivity.class);
+            case R.id.my_trip:
+                intent = new Intent(this, MyTrip.class);
+                intent.putExtra("trip","my");
+                break;
+            case R.id.my_ctrip:
+                intent = new Intent(this, MyTrip.class);
+                intent.putExtra("trip","collection");
                 break;
 
         }

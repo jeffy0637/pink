@@ -29,13 +29,12 @@
     //左拉選單
     <string name="page_memberData">使用者資訊</string>
     <string name="page_memorialDay">設定紀念日</string>
-    <string name="page_myTravle">我的行程</string>
-    <string name="page_travleEdit">行程修改(目前是新增景點頁面)</string>
+    <string name="page_myTravle">Map</string>
+    <string name="page_travleEdit">新增景點頁面</string>
     <string name="page_logout">登出</string>
 
     <string name="title_activity_member_data">memberData</string>
     <string name="title_activity_site">SiteActivity</string>
-    <string name="title_activity_test">TestActivity</string>
 
     <string name="collect_site">收藏景點</string>
     <string name="join_trip">加入行程</string>
