@@ -187,4 +187,6 @@
     <string name="title_activity_my_like">MyLike</string>
     <string name="title_activity_travel_map">Map</string>
     <string name="title_activity_select_city_area">SelectCityArea</string>
+    
+    <string name="commend"><b><u><i>撰寫評論</i></u></b></string>
 </resources>

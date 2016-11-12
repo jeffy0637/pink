@@ -22,41 +22,45 @@
 
         <LinearLayout
             android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="118dp"
-            android:layout_gravity="left"
-            android:weightSum="1">
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:weightSum="5">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.04"
-                android:layout_gravity="center">
+                android:layout_weight="3"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/default_margin">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize = "20dp"
+                    android:textSize = "@dimen/content_txt_size_big"
                     android:textColor="#000"
                     android:textStyle="bold"
                     android:id="@+id/site_name"
-                    android:layout_margin="5dp" />
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="5dp"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="15dp"
+                    android:textSize="@dimen/content_txt_size_medium"
                     android:id="@+id/site_area"
-                    android:layout_margin="5dp" />
-
-            </LinearLayout>
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                    android:layout_marginLeft="5dp"/>
 
                 <RatingBar
                     android:layout_width="wrap_content"
@@ -66,43 +70,49 @@
                     android:rating="5"
                     android:stepSize="0.1"
                     android:isIndicator="true"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="-10dp"/>
 
                 <Button
-                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="27dp"
+                    android:text="@string/commend"
+                    android:background="@color/transparent"
+                    android:id="@+id/score"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2"
+                android:weightSum="2"   >
+
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="評分"
-                    android:id="@+id/score"
-                    android:layout_gravity="right|bottom" />
-            </FrameLayout>
+                    android:layout_gravity="center"
+                    android:text="@string/addToFavorite"
+                    android:background="@drawable/circle_corner_button_selector"
+                    android:id="@+id/addLikeBtn"
+                    android:layout_margin="@dimen/default_margin"
+                    android:layout_weight="1" />
 
-        </LinearLayout>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/default_margin"
+                    android:background="@drawable/circle_corner_button_selector"
+                    android:text="@string/joinMyTrip"
+                    android:scaleType="centerInside"
+                    android:id="@+id/addTravelBtn"
+                    android:layout_weight="1"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="center">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/addToFavorite"
-                android:background="@drawable/circle_corner_button_selector"
-                android:id="@+id/addLikeBtn"
-                android:layout_weight="1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@color/transparent"
-                android:text="@string/joinMyTrip"
-                android:scaleType="centerInside"
-                android:id="@+id/addTravelBtn"
-                android:layout_weight="1"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -438,7 +448,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="覺得景點資訊不夠完整嗎?"
-                android:textSize="15dp"
+                android:textSize="@dimen/content_txt_size_medium"
                 android:id="@+id/editQ"
                 android:layout_weight="1"
                 android:layout_gravity="center" />
@@ -447,7 +457,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="修改"
-                android:textSize="15dp"
+                android:textSize="@dimen/content_txt_size_medium"
                 android:id="@+id/editSiteBtn"
                 android:layout_weight="1"
                 android:layout_gravity="center" />
