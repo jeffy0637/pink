@@ -30,7 +30,7 @@
     <string name="page_memberData">使用者資訊</string>
     <string name="page_memorialDay">設定紀念日</string>
     <string name="page_myTravle">我的行程</string>
-    <string name="page_travleEdit">行程修改(目前是新增景點頁面)</string>
+    <string name="page_travleEdit">行程修改(目前是新增景點頁面(可改回))</string>
     <string name="page_logout">登出</string>
 
     <string name="title_activity_member_data">memberData</string>
@@ -40,126 +40,8 @@
     <string name="collect_site">收藏景點</string>
     <string name="join_trip">加入行程</string>
 
-    <string name="select_region_dialog_title">Spinner 對話視窗標題</string>
-    <string name="select_region_dialog_title_city">大行政區</string>
-    <string-array name="spn_list_city">
-        <item>大行政區</item>
-        <item>高雄市</item>
-    </string-array>
 
-    <string name="select_region_dialog_title_area">小行政區</string>
-    <string-array name="spn_list_area">
-        <item>小行政區</item>
-        <item>楠梓區</item>
-        <item>左營區</item>
-        <item>鼓山區</item>
-        <item>三民區</item>
-        <item>鹽埕區</item>
-        <item>前金區</item>
-        <item>新興區</item>
-        <item>苓雅區</item>
-        <item>前鎮區</item>
-        <item>旗津區</item>
-        <item>小港區</item>
-        <item>鳳山區</item>
-        <item>大寮區</item>
-        <item>鳥松區</item>
-        <item>林園區</item>
-        <item>仁武區</item>
-        <item>大樹區</item>
-        <item>大社區</item>
-        <item>岡山區</item>
-        <item>路竹區</item>
-        <item>橋頭區</item>
-        <item>梓官區</item>
-        <item>彌陀區</item>
-        <item>永安區</item>
-        <item>燕巢區</item>
-        <item>田寮區</item>
-        <item>阿蓮區</item>
-        <item>茄萣區</item>
-        <item>湖內區</item>
-        <item>旗山區</item>
-        <item>美濃區</item>
-        <item>內門區</item>
-        <item>杉林區</item>
-        <item>甲仙區</item>
-        <item>六龜區</item>
-        <item>茂林區</item>
-        <item>桃源區</item>
-        <item>那瑪夏區</item>
-    </string-array>
 
-    <string name="select_region_dialog_title_country1">餐飲類別1</string>
-    <string-array name="spn_list_country1">
-        <item>餐飲類別1</item>
-        <item>美式</item>
-        <item>歐陸</item>
-        <item>南洋</item>
-        <item>日式</item>
-        <item>韓式</item>
-        <item>中港台</item>
-    </string-array>
-
-    <string name="select_region_dialog_title_country2">餐飲類別2</string>
-    <string-array name="spn_list_country2">
-        <item>餐飲類別2</item>
-        <item>美式</item>
-        <item>歐陸</item>
-        <item>南洋</item>
-        <item>日式</item>
-        <item>韓式</item>
-        <item>中港台</item>
-    </string-array>
-
-    <string name="select_region_dialog_title_country3">餐飲類別3</string>
-    <string-array name="spn_list_country3">
-        <item>餐飲類別3</item>
-        <item>美式</item>
-        <item>歐陸</item>
-        <item>南洋</item>
-        <item>日式</item>
-        <item>韓式</item>
-        <item>中港台</item>
-    </string-array>
-
-    <string name="select_region_dialog_title_time">用餐時段</string>
-    <string-array name="spn_list_time">
-        <item>用餐時段</item>
-        <item>早餐</item>
-        <item>午餐</item>
-        <item>早午餐</item>
-        <item>下午茶</item>
-        <item>晚餐</item>
-        <item>消夜</item>
-    </string-array>
-
-    <string name="select_region_dialog_title_catagory">餐飲種類</string>
-    <string-array name="spn_list_kind">
-        <item>餐飲種類</item>
-        <item>火烤</item>
-        <item>吃到飽</item>
-        <item>壽喜燒</item>
-        <item>輕食</item>
-        <item>晚餐</item>
-        <item>素食</item>
-        <item>速食</item>
-        <item>海鮮</item>
-        <item>手搖飲品</item>
-        <item>咖啡廳</item>
-        <item>小吃</item>
-        <item>酒吧</item>
-        <item>壽司</item>
-        <item>火鍋</item>
-        <item>排餐</item>
-        <item>鐵板燒</item>
-        <item>烘培</item>
-        <item>熱炒</item>
-        <item>甜點</item>
-        <item>冰品</item>
-        <item>拉麵</item>
-        <item>炸物</item>
-    </string-array>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_site_search">SiteSearchActivity</string>
 
@@ -188,4 +70,79 @@
     <string name="title_activity_my_like">MyLike</string>
     <string name="title_activity_travel_map">Map</string>
     <string name="title_activity_select_city_area">SelectCityArea</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_main3">Main3Activity</string>
 </resources>

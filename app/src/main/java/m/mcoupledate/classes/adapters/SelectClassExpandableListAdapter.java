@@ -10,6 +10,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import m.mcoupledate.R;
 import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.customView.ResponsiveGridView;
+import m.mcoupledate.classes.funcs.Actioner;
 
 /**
  * Created by user on 2016/10/27.
@@ -60,8 +62,8 @@ public class SelectClassExpandableListAdapter extends BaseExpandableListAdapter
             rGirdView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    rGridViewAdapter.setCheckItem(position);
-                    refreshOptions(((int) aClass.get("classType")), rGridViewAdapters.get(SELECTCLASS_AREA), rGridViewAdapter.getItem(position));
+                    rGridViewAdapter.setCheckItem(position, true);
+                    refreshOptions(((int) aClass.get("classType")), rGridViewAdapters.get(SELECTCLASS_AREA), rGridViewAdapter.getItem(position), null);
 
                 }
             });
@@ -160,7 +162,7 @@ public class SelectClassExpandableListAdapter extends BaseExpandableListAdapter
     }
 
 
-    protected void refreshOptions(int classType, ConstellationAdapter rGridViewAdapter, String param) {}
+    protected void refreshOptions(int classType, ConstellationAdapter rGridViewAdapter, String param, String initContent) {}
 
     public JSONObject getClassesJSONObj() throws JSONException {
         JSONObject classesValues = new JSONObject();
@@ -172,6 +174,40 @@ public class SelectClassExpandableListAdapter extends BaseExpandableListAdapter
 
 //        for (rGridViewAdapters.)
         return classesValues;
+    }
+
+
+
+    public void setData(Object[] args, Actioner callbackActioner)
+    {
+        for (int a=0; a<rGridViewAdapters.size(); ++a)
+        {
+            switch (rGridViewAdapters.keyAt(a))
+            {
+                case SELECTCLASS_CITY:
+                    rGridViewAdapters.valueAt(a).setCheckItem((String)args[0], true);
+                    refreshOptions(SELECTCLASS_CITY, rGridViewAdapters.get(SELECTCLASS_AREA), (String)args[0], (String)args[1]);
+                    break;
+
+                case SELECTCLASS_AREA:
+                    rGridViewAdapters.valueAt(a).setCheckItem((String)args[1], true);
+                    break;
+
+                case SELECTCLASS_TIME:
+                    rGridViewAdapters.valueAt(a).setCheckItem((String)args[0], true);
+                    break;
+
+                case SELECTCLASS_COUNTRY:
+                    rGridViewAdapters.valueAt(a).setCheckedList((JSONArray) args[1]);
+                    break;
+
+                case SELECTCLASS_FOODKIND:
+                    rGridViewAdapters.valueAt(a).setCheckedList((JSONArray) args[2]);
+                    break;
+            }
+        }
+
+        callbackActioner.act();
     }
 
 

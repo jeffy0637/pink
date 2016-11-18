@@ -75,10 +75,10 @@ import m.mcoupledate.classes.adapters.GridAlbumAdapter;
 import m.mcoupledate.classes.adapters.SelectClassExpandableListAdapter;
 import m.mcoupledate.classes.customView.LockableScrollView;
 import m.mcoupledate.classes.customView.TimeInputEditText;
+import m.mcoupledate.classes.funcs.Actioner;
+import m.mcoupledate.classes.funcs.AuthChecker6;
+import m.mcoupledate.classes.funcs.PinkCon;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
-import m.mcoupledate.funcs.Actioner;
-import m.mcoupledate.funcs.AuthChecker6;
-import m.mcoupledate.funcs.PinkCon;
 
 public class EditSite extends PinkClusterMapFragmentActivity implements
         GoogleMap.OnMapLongClickListener,
@@ -100,6 +100,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
     private TextView title;
     private ImageButton submit;
+
+    private final int EDITTYPE_NEW = 8341, EDITTYPE_UPDATE = 8342;
 
 
     private Map<String, EditText> input;    //  輸入欄位的map
@@ -143,7 +145,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
     //存圖片uri 之後拿來將圖片設定給相簿使用
     private Uri uriMyImage;
 
-    private String siteType = "";
+    private int siteType;
+    private String siteTypeName;
 
 
 
@@ -153,7 +156,12 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         setContentView(R.layout.activity_edit_site);
 
         intent = this.getIntent();
-        siteType = intent.getStringExtra("siteType");
+        siteType = intent.getIntExtra("siteType", 0);
+
+        if (siteType==SearchSites.SITETYPE_ATTRACTION)
+            siteTypeName = "a";
+        else
+            siteTypeName = "r";
 
         mQueue = Volley.newRequestQueue(this);
         initErrorBar = PinkCon.getInitErrorSnackBar(getRootView(), PinkCon.INIT_FAIL, this);
@@ -171,11 +179,12 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             }
         });
 
-        mapFragment.getMapAsync(this);
+//        若是編輯時，initEditSite需要晚於initSelectClassesInputDialogManager()，所以放到onCreate()的最後
+//        mapFragment.getMapAsync(this);
 
 
-        title = (TextView) findViewById(R.id.siteTitle);
-        title.setText(siteType);
+//        title = (TextView) findViewById(R.id.siteTitle);
+//        title.setText(siteType);
 
 
         input = new HashMap<String, EditText>();
@@ -348,7 +357,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         classArea.put("optionSelectType", ConstellationAdapter.RADIO);
         classesCityArea.add(classArea);
 
-        initSelectSiteClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_SITEAREA, cityAreaInputDialogManager, classesCityArea, (TextView) findViewById(R.id.valueText_cityArea),
+        initSelectClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_SITEAREA, cityAreaInputDialogManager, classesCityArea, (TextView) findViewById(R.id.valueText_cityArea),
                 new Actioner(){
                     @Override
                     public void act(Object... args)
@@ -364,8 +373,10 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 });
 
 
-        if (siteType.compareTo("r")==0)
+        if (siteType==SearchSites.SITETYPE_RESTAURANT)
         {
+            findViewById(R.id.layout_newsite_restaurant_classes).setVisibility(View.VISIBLE);
+
             final ArrayList<HashMap<String, Object>> classesRestaurant = new ArrayList<HashMap<String, Object>>();
 
             HashMap<String, Object> classTime = new HashMap<String, Object>();
@@ -383,7 +394,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             classCountry.put("optionSelectType", ConstellationAdapter.CHECK);
             classesRestaurant.add(classCountry);
 
-            initSelectSiteClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_RESTAURANT, restaurantClassesInputDialogManager, classesRestaurant, (TextView) findViewById(R.id.valueText_restaurantClasses),
+            initSelectClassesInputDialogManager(SELECTSITECLASSINPUTDIALOGTYPE_RESTAURANT, restaurantClassesInputDialogManager, classesRestaurant, (TextView) findViewById(R.id.valueText_restaurantClasses),
                     new Actioner(){
                         @Override
                         public void act(Object... args)
@@ -398,6 +409,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                         }
                     });
         }
+
 
 
 
@@ -465,6 +477,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 }
             }
         });
+
+
+        mapFragment.getMapAsync(this);
     }
 
     //  當map載入完成後，相關功能設定並檢查是否可定位
@@ -757,7 +772,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 map.put("activity", input.get("activity").getText().toString());
                 map.put("creator", pref.getString("mId", null));
                 map.put("note", input.get("note").getText().toString());
-                map.put("siteType", siteType);
+                map.put("siteType", String.valueOf(siteType));
 
                 try
                 {
@@ -766,7 +781,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     map.put("area",  cityAreaInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_AREA)).optString(0));
                     map.put("business_hours", timeInputDialogManager.getInputsData());
 
-                    if (siteType.compareTo("r")==0)
+                    if (siteType==SearchSites.SITETYPE_RESTAURANT)
                     {
                         map.put("time", restaurantClassesInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_TIME)).optString(0));
                         map.put("food_kind", restaurantClassesInputDialogManager[0].getInputsJSONObj().optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_FOODKIND)).toString());
@@ -783,11 +798,11 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                 if (ifEditting==false)
                 {
-                    map.put("editType", "new");
+                    map.put("editType", String.valueOf(EDITTYPE_NEW));
                 }
                 else
                 {
-                    map.put("editType", "editSiteBtn");
+                    map.put("editType", String.valueOf(EDITTYPE_UPDATE));
                     map.put("sId", intent.getStringExtra("sId"));
                 }
 
@@ -852,40 +867,18 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                     input.get(colName).setText(site.optString(colName));
                             }
 
+                            cityAreaInputDialogManager[0].updateContentData(site.optString("city"), site.optString("area"));
 
-
-                            try {
-                                JSONArray businessHours = o.getJSONArray("business_hours");
-                                int nowDay = 0, businessHoursIndex = 0;
-                                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][]) timeInputDialogManager.vars.get("inputIds")) {
-                                    ++nowDay;
-                                    if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
-                                        weekDayInputs[0][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
-                                        weekDayInputs[0][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
-                                        ++businessHoursIndex;
-//                                        Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
-
-                                        if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
-                                            weekDayInputs[1][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
-                                            weekDayInputs[1][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
-                                            ++businessHoursIndex;
-
-                                            HashMap vars = timeInputDialogManager.vars;
-                                            Button extraBtn = (Button) timeInputDialogManager.dialogFindViewById(((SparseIntArray) vars.get("extraBtnTargetIds")).keyAt(nowDay - 1));
-                                            LinearLayout extraTarget = (LinearLayout) timeInputDialogManager.dialogFindViewById(((SparseIntArray) vars.get("extraBtnTargetIds")).get(extraBtn.getId()));
-                                            ((InputDialogManager.Actioner) vars.get("extraTargetToggler")).act(extraBtn, extraTarget);
-                                            Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
-
-                                        }
-                                    }
-
-                                }
-
-                            }
-                            catch(Exception e)
+                            if (siteType==SearchSites.SITETYPE_RESTAURANT)
                             {
-                                throw new Exception(e.getMessage());
+                                JSONObject rSiteClass = o.optJSONObject("restaurantClass");
+                                restaurantClassesInputDialogManager[0].updateContentData(rSiteClass.optString("time"), rSiteClass.optJSONArray("country"), rSiteClass.optJSONArray("foodKind"));
                             }
+
+                            timeInputDialogManager.updateContentData(o.getJSONArray("business_hours"));
+
+
+
 
                             LatLng siteLatLng = new LatLng(site.optDouble("Py"), site.optDouble("Px"));
                             setTheSiteMarker(siteLatLng, site.optString("sName"));
@@ -896,7 +889,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                             while(picNum>0)
                             {
-                                String url = PinkCon.URL + "images/sitePic/" + o.getJSONArray("diffSite").getJSONObject(0).optString("picId") + (char)(seq) +".jpg";
+                                String url = PinkCon.URL + "images/sitePic/" + o.optString("picId") + (char)(seq) +".jpg";
 //                                Log.d("sitePicUrl", url);
                                 Glide.with(EditSite.this)
                                         .load(url)
@@ -939,7 +932,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
     }
 
-    private void initSelectSiteClassesInputDialogManager(final int selectSiteClassInputDialogType, final InputDialogManager[] inputDialogManager, final ArrayList<HashMap<String, Object>> classes, final TextView valueTextView, final Actioner setBtnActioner)
+    private void initSelectClassesInputDialogManager(final int selectSiteClassInputDialogType, final InputDialogManager[] inputDialogManager, final ArrayList<HashMap<String, Object>> classes, final TextView valueTextView, final Actioner setBtnActioner)
     {
         String url = PinkCon.URL+"editSite_getSiteClasses.php?classes=";
         for (HashMap<String, Object> aClass : classes)
@@ -955,8 +948,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     @Override
                     public void onResponse(String response)
                     {
-                        try {
-
+                        try
+                        {
                             JSONObject o = new JSONObject(response);
 
                             for (HashMap<String, Object> aClass : classes)
@@ -982,15 +975,14 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
                                     selectClassExpandableListAdapter[0] = new SelectClassExpandableListAdapter(EditSite.this, classes){
                                         @Override
-                                        protected void refreshOptions(int classType, ConstellationAdapter rGridViewAdapter, String param)
+                                        protected void refreshOptions(int classType, ConstellationAdapter rGridViewAdapter, String param, String initContent)
                                         {
                                             if (classType==SelectClassExpandableListAdapter.SELECTCLASS_CITY)
-                                                refreshArea(rGridViewAdapter, param);
+                                                refreshArea(rGridViewAdapter, param, initContent);
                                         }
                                     };
 
                                     selectSiteClassesForm.setAdapter(selectClassExpandableListAdapter[0]);
-
                                 }
                                 @Override
                                 public JSONObject getInputsJSONObj() throws JSONException
@@ -999,6 +991,30 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                 }
                                 @Override
                                 protected Boolean onConfirm()
+                                {
+                                    printResult();
+
+                                    return true;
+                                }
+                                @Override
+                                public Boolean onCancel()
+                                {
+                                    valueTextView.setText("");
+                                    return true;
+                                }
+                                @Override
+                                public void updateContentData(Object... args)
+                                {
+                                    selectClassExpandableListAdapter[0].setData(args, new Actioner() {
+                                        @Override
+                                        public void act(Object... args)
+                                        {
+                                            inputDialogManager[0].printResult();
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void printResult()
                                 {
                                     try
                                     {
@@ -1030,14 +1046,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                     {
                                         e.printStackTrace();
                                     }
-
-                                    return true;
-                                }
-                                @Override
-                                public Boolean onCancel()
-                                {
-                                    valueTextView.setText("");
-                                    return true;
                                 }
                             };
 
@@ -1056,7 +1064,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         mQueue.add(stringRequest);
     }
 
-    private void refreshArea(final ConstellationAdapter rGridViewAdapter, String param)
+    private void refreshArea(final ConstellationAdapter rGridViewAdapter, String param, final String initContent)
     {
         String url = PinkCon.URL+"editSite_getSiteClasses.php?classes="+SelectClassExpandableListAdapter.SELECTCLASS_AREA+"&city="+param;
 
@@ -1065,8 +1073,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                     @Override
                     public void onResponse(String response)
                     {
-                        try {
-
+                        try
+                        {
                             JSONArray areaOptionsJArr = new JSONObject(response).optJSONArray(String.valueOf(SelectClassExpandableListAdapter.SELECTCLASS_AREA));
 
                             ArrayList<String> options = new ArrayList<String>();
@@ -1074,6 +1082,9 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                                 options.add(areaOptionsJArr.getJSONObject(a).optString("oName"));
 
                             rGridViewAdapter.changeData(options);
+
+                            if (initContent!=null)
+                                rGridViewAdapter.setCheckItem(initContent, true);
                         }
                         catch (JSONException e)
                         {
@@ -1157,6 +1168,8 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 };
                 vars.put("inputIds", inputs);
 
+
+                vars.put("valueText_time", findViewById(R.id.valueText_time));
             }
 
             @Override
@@ -1181,6 +1194,13 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
             }
 
             @Override
+            protected Boolean onConfirm()
+            {
+                printResult();
+
+                return true;
+            }
+            @Override
             protected  Boolean onCancel()
             {
                 for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
@@ -1193,6 +1213,71 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 }
 
                 return true;
+            }
+
+            @Override
+            public void updateContentData(Object... args)
+            {
+                try
+                {
+                    JSONArray businessHours = (JSONArray) args[0];
+
+                    int nowDay = 0, businessHoursIndex = 0;
+                    for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][]) vars.get("inputIds"))
+                    {
+                        ++nowDay;
+                        if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
+                            weekDayInputs[0][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
+                            weekDayInputs[0][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
+                            ++businessHoursIndex;
+    //                                        Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
+
+                            if ( businessHoursIndex < businessHours.length() && nowDay == businessHours.optJSONObject(businessHoursIndex).optInt("day")) {
+                                weekDayInputs[1][0].setText(businessHours.getJSONObject(businessHoursIndex).optString("start_time"));
+                                weekDayInputs[1][1].setText(businessHours.getJSONObject(businessHoursIndex).optString("end_time"));
+                                ++businessHoursIndex;
+
+                                Button extraBtn = (Button) dialogFindViewById(((SparseIntArray) vars.get("extraBtnTargetIds")).keyAt(nowDay - 1));
+                                LinearLayout extraTarget = (LinearLayout) dialogFindViewById(((SparseIntArray) vars.get("extraBtnTargetIds")).get(extraBtn.getId()));
+                                ((Actioner) vars.get("extraTargetToggler")).act(extraBtn, extraTarget);
+//                                Log.d("HFaPeriod", String.valueOf(businessHoursIndex) + " - " + nowDay);
+                            }
+                        }
+                    }
+                }
+                catch (JSONException e)
+                {   e.printStackTrace();    }
+
+                printResult();
+            }
+            @Override
+            public void printResult()
+            {
+                String time = "";
+                String[] weekDayNames = {"一", "二", "三", "四", "五", "六", "日"};
+                int nowDay = -1;
+
+                for (TimeInputEditText[][] weekDayInputs : (TimeInputEditText[][][])vars.get("inputIds"))
+                {
+                    ++nowDay;
+
+                    for (int a=0; a<2; ++a)
+                    {
+                        TimeInputEditText[] period = weekDayInputs[a];
+
+                        String startTime = period[0].getText().toString();
+                        String endTime = period[1].getText().toString();
+
+                        if (startTime.compareTo("")==0 && endTime.compareTo("")==0)
+                            continue;
+                        else if (a==0)
+                            time += "("+ weekDayNames[nowDay] +")  " + startTime + " ~ " + endTime + "\n";
+                        else
+                            time += " 　    " + startTime + " ~ " + endTime + "\n";
+                    }
+                }
+
+                ((TextView) vars.get("valueText_time")).setText(time);
             }
 
         };
@@ -1280,7 +1365,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
         int maxBufferSize = 1 * 1024 * 1024;
         File sourceFile = new File(sourceFileUri);
 
-        Log.d("HFFILENAME", siteType + id + seq+ ".jpg");
+        Log.d("HFFILENAME", siteTypeName + id + seq+ ".jpg");
 
         if (!sourceFile.isFile()) {
             dialog.dismiss();
@@ -1319,7 +1404,7 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
                 //更改圖片在sever的檔名
 
-                fileName =  siteType + id + seq+ ".jpg";
+                fileName =  siteTypeName + id + seq+ ".jpg";
 
 
                 dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""

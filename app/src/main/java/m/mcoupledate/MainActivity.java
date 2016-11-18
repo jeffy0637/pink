@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener {
@@ -286,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements
             for (int a=0; a<places.length(); ++a)
             {
 //                if (places.getJSONObject(a).optString("created_time").substring(0, 10).compareTo("2004-12-26")<0)
+                //  若打卡時間早於上次登入時間代表已抓過，return
                 if (places.getJSONObject(a).optString("created_time").substring(0, 10).compareTo(lastLoginDate)<0)
                 {
                     saveTaggedPlaceTopics();

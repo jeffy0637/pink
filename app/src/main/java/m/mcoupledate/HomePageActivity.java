@@ -29,8 +29,8 @@ public class HomePageActivity extends NavigationActivity {
     private SQLiteDatabase db = null;
 
 
-    private TextView totalDays;
-    private ResponsiveListView memorialDaysListView;
+    private TextView totalDays = null;
+    private ResponsiveListView memorialDaysListView = null;
     private MemorialDaysAdapter memorialDaysAdapter = null;
 
 
@@ -80,8 +80,6 @@ public class HomePageActivity extends NavigationActivity {
 
 
 
-        totalDays = (TextView) findViewById(R.id.totalDays);
-        memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDaysListView);
 
 //        setTotalDays();
 //        loadMemorialDays();
@@ -99,6 +97,11 @@ public class HomePageActivity extends NavigationActivity {
     protected void onResume()
     {
         super.onResume();
+
+        if (totalDays==null)
+            totalDays = (TextView) findViewById(R.id.totalDays);
+        if (memorialDaysListView==null)
+            memorialDaysListView = (ResponsiveListView) findViewById(R.id.memorialDaysListView);
 
         setTotalDays();
         loadMemorialDays();
@@ -142,9 +145,9 @@ public class HomePageActivity extends NavigationActivity {
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
 
         Calendar calendar = Calendar.getInstance();
-        String nowDate = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH)+1) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-        Cursor cursor = db.rawQuery("SELECT * FROM memorialday WHERE _id='"+mId+"' AND eventDate>='"+nowDate+"'  ORDER BY eventDate ASC",null);
+        Cursor cursor = db.rawQuery("SELECT * FROM memorialday WHERE _id='"+mId+"' ORDER BY eventDate ASC",null);
 
 
         ArrayList<MemorialDay> memorialDaysList = new ArrayList<MemorialDay>();
@@ -154,16 +157,16 @@ public class HomePageActivity extends NavigationActivity {
 
             do
             {
-                memorialDaysList.add(new MemorialDay(cursor.getString(1), cursor.getString(2)));
+                memorialDaysList.add(new MemorialDay(cursor.getString(1), cursor.getString(2), formatter, calendar));
             }
             while (cursor.moveToNext());
         }
-        memorialDaysList.add(new MemorialDay("21", "2016-12-21"));
-        memorialDaysList.add(new MemorialDay("22", "2016-12-22"));
-        memorialDaysList.add(new MemorialDay("23", "2016-12-23"));
-        memorialDaysList.add(new MemorialDay("24", "2016-12-24"));
-        memorialDaysList.add(new MemorialDay("25", "2016-12-25"));
-        memorialDaysList.add(new MemorialDay("26", "2016-12-26"));
+//        memorialDaysList.add(new MemorialDay("21", "2016-12-21"));
+//        memorialDaysList.add(new MemorialDay("22", "2016-12-22"));
+//        memorialDaysList.add(new MemorialDay("23", "2016-12-23"));
+//        memorialDaysList.add(new MemorialDay("24", "2016-12-24"));
+//        memorialDaysList.add(new MemorialDay("25", "2016-12-25"));
+//        memorialDaysList.add(new MemorialDay("26", "2016-12-26"));
 
         if (memorialDaysAdapter==null)
         {

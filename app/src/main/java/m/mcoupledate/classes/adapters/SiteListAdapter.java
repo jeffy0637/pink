@@ -20,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import m.mcoupledate.R;
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 /**
  * Created by user on 2016/8/26.

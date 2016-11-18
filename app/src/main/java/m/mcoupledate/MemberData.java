@@ -30,7 +30,7 @@ import java.util.Map;
 
 import m.mcoupledate.classes.NavigationActivity;
 import m.mcoupledate.classes.customView.DateInputEditText;
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 public class MemberData extends NavigationActivity
 {

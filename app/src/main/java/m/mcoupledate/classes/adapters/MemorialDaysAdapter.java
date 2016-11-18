@@ -7,9 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 import m.mcoupledate.R;
@@ -20,16 +21,15 @@ import m.mcoupledate.R;
 
 public class MemorialDaysAdapter extends BaseAdapter
 {
-    private LayoutInflater mInflater;
-    private ArrayList<MemorialDay> memorialDaysList;
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
+    protected LayoutInflater mInflater;
+    protected ArrayList<MemorialDay> memorialDaysList;
 
 
     public MemorialDaysAdapter (Context context, ArrayList<MemorialDay> memorialDaysList)
     {
         this.mInflater = LayoutInflater.from(context);
         this.memorialDaysList = memorialDaysList;
+        sortListAsc();
     }
 
     @Override
@@ -59,43 +59,135 @@ public class MemorialDaysAdapter extends BaseAdapter
 
 
         ((TextView) convertView.findViewById(R.id.mDateName)).setText(theDay.name);
-        ((TextView) convertView.findViewById(R.id.mDate)).setText(theDay.date);
-        ((TextView) convertView.findViewById(R.id.diffTime)).setText(calDiffDays(theDay.date));
-
+        String[] dateSplitArr = theDay.date.split("-");
+        ((TextView) convertView.findViewById(R.id.mDate)).setText(dateSplitArr[1] + "/" + dateSplitArr[2]);
+        ((TextView) convertView.findViewById(R.id.offsetDays)).setText(theDay.getOffsetDays());
 
 
         return convertView;
-    }
-
-    private String calDiffDays(String date)
-    {
-        Date d1 = null;
-        try
-        {   d1 = formatter.parse(date);  }
-        catch (ParseException e)
-        {   e.printStackTrace();    }
-
-        Date d2 = new Date();
-
-        return  String.valueOf((d2.getTime() - d1.getTime()) / (1000*60*60*24));
     }
 
 
     public void changeData(ArrayList<MemorialDay> memorialDaysList)
     {
         this.memorialDaysList = memorialDaysList;
+        sortListAsc();
         notifyDataSetChanged();
     }
 
 
-    public static class MemorialDay
+    protected void sortListAsc()
+    {
+        Collections.sort(memorialDaysList);
+    }
+
+
+
+
+
+
+
+
+
+    public static class MemorialDay implements Comparable
     {
         public String name, date;
+        private String offsetDays;
+        private String nowDate = "";
 
-        public MemorialDay(String name, String date)
+        private SimpleDateFormat formatter;
+        private Calendar calendar;
+
+        public MemorialDay(SimpleDateFormat formatter, Calendar calendar)
+        {
+            this.formatter = formatter;
+            this.calendar = calendar;
+
+            this.nowDate = calendar.get(Calendar.YEAR) + "- " + (calendar.get(Calendar.MONTH)+1) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+        }
+
+        public MemorialDay(String name, String date, SimpleDateFormat formatter, Calendar calendar)
         {
             this.name = name;
             this.date = date;
+
+            this.formatter = formatter;
+            this.calendar = calendar;
+
+            this.nowDate = calendar.get(Calendar.YEAR) + "- " + (calendar.get(Calendar.MONTH)+1) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+            this.offsetDays = getOffsetDays();
+        }
+
+        public String getOffsetDays()
+        {
+            String calNowDate = formatter.format(new Date());
+
+            if (calNowDate.compareTo(nowDate)==0)
+            {
+                return offsetDays;
+            }
+            else
+            {
+                nowDate = calNowDate;
+
+                String[] dateSplitArr = date.split("-");
+                int offsetDaysInt = 0;
+                try
+                {
+                    Date thisYearDate = formatter.parse(calendar.get(Calendar.YEAR) + "-" + dateSplitArr[1] + "-" + dateSplitArr[2]);
+                    offsetDaysInt =  (int) ((thisYearDate.getTime() - formatter.parse(calNowDate).getTime()) / (1000 * 60 * 60 * 24));
+
+                    if (offsetDaysInt<0)
+                    {
+                        thisYearDate = formatter.parse((calendar.get(Calendar.YEAR)+1) + "-" + dateSplitArr[1] + "-" + dateSplitArr[2]);
+                        offsetDaysInt =  (int) ((thisYearDate.getTime() - formatter.parse(calNowDate).getTime()) / (1000 * 60 * 60 * 24));
+                    }
+
+                    offsetDays = String.valueOf(offsetDaysInt);
+                }
+                catch (Exception e)
+                {   e.printStackTrace();    }
+
+                return offsetDays;
+            }
+
+        }
+
+        @Override
+        public int compareTo(Object obj)
+        {
+            //  -1: earlier
+            //  1: late
+            //  0: equal
+
+            MemorialDay anotherMDay = (MemorialDay) obj;
+
+            return (Integer.valueOf(this.getOffsetDays()) - Integer.valueOf(anotherMDay.getOffsetDays()));
+
+//            if (this.ifPast && !anotherMDay.ifPast)
+//            {
+//                return -1;
+//            }
+//            else if (!this.ifPast && anotherMDay.ifPast)
+//            {
+//                return 1;
+//            }
+//            else
+//            {
+//                int minus = Integer.valueOf(this.offsetDays) - Integer.valueOf(anotherMDay.offsetDays);
+//
+//                if (minus==0)
+//                    return 0;
+//                else if (this.ifPast && minus>0)
+//                    return -1;
+//                else if (this.ifPast && minus<0)
+//                    return 1;
+//                else if (!this.ifPast && minus<0)
+//                    return -1;
+//                else
+//                    return 1;
+//            }
+
         }
     }
 }

@@ -49,7 +49,7 @@ import m.mcoupledate.classes.PinkClusterMapFragmentActivity;
 import m.mcoupledate.classes.adapters.CommentAdapter;
 import m.mcoupledate.classes.adapters.RecyclerAlbumAdapter;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 public class SiteInfo extends PinkClusterMapFragmentActivity{
 
@@ -59,7 +59,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private PinkCon.InitErrorBar initErrorBar;
 
     private String sId, mId, picId;
-    private String siteTypeName;
+    private int siteType;
     private Boolean ifLiked;
 
     //印資訊
@@ -81,6 +81,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private ScrollView scrollView;
 
     private GoogleMap mMap;
+    private WorkaroundMapFragment mapFragment;
 
 
     RecyclerView album;
@@ -153,7 +154,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
             {
                 Intent i = new Intent(SiteInfo.this, EditSite.class);
                 i.putExtra("sId", sId);
-                i.putExtra("siteType", siteTypeName.split("")[0]);
+                i.putExtra("siteType", siteType);
                 i.putExtra("picId", picId);
                 startActivity(i);
             }
@@ -164,7 +165,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         scrollView = (ScrollView) findViewById(R.id.scrollView);
 
 
-        WorkaroundMapFragment mapFragment = getMapFragment(R.id.siteInfoMap);
+        mapFragment = getMapFragment(R.id.siteInfoMap);
         mapFragment.setListener(new WorkaroundMapFragment.OnTouchListener() {
             @Override
             public void onTouch() {
@@ -172,7 +173,6 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
             }
         });
 
-        mapFragment.getMapAsync(this);
 
 
         album = (RecyclerView)findViewById(R.id.album);
@@ -183,6 +183,14 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
         raAdapter = new RecyclerAlbumAdapter(this, album.getHeight());
         album.setAdapter(raAdapter);
+    }
+
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        mapFragment.getMapAsync(this);
     }
 
 
@@ -255,7 +263,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                             loveRateBar.setRating((float)o.getJSONArray("diffSite").getJSONObject(0).optDouble("site_love"));
 
                             picId = o.getJSONArray("diffSite").getJSONObject(0).optString("picId");
-                            siteTypeName = o.getJSONArray("diffSite").getJSONObject(0).optString("siteTypeName");
+                            siteType = o.getJSONArray("diffSite").getJSONObject(0).optInt("siteType");
 
                             phoneCallBtn = (Button) findViewById(R.id.call);
                             phoneCallBtn.setOnClickListener(new View.OnClickListener() {
@@ -294,7 +302,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                                         public void onClick(DialogInterface dialog, int which)
                                         {
                                             if (ifCommented)
-                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "editSiteBtn");
+                                                submitComment(commentText.getText().toString(), commentRBar.getRating(), "edit");
                                             else
                                                 submitComment(commentText.getText().toString(), commentRBar.getRating(), "new");
                                         }
@@ -372,6 +380,9 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         int seq = 97;
         int picNum = getResources().getInteger(R.integer.sitePicMaxLimit);
 
+        if (raAdapter.getItemCount()>0)
+            raAdapter.clear(false);
+
         while (picNum>0)
         {
             String url = PinkCon.URL + "images/sitePic/" + id + (char)(seq) +".jpg";
@@ -410,6 +421,11 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                         {
                             ifCommented = true;
                             setCommentContent(personLove, text);
+                            allCommentsAdapter.add(mId, pref.getString("mName", ""), text, personLove);
+                        }
+                        else
+                        {
+                            allCommentsAdapter.update(mId, pref.getString("mName", ""), text, personLove);
                         }
 
                         loveRateBar.setRating(Float.valueOf(response));
@@ -438,7 +454,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                 map.put("member", mId);
                 map.put("text", text);
                 map.put("person_love", String.valueOf(personLove));
-                map.put("siteTypeName", siteTypeName);
+                map.put("siteType", String.valueOf(siteType));
                 map.put("editType", editType);
 
                 return map;

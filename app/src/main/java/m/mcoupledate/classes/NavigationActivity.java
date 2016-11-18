@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +34,9 @@ import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
 import m.mcoupledate.StrokeActivity;
 import m.mcoupledate.TravelMap;
-import m.mcoupledate.funcs.SQLiteViewer;
+import m.mcoupledate.classes.funcs.SQLiteViewer;
+
+import static m.mcoupledate.R.id.appBarLayout;
 
 /**
  *      用於左側選單，使用時只要 extends NavigationActivity即可
@@ -45,7 +48,7 @@ import m.mcoupledate.funcs.SQLiteViewer;
  *
  *      若需用到onBackPressed這條函式(按下手機上的返回鍵時觸發) (不要Override這條!!)
  *      改Override  public Boolean onBackPressedAct() 這條
- *      若在動作完成後不需再執行其他動作時return true，反則return false
+ *      若在動作完成後不需再執行其他動作(已完成所有動作)時return true，反則return false
  *      可參考EditSite或SearchSites
  *
  *
@@ -66,7 +69,10 @@ public class NavigationActivity extends AppCompatActivity
 
     private DrawerLayout drawer;
 
+    private LayoutInflater layoutInflater;
+
     private RelativeLayout rootView;
+    private Toolbar toolbar;
 
     private SharedPreferences pref;
 
@@ -76,7 +82,7 @@ public class NavigationActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.navigation_template);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -87,6 +93,8 @@ public class NavigationActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        layoutInflater = LayoutInflater.from(this);
 
         rootView = (RelativeLayout) findViewById(R.id.contentContainer);
 
@@ -99,7 +107,7 @@ public class NavigationActivity extends AppCompatActivity
     @Override
     public void setContentView(@LayoutRes int layoutId)
     {
-        View contentView = LayoutInflater.from(this).inflate(layoutId, null);
+        View contentView = layoutInflater.inflate(layoutId, null);
         contentView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
 
         rootView.addView(contentView);
@@ -107,6 +115,22 @@ public class NavigationActivity extends AppCompatActivity
 
     public RelativeLayout getRootView()
     {   return rootView;    }
+//
+//    public void toolbarInflate(@LayoutRes int layoutId)
+//    {
+//        View toolbarContent = layoutInflater.inflate(layoutId, null);
+//        toolbar.addView(toolbarContent);
+//    }
+
+    public SharedPreferences getPref()
+    {
+        return pref;
+    }
+
+    public AppBarLayout getAppBarLayout()
+    {
+        return (AppBarLayout) findViewById(appBarLayout);
+    }
 
 
 
@@ -157,6 +181,7 @@ public class NavigationActivity extends AppCompatActivity
 //        return super.onOptionsItemSelected(item);
 //    }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -194,7 +219,7 @@ public class NavigationActivity extends AppCompatActivity
             case R.id.nav_logout:
                 FacebookSdk.sdkInitialize(getApplicationContext());
                 LoginManager.getInstance().logOut();
-                this.getSharedPreferences("pinkpink", 0).edit().clear().commit();
+                pref.edit().clear().commit();
                 intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
