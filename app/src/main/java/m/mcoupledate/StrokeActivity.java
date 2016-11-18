@@ -1,10 +1,9 @@
 package m.mcoupledate;
 
-import android.graphics.drawable.ColorDrawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,16 +11,29 @@ import m.mcoupledate.classes.NavigationActivity;
 
 public class StrokeActivity extends NavigationActivity {
 
+    Intent intent;
+    int tripId;
+    String tripType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stroke);
 
+        intent = this.getIntent();
+        // String tripId = intent.getStringExtra("tripId");
+
+        Bundle bundle = this.getIntent().getExtras();
+        tripId = bundle.getInt("tripId");
+        tripType = bundle.getString("tripType");
+
+
+
         if (savedInstanceState == null) {
             showFragment(BoardFragment.newInstance());
         }
 
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.app_color)));
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.app_color)));
     }
 
     private void showFragment(Fragment fragment) {

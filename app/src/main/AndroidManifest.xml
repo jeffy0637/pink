@@ -95,6 +95,11 @@
         <activity
             android:name=".TravelMap"
             android:label="@string/title_activity_travel_map" />
+        <activity
+            android:name=".MyTrip"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".funcs.SQLiteViewer"/>
         <activity android:name=".classes.funcs.SQLiteViewer" />
     </application>
 

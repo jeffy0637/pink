@@ -15,4 +15,10 @@
         <item>3</item>
     </integer-array>
 
+    <string-array name="list">
+        <item>相機</item>
+        <item>相簿</item>
+        <item>地圖</item>
+    </string-array>
+
 </resources>

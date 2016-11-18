@@ -204,6 +204,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:id="@+id/cityAreaInputBtn"
                     app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
@@ -249,6 +250,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:id="@+id/restaurantClassesInputBtn"
                     app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
@@ -326,6 +328,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/timeInputBtn"
+                    android:layout_gravity="end"
                     app:srcCompat="@drawable/edit"
                     android:background="#00ffffff" />
             </FrameLayout>

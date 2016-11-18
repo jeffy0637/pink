@@ -18,8 +18,8 @@
         android:layout_height="100dp">
 
         <ImageView
-            android:layout_width="53dp"
-            android:layout_height="53dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@drawable/person"
             android:layout_gravity="bottom" />
 
@@ -68,8 +68,8 @@
         android:id="@+id/linearLayout">
 
         <ImageView
-            android:layout_width="53dp"
-            android:layout_height="53dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@drawable/cake"
             android:layout_gravity="bottom" />
 
@@ -98,6 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="4"
                     android:id="@+id/birthday"
+                    android:gravity="center"
                     android:hint="ex. 1994/01/01"
                     android:inputType="date" />
 
@@ -106,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:id="@+id/birthdayEditBtn"
-                    app:srcCompat="@drawable/edit"
+                    app:srcCompat="@drawable/ic_calendar"
                     android:background="#00ffffff" />
 
 
@@ -122,9 +123,9 @@
         android:layout_height="100dp">
 
         <ImageView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            app:srcCompat="@drawable/calendar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_loveday"
             android:layout_gravity="bottom" />
 
         <LinearLayout
@@ -152,6 +153,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="4"
                     android:id="@+id/relationshipDate"
+                    android:gravity="center"
                     android:hint="ex. 1994/01/01"
                     android:inputType="date" />
 
@@ -160,7 +162,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:id="@+id/relationshipDateEditBtn"
-                    app:srcCompat="@drawable/edit"
+                    app:srcCompat="@drawable/ic_calendar"
                     android:background="#00ffffff" />
 
 
@@ -173,25 +175,30 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="5">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_margin="@dimen/default_margin"
+            android:layout_gravity="center"
             android:id="@+id/cancelBtn"
+            android:background="@drawable/circle_corner_button"
+            android:layout_weight="1"
             android:text="取消"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:id="@+id/submitBtn"
+            android:background="@drawable/circle_corner_button"
             android:text="完成"/>
 
 
     </LinearLayout>
-
 
 
 </LinearLayout>

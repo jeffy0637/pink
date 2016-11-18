@@ -25,6 +25,12 @@
     <!--icon_size-->
     <dimen name="icon_size">25dp</dimen>
 
+    <dimen name="button_size">20dp</dimen>
+
     <!--EditSite inputTimeDialog-->
     <dimen name="dialog_sign_size">15sp</dimen>
+
+    <!--height-->
+    <dimen name="travellist_height">120dp</dimen>
+
 </resources>
