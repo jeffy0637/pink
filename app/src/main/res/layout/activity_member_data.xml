@@ -108,7 +108,7 @@
                     android:layout_weight="1"
                     android:id="@+id/birthdayEditBtn"
                     app:srcCompat="@drawable/ic_calendar"
-                    android:background="#00ffffff" />
+                    android:background="#00fffffc" />
 
 
             </LinearLayout>
