@@ -59,7 +59,7 @@ public class BoardFragment extends Fragment {
     Intent intent;
     private String tripType;
     private String tripTId;
-    private static String startHour;
+    private static String startHour,startMin;
 
     private static String tripTIdForSend;
 
@@ -393,27 +393,15 @@ public class BoardFragment extends Fragment {
                 header.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        //final EditText choose = new EditText(mBoardView.getContext());
-                        /*
-                        new AlertDialog.Builder(mBoardView.getContext())
-                                .setTitle("刪除整天行程")
-                                //.setView(choose)
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        while (mItemArray.size() != 0){
-                                            mBoardView.removeItem(column, 0);
-                                        }
-                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-                                    }
-                                }).show();*/
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener()
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener()
                         {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute)
                             {
-                                ((TextView) header.findViewById(R.id.item_count)).setText("開始時間: " + hourOfDay + "時");
-
+                                ((TextView) header.findViewById(R.id.item_count)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
+                                startHour = Integer.toString(hourOfDay);
+                                startMin = Integer.toString(minute);
+                                Toast.makeText(getActivity(),"改成"+startHour+":"+startMin,Toast.LENGTH_SHORT).show();
                             }
                         }, hourOfDay, minute, false);
 
@@ -511,17 +499,17 @@ public class BoardFragment extends Fragment {
                         header.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                //final EditText choose = new EditText(mBoardView.getContext());
-                                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener()
+                                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener()
                                 {
                                     @Override
                                     public void onTimeSet(TimePicker view, int hourOfDay, int minute)
                                     {
-                                        ((TextView) header.findViewById(R.id.item_count)).setText("Time: " + hourOfDay + ":" + minute);
+                                        ((TextView) header.findViewById(R.id.item_count)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
                                         startHour = Integer.toString(hourOfDay);
-                                        Toast.makeText(getActivity(),"改成"+startHour,Toast.LENGTH_SHORT).show();
+                                        startMin = Integer.toString(minute);
+                                        Toast.makeText(getActivity(),"改成"+startHour+":"+startMin,Toast.LENGTH_SHORT).show();
                                     }
-                                }, hourOfDay, minute, true);
+                                }, hourOfDay, minute, false);
                                 timePickerDialog.show();
                                 /*
                                 new AlertDialog.Builder(mBoardView.getContext())
