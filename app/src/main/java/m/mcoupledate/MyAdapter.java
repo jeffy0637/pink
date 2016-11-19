@@ -63,4 +63,6 @@ public class MyAdapter extends BaseAdapter {
     public void removeItem(int index){
         //remove
     }
+
+
 }
