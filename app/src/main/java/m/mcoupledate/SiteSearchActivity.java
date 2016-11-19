@@ -13,7 +13,6 @@ import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -70,13 +69,14 @@ public class SiteSearchActivity extends NavigationActivity implements
                     //单击事件 menuItemId 是 R.menu.bottombar_menu 中 item 的 id
                     switch (menuItemId) {
                         case R.id.bb_menu_memorialday:
-                            /*Intent go2 = new Intent(SiteSearch.this, HomePageActivity.class);
-                            startActivity(go2);*/
+                            //Intent go2 = new Intent(SiteSearchActivity.this, HomePageActivity.class);
+                            //startActivity(go2);
                             break;
                         case R.id.bb_menu_site:
                             break;
                         case R.id.bb_menu_trip:
-
+                            Intent go3 = new Intent(SiteSearchActivity.this, StrokeSearch.class);
+                            startActivity(go3);
                             break;
                     }
                 }
@@ -92,8 +92,6 @@ public class SiteSearchActivity extends NavigationActivity implements
                     case R.id.bb_menu_site:
                         break;
                     case R.id.bb_menu_trip:
-                        Intent go3 = new Intent(SiteSearchActivity.this, StrokeSearch.class);
-                        startActivity(go3);
                         break;
                 }
 

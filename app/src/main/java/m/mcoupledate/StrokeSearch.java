@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -27,6 +30,7 @@ public class StrokeSearch extends NavigationActivity {
 
     Intent intent;
     String tripType;
+    private SearchView searchView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +58,8 @@ public class StrokeSearch extends NavigationActivity {
                 //单击事件 menuItemId 是 R.menu.bottombar_menu 中 item 的 id
                 switch (menuItemId) {
                     case R.id.bb_menu_memorialday:
-
                         break;
                     case R.id.bb_menu_site:
-                        //Intent go2 = new Intent(StrokeSearch.this, SiteSearchActivity.class);
-                        //startActivity(go2);
                         break;
                     case R.id.bb_menu_trip:
 
@@ -122,4 +123,42 @@ public class StrokeSearch extends NavigationActivity {
             startActivity(intent);
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.topbar_search, menu);
+
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.topbarSearch));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                onQueryTextChange(query);
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                passSearchQuery(newText);
+                return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose()
+            {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    private void passSearchQuery(String query)
+    {
+        //
+    }
 }

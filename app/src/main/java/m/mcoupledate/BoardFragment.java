@@ -72,17 +72,9 @@ public class BoardFragment extends Fragment {
 
         tripType = (String)getArguments().get("TT");
 
-        switch (tripType){
-            case "my":
-                tripTypeNum = 3;
-            case "trip":
-                tripTypeNum = 2;
-            case "search":
-                tripTypeNum = 1;
-        }
         //測試
         setHasOptionsMenu(true);
-        Toast.makeText(getActivity(),tripType,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
     }
 
     @Override
