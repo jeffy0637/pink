@@ -9,4 +9,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/pic"
         android:background="#000000" />
+
 </LinearLayout>

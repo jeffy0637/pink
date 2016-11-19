@@ -17,15 +17,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import m.mcoupledate.classes.NavigationActivity;
 import m.mcoupledate.classes.adapters.MemorialDaysModifierAdapter;
-import m.mcoupledate.classes.adapters.MemorialDaysModifierAdapter.MemorialDay;
-import m.mcoupledate.funcs.Actioner;
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.adapters.MemorialDaysAdapter.MemorialDay;
+import m.mcoupledate.classes.funcs.Actioner;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 
 public class ModifyMemorialDay extends NavigationActivity {
@@ -74,6 +76,9 @@ public class ModifyMemorialDay extends NavigationActivity {
     {
         db = openOrCreateDatabase("userdb.db", MODE_PRIVATE, null);
 
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+
         Cursor cursor = db.rawQuery("SELECT * FROM memorialday WHERE _id='"+mId+"' ORDER BY eventDate ASC",null);
 
 
@@ -84,7 +89,7 @@ public class ModifyMemorialDay extends NavigationActivity {
 
             do
             {
-                memorialDaysList.add(new MemorialDay(cursor.getString(1), cursor.getString(2)));
+                memorialDaysList.add(new MemorialDay(cursor.getString(1), cursor.getString(2), formatter, calendar));
             }
             while (cursor.moveToNext());
         }

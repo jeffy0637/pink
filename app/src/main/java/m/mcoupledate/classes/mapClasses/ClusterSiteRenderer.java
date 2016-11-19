@@ -1,7 +1,6 @@
 package m.mcoupledate.classes.mapClasses;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -34,7 +34,7 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
     private Context context;
     private GoogleMap mMap;
 
-    private Bitmap aIcon, rIcon;
+    private BitmapDescriptor aBmpDescriptor, rBmpDescriptor;
 
 
     public ClusterSiteRenderer(Context context, GoogleMap mMap, ClusterManager<ClusterSite> mClusterManager) {
@@ -66,10 +66,10 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
 
 
         mImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.map_attraction));
-        aIcon = mIconGenerator.makeIcon();
+        aBmpDescriptor = BitmapDescriptorFactory.fromBitmap(mIconGenerator.makeIcon());
 
         mImageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.map_restaurant));
-        rIcon = mIconGenerator.makeIcon();
+        rBmpDescriptor = BitmapDescriptorFactory.fromBitmap(mIconGenerator.makeIcon());
     }
 
     /*
@@ -82,9 +82,9 @@ public class ClusterSiteRenderer extends DefaultClusterRenderer<ClusterSite> {
         // Draw a single person.
         // Set the info window to show their name.
         if (site.siteType==ClusterSite.SITETYPE_ATTRACTION)
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(aIcon)).title(site.name);
+            markerOptions.icon(aBmpDescriptor).title(site.name);
         else
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(rIcon)).title(site.name);
+            markerOptions.icon(rBmpDescriptor).title(site.name);
     }
 
     /*

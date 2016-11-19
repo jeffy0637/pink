@@ -7,34 +7,33 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import m.mcoupledate.R;
 import m.mcoupledate.classes.InputDialogManager;
 import m.mcoupledate.classes.customView.DateInputEditText;
-import m.mcoupledate.funcs.Actioner;
+import m.mcoupledate.classes.funcs.Actioner;
 
 
 /**
  * Created by user on 2016/11/8.
  */
 
-public class MemorialDaysModifierAdapter extends BaseAdapter
+public class MemorialDaysModifierAdapter extends MemorialDaysAdapter
 {
     private LayoutInflater mInflater;
     private ArrayList<MemorialDay> memorialDaysList;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private Calendar calendar;
+    private int colorPastDay, colorComingDay;
 
     private InputDialogManager modifierDialogManager;
     private DatePickerDialog datePickerDialog;
@@ -48,10 +47,13 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
 
     public MemorialDaysModifierAdapter(final Context context, final ArrayList<MemorialDay> memorialDaysList, final Actioner memorialDayUpdater)
     {
-        this.mInflater = LayoutInflater.from(context);
-        this.memorialDaysList = memorialDaysList;
+        super(context, memorialDaysList);
+        this.mInflater = super.mInflater;
+        this.memorialDaysList = super.memorialDaysList;
 
-        final Calendar calendar = Calendar.getInstance();;
+        this.calendar = Calendar.getInstance();
+
+
         this.modifierDialogManager = new InputDialogManager(context, R.layout.dialog_memorialday_modifier, "編輯紀念日", "完成", "取消")
         {
             @Override
@@ -68,24 +70,24 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
 
 
                 datePickerDialog= new DatePickerDialog(context,
-                    new DatePickerDialog.OnDateSetListener()
-                    {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+                        new DatePickerDialog.OnDateSetListener()
                         {
-                            String monthOfYearStr = String.valueOf(monthOfYear+1);
-                            String dayOfMonthStr = String.valueOf(dayOfMonth);
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+                            {
+                                String monthOfYearStr = String.valueOf(monthOfYear+1);
+                                String dayOfMonthStr = String.valueOf(dayOfMonth);
 
-                            if ((monthOfYear+1)<10)
-                                monthOfYearStr = "0" + monthOfYearStr;
+                                if ((monthOfYear+1)<10)
+                                    monthOfYearStr = "0" + monthOfYearStr;
 
-                            if (dayOfMonth<10)
-                                dayOfMonthStr = "0" + dayOfMonthStr;
+                                if (dayOfMonth<10)
+                                    dayOfMonthStr = "0" + dayOfMonthStr;
 
-                            date.setText(year + "/" + monthOfYearStr + "/" + dayOfMonthStr);
+                                date.setText(year + "/" + monthOfYearStr + "/" + dayOfMonthStr);
+                            }
                         }
-                    }
-                    , calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
+                        , calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
                 );
 
                 ImageButton dateEditBtn = (ImageButton) dialogFindViewById(R.id.dateEditBtn);
@@ -105,6 +107,8 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
 
                 if (((int) vars.get("position"))!=-1)
                 {
+                    //  編輯紀念日
+
                     MemorialDay theDay = getItem((int) vars.get("position"));
 
                     if (eventDate!=null && eventDate.compareTo("")!=0 && eventName.compareTo("")!=0)
@@ -126,7 +130,8 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
                 }
                 else
                 {
-                    MemorialDay theDay = new MemorialDay();
+                    //  新增紀念日
+                    MemorialDay theDay = new MemorialDay(formatter, calendar);
 
                     if (eventDate!=null && eventDate.compareTo("")!=0 && eventName.compareTo("")!=0)
                     {
@@ -170,38 +175,23 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
         };
 
         ifDeleteDialog = new AlertDialog.Builder(context)
-            .setTitle("確定刪除?")
-            .setPositiveButton("刪除", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    MemorialDay theDay = getItem(nowPosition);
-                    memorialDayUpdater.act(UPDATEMEMORIALDAYTYPE_DELETE, theDay.name, theDay.date);
+                .setTitle("確定刪除?")
+                .setPositiveButton("刪除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        MemorialDay theDay = getItem(nowPosition);
+                        memorialDayUpdater.act(UPDATEMEMORIALDAYTYPE_DELETE, theDay.name, theDay.date);
 
-                    memorialDaysList.remove(nowPosition);
-                    notifyDataSetChanged();
-                }
-            })
-            .setNeutralButton("取消", null)
-            .create();
+                        memorialDaysList.remove(nowPosition);
+                        notifyDataSetChanged();
+                    }
+                })
+                .setNeutralButton("取消", null)
+                .create();
     }
 
-    @Override
-    public int getCount()
-    {
-        return memorialDaysList.size();
-    }
 
-    @Override
-    public MemorialDay getItem(int arg0)
-    {
-        return memorialDaysList.get(arg0);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
@@ -213,8 +203,10 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
 
 
         ((TextView) convertView.findViewById(R.id.mDateName)).setText(theDay.name);
-        ((TextView) convertView.findViewById(R.id.mDate)).setText(theDay.date.replace("-", "/"));
-        ((TextView) convertView.findViewById(R.id.diffTime)).setText(calDiffDays(theDay.date));
+        String[] dateSplitArr = theDay.date.split("-");
+        ((TextView) convertView.findViewById(R.id.mDate)).setText(dateSplitArr[1] + "/" + dateSplitArr[2]);
+        ((TextView) convertView.findViewById(R.id.offsetDays)).setText(theDay.getOffsetDays());
+
 
         ImageButton editBtn = (ImageButton) convertView.findViewById(R.id.editBtn);
         editBtn.setOnClickListener(new View.OnClickListener() {
@@ -241,34 +233,23 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
         return convertView;
     }
 
-    private String calDiffDays(String date)
-    {
-        Date d1 = null;
-        try
-        {   d1 = formatter.parse(date);  }
-        catch (ParseException e)
-        {   e.printStackTrace();    }
-
-        Date d2 = new Date();
-
-        return  String.valueOf((d2.getTime() - d1.getTime()) / (1000*60*60*24));
-    }
 
     private void add(MemorialDay theDay)
     {
-        int a = 0;
-        for (MemorialDay aDay : memorialDaysList)
-        {
-            if (aDay.date.compareTo(theDay.date)>0)
-            {
-                memorialDaysList.add(a, theDay);
-                notifyDataSetChanged();
-                return ;
-            }
-            ++a;
-        }
+//        int a = 0;
+//        for (MemorialDay aDay : memorialDaysList)
+//        {
+//            if (aDay.date.compareTo(theDay.date)>0)
+//            {
+//                memorialDaysList.add(a, theDay);
+//                notifyDataSetChanged();
+//                return ;
+//            }
+//            ++a;
+//        }
 
         memorialDaysList.add(theDay);
+        sortListAsc();
         notifyDataSetChanged();
     }
 
@@ -279,25 +260,5 @@ public class MemorialDaysModifierAdapter extends BaseAdapter
     }
 
 
-    public void changeData(ArrayList<MemorialDay> memorialDaysList)
-    {
-        this.memorialDaysList = memorialDaysList;
-        notifyDataSetChanged();
-    }
-
-
-    public static class MemorialDay
-    {
-        public String name, date;
-
-        public MemorialDay()
-        {}
-
-        public MemorialDay(String name, String date)
-        {
-            this.name = name;
-            this.date = date;
-        }
-    }
 
 }

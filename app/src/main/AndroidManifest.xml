@@ -110,6 +110,7 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".funcs.SQLiteViewer"/>
+        <activity android:name=".classes.funcs.SQLiteViewer" />
     </application>
 
 </manifest>

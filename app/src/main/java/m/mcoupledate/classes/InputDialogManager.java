@@ -58,11 +58,15 @@ public class InputDialogManager
     public JSONObject getInputsJSONObj() throws JSONException
     {   return new JSONObject();      }
 
+    //return true if the dialog is ready to be dismissed
     protected Boolean onConfirm()
     {   return true;    }
 
+    //return true if the dialog is ready to be dismissed
     protected Boolean onCancel()
     {   return true;    }
+
+    public void printResult(){}
 
     public void updateContentData(Object... args) {}
 
@@ -128,8 +132,4 @@ public class InputDialogManager
         });
     }
 
-    public static class Actioner
-    {
-        public void act(Object... args){}
-    }
 }

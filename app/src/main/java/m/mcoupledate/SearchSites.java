@@ -3,15 +3,13 @@ package  m.mcoupledate;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -37,7 +35,7 @@ import m.mcoupledate.classes.DropDownMenu.ConstellationAdapter;
 import m.mcoupledate.classes.DropDownMenu.DropDownMenu;
 import m.mcoupledate.classes.DropDownMenu.ListDropDownAdapter;
 import m.mcoupledate.classes.adapters.SiteListAdapter;
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 
 public class SearchSites extends Fragment
@@ -56,6 +54,7 @@ public class SearchSites extends Fragment
     private ListView siteListView;
     private SiteListAdapter siteListAdapter;
     private JSONArray sites;
+    private JSONArray initSiteList = null;
 
 
     public String select_city = "";
@@ -71,16 +70,22 @@ public class SearchSites extends Fragment
 
     private View rootView;
 
+    private FloatingActionButton addNewSiteFAB;
 
-    public static SearchSites newInstance(int searchType, int siteType)
+    private Boolean ifFirstPage;
+
+
+    public static SearchSites newInstance(int searchType, int siteType, Boolean ifFirstPage)
     {
         SearchSites newInstance = new SearchSites();
 
         Bundle settings = new Bundle();
         settings.putInt("searchType", searchType);
         settings.putInt("siteType", siteType);
+        settings.putBoolean("ifFirstPage", ifFirstPage);
 
         newInstance.setArguments(settings);
+
 
         return newInstance;
     }
@@ -99,6 +104,8 @@ public class SearchSites extends Fragment
         else if  (siteType==SITETYPE_RESTAURANT)
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區", "時段", "種類", "口味"}));
 
+
+        ifFirstPage = getArguments().getBoolean("ifFirstPage");
     }
 
     @Override
@@ -121,6 +128,29 @@ public class SearchSites extends Fragment
 
         mDropDownMenu= (DropDownMenu) getView().findViewById( R.id.dropDownMenu);
         initDropDownMenu();
+
+
+
+        addNewSiteFAB = (FloatingActionButton) getView().findViewById(R.id.addNewSiteFAB);
+        addNewSiteFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent();
+
+                if (searchType==SearchSites.SEARCHTYPE_BROWSE)
+                    intent.setClass(SearchSites.this.getActivity(), EditSite.class);
+                else
+                    intent.setClass(SearchSites.this.getActivity(), SiteSearchActivity.class);
+
+                intent.putExtra("siteType", siteType);
+                startActivity(intent);
+            }
+        });
+        if (ifFirstPage)
+            addNewSiteFAB.setVisibility(View.VISIBLE);
+
+
     }
 
     private void initDropDownMenu()
@@ -169,15 +199,22 @@ public class SearchSites extends Fragment
             }
         });
 
-        mDropDownMenu.setListRefresher(
-                new DropDownMenu.ListRefresher() {
-                    @Override
-                    public void refresh(JSONArray jArr) throws JSONException {
-                        siteListAdapter.changeData(jArr);
-                    }
-                }
-        );
-        mDropDownMenu.setDynamicSearcher(getDynamicSearcher());
+        mDropDownMenu.setClassSearcher(new DropDownMenu.ClassSearcher() {
+            @Override
+            public void search() {
+                searchByClasses();
+            }
+        });
+
+//        mDropDownMenu.setListRefresher(
+//                new DropDownMenu.ListRefresher() {
+//                    @Override
+//                    public void refresh(JSONArray jArr) throws JSONException {
+//                        siteListAdapter.changeData(jArr);
+//                    }
+//                }
+//        );
+//        mDropDownMenu.setDynamicSearcher(getDynamicSearcher());
     }
 
 
@@ -285,36 +322,43 @@ public class SearchSites extends Fragment
         mQueue.add(stringRequest);
     }
 
-    private void setInitSiteList()
+    public void setInitSiteList()
     {
-        String url;
-        if (searchType==SEARCHTYPE_BROWSE)
-            url = PinkCon.URL +"searchSites_initSiteList_recommended.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
+        if (initSiteList!=null)
+        {
+            try
+            {
+                siteListAdapter.changeData(initSiteList);
+            }
+            catch (JSONException e)
+            {   e.printStackTrace();    }
+        }
         else
-            url = PinkCon.URL +"searchSites_initSiteList_allMyLike.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
+        {
+            String url;
+            if (searchType == SEARCHTYPE_BROWSE)
+                url = PinkCon.URL + "searchSites_initSiteList_recommended.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
+            else
+                url = PinkCon.URL + "searchSites_initSiteList_allMyLike.php?siteType=" + siteType + "&mId=" + pref.getString("mId", null);
 
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response)
-                {
-                    Log.d("HFresponse", response);
-                    try
-                    {
-                        siteListAdapter.changeData(new JSONArray(response));
-                    }
-                    catch (JSONException e)
-                    {
-                        e.printStackTrace();
-                    }
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+//                    Log.d("HFresponse", response);
+                            try {
+                                initSiteList = new JSONArray(response);
+                                siteListAdapter.changeData(initSiteList);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
 
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error)
-                {
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
 //                    PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
 //                            new View.OnClickListener() {
 //                                @Override
@@ -322,17 +366,18 @@ public class SearchSites extends Fragment
 //                                    searchByClasses();
 //                                }
 //                            });
-                }
-            });
+                        }
+                    });
 
-        mQueue.add(stringRequest);
+            mQueue.add(stringRequest);
+        }
     }
 
 
 
     public Boolean onBackPressedAct() {
         //退出activity前关闭菜单
-        if (mDropDownMenu.isShowing())
+        if (mDropDownMenu!=null && mDropDownMenu.isShowing())
         {
             mDropDownMenu.closeMenu();
             return true;
@@ -346,13 +391,14 @@ public class SearchSites extends Fragment
 
     public void searchByClasses()
     {
-        mDropDownMenu.closeMenu();
+//        mDropDownMenu.closeMenu();
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL +"searchSites_searchByClasses.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
+                        Log.d("HFsearchByClass", response);
                         try
                         {
                             sites = new JSONArray(response);
@@ -410,69 +456,94 @@ public class SearchSites extends Fragment
         mQueue.add(stringRequest);
     }
 
-    private DropDownMenu.DynamicSearcher getDynamicSearcher()
+//    private DropDownMenu.DynamicSearcher getDynamicSearcher()
+//    {
+//        return new DropDownMenu.DynamicSearcher()
+//        {
+//            @Override
+//            public TextWatcher getSearcher(final EditText searchBar, final DropDownMenu.ListRefresher listRefresher)
+//            {
+//                return new TextWatcher() {
+//                    @Override
+//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//
+//                    @Override
+//                    public void onTextChanged(CharSequence s, int start, int before, int count)
+//                    {
+//                        String query = searchBar.getText().toString();
+//
+//                        searchByText(query);
+//
+//                    }
+//
+//                    @Override
+//                    public void afterTextChanged(Editable s) {}
+//                };
+//            };
+//
+//        };
+//    }
+
+
+    public void searchByText(String query)
     {
-        return new DropDownMenu.DynamicSearcher()
-        {
-            @Override
-            public TextWatcher getSearcher(final EditText searchBar, final DropDownMenu.ListRefresher listRefresher)
-            {
-                return new TextWatcher() {
+        query = query.replace(" ", "%");
+
+        if (query.matches("^[%]*$"))
+            return ;
+
+        String url = null;
+        try {
+            url = PinkCon.URL +"searchSites_searchByText.php?searchType="+searchType+"&siteType="+siteType+"&mId="+pref.getString("mId", "anyone")+"&query="+ URLEncoder.encode(query, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return ;
+        }
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count)
-                    {
-                        String query = searchBar.getText().toString().replace(" ", "%");
-                        String spacePattern = "^[%]*$";
-
-                        if (query.matches(spacePattern))
-                            return ;
-
-                        String url = null;
-                        try {
-                            url = PinkCon.URL +"searchSites_searchByText.php?searchType="+searchType+"&siteType="+siteType+"&mId="+pref.getString("mId", "anyone")+"&query="+ URLEncoder.encode(query, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            return ;
-                        }
-
-                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                                new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
+                    public void onResponse(String response) {
 //                                        Log.d("HF~r", response);
 
-                                        try {
-                                            listRefresher.refresh(new JSONArray(response));
-                                        } catch (JSONException e) {
-                                            //  do nothing
-                                        }
+                        try {
+                            siteListAdapter.changeData(new JSONArray(response));
+                        } catch (JSONException e) {
+                            //  do nothing
+                        }
 
-                                    }
-                                },
-                                new Response.ErrorListener() {
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
+                                new View.OnClickListener() {
                                     @Override
-                                    public void onErrorResponse(VolleyError error)
-                                    {
-                                        PinkCon.retryConnect(rootView, PinkCon.SEARCH_FAIL, initErrorBar,
-                                            new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    searchByClasses();
-                                                }
-                                            });
+                                    public void onClick(View view) {
+                                        searchByClasses();
                                     }
                                 });
-                        mQueue.add(stringRequest);
                     }
+                });
+        mQueue.add(stringRequest);
 
-                    @Override
-                    public void afterTextChanged(Editable s) {}
-                };
-            };
 
-        };
+    }
+
+
+    public void onScrolledIn()
+    {
+        if (addNewSiteFAB!=null)
+            addNewSiteFAB.setVisibility(View.VISIBLE);
+    }
+
+
+    public void onScrollOut()
+    {
+        if (addNewSiteFAB!=null)
+            addNewSiteFAB.setVisibility(View.GONE);
+
     }
 
 }

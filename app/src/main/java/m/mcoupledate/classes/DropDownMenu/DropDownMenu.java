@@ -4,9 +4,7 @@ package m.mcoupledate.classes.DropDownMenu;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,16 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,45 +113,45 @@ public class DropDownMenu extends LinearLayout {
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         //初始化tabMenuView并添加到tabMenuView
-        LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setLayoutParams(params);
-        linearLayout.setBackgroundColor(menuBackgroundColor);
-        linearLayout.setPadding(12, 0, 0, 0);
-        searchBar = new EditText(context);
-        searchBar.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        searchBar.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
-        Button clearBtn = new Button(context);
-        clearBtn.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        clearBtn.setText("✕");
-        clearBtn.setTextSize(18f);
-        clearBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
-        clearBtn.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) { searchBar.setText(""); } });
-        linearLayout.addView(searchBar, 0);
-        linearLayout.addView(clearBtn, 1);
-        addView(linearLayout, 0);
-
-        View searchUnderLine = new View(getContext());
-        searchUnderLine.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpTpPx(1.0f)));
-        searchUnderLine.setBackgroundColor(underlineColor);
-        addView(searchUnderLine, 1);
+//        LinearLayout linearLayout = new LinearLayout(context);
+//        linearLayout.setLayoutParams(params);
+//        linearLayout.setBackgroundColor(menuBackgroundColor);
+//        linearLayout.setPadding(12, 0, 0, 0);
+//        searchBar = new EditText(context);
+//        searchBar.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+//        searchBar.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+//        Button clearBtn = new Button(context);
+//        clearBtn.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+//        clearBtn.setText("✕");
+//        clearBtn.setTextSize(18f);
+//        clearBtn.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+//        clearBtn.setOnClickListener(new OnClickListener() { @Override public void onClick(View v) { searchBar.setText(""); } });
+//        linearLayout.addView(searchBar, 0);
+//        linearLayout.addView(clearBtn, 1);
+//        addView(linearLayout, 0);
+//
+//        View searchUnderLine = new View(getContext());
+//        searchUnderLine.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpTpPx(1.0f)));
+//        searchUnderLine.setBackgroundColor(underlineColor);
+//        addView(searchUnderLine, 1);
 
         //初始化tabMenuView并添加到tabMenuView
         tabMenuView = new LinearLayout(context);
         tabMenuView.setOrientation(HORIZONTAL);
         tabMenuView.setBackgroundColor(menuBackgroundColor);
         tabMenuView.setLayoutParams(params);
-        addView(tabMenuView, 2);
+        addView(tabMenuView, 0);
 
         //为tabMenuView添加下划线
         View underLine = new View(getContext());
         underLine.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpTpPx(1.0f)));
         underLine.setBackgroundColor(underlineColor);
-        addView(underLine, 3);
+        addView(underLine, 1);
 
         //初始化containerView并将其添加到DropDownMenu
         containerView = new FrameLayout(context);
         containerView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        addView(containerView, 4);
+        addView(containerView, 2);
     }
 
     public interface OnDefultMenuSelectListener {
@@ -317,14 +311,14 @@ public class DropDownMenu extends LinearLayout {
         View v = li.inflate(R.layout.drop_menu_grid_layout, null);
         GridView grid = (GridView) v.findViewById(R.id.constellation);
         if (select_position != -1) {
-            cAdapter.setCheckItem(select_position);
+            cAdapter.setCheckItem(select_position, true);
             setTabText(index, arr[select_position]);
         }
         grid.setAdapter(cAdapter);
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                cAdapter.setCheckItem(position);
+                cAdapter.setCheckItem(position, true);
                 setTabText(current_tab_position, cAdapter.list.get(position));
 //                closeMenu();
                 lis.onSelectDefaultMenu(index, position, cAdapter.getItem(position));
@@ -397,6 +391,8 @@ public class DropDownMenu extends LinearLayout {
             maskView.setVisibility(GONE);
             maskView.setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dd_mask_out));
             current_tab_position = -1;
+
+            classSearcher.search();
         }
 
     }
@@ -450,33 +446,43 @@ public class DropDownMenu extends LinearLayout {
     }
 
 
+//
+//    public void setDynamicSearcher(DynamicSearcher dynamicSearcher)
+//    {
+//        searchBar.addTextChangedListener(dynamicSearcher.getSearcher(searchBar, listRefresher));
+////        if (searchType== SearchSites.SITETYPE_ATTRACTION)
+////            searchBar.setHint("搜尋景點");
+////        else
+////            searchBar.setHint("搜尋餐廳");
+//
+//
+//    }
 
-    public void setDynamicSearcher(DynamicSearcher dynamicSearcher)
+
+
+//    public interface ListRefresher
+//    {
+//        void refresh(JSONArray jArr) throws JSONException;
+//    }
+//    private ListRefresher listRefresher;
+//    public void setListRefresher(ListRefresher listRefresher) {
+//        this.listRefresher = listRefresher;
+//    }
+//
+//    public interface DynamicSearcher
+//    {
+//        TextWatcher getSearcher(EditText searchBar, ListRefresher listRefresher);
+//    }
+
+
+    public interface ClassSearcher
     {
-        searchBar.addTextChangedListener(dynamicSearcher.getSearcher(searchBar, listRefresher));
-//        if (searchType== SearchSites.SITETYPE_ATTRACTION)
-//            searchBar.setHint("搜尋景點");
-//        else
-//            searchBar.setHint("搜尋餐廳");
-
-
+        void search();
     }
-
-
-
-    public interface ListRefresher
+    private ClassSearcher classSearcher;
+    public void setClassSearcher(ClassSearcher classSearcher)
     {
-        void refresh(JSONArray jArr) throws JSONException;
+        this.classSearcher = classSearcher;
     }
-    private ListRefresher listRefresher;
-    public void setListRefresher(ListRefresher listRefresher) {
-        this.listRefresher = listRefresher;
-    }
-
-    public interface DynamicSearcher
-    {
-        TextWatcher getSearcher(EditText searchBar, ListRefresher listRefresher);
-    }
-
 
 }

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import m.mcoupledate.funcs.PinkCon;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 /**
  * Created by user on 2016/10/25.

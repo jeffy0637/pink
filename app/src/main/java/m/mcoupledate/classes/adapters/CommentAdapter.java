@@ -30,7 +30,6 @@ public class CommentAdapter extends BaseAdapter {
     private JSONArray sites;
 
 
-
     public CommentAdapter (Context context, JSONArray sites)
     {
         this.context = context;
@@ -100,5 +99,47 @@ public class CommentAdapter extends BaseAdapter {
     {
         this.sites = sites;
         this.notifyDataSetChanged();
+    }
+
+
+    public void add(String mId, String name, String text, float person_love)
+    {
+        JSONObject aComment = new JSONObject();
+        try
+        {
+            aComment.put("mId", mId);
+            aComment.put("name", name);
+            aComment.put("text", text);
+            aComment.put("person_love", person_love);
+
+            sites.put(aComment);
+
+            notifyDataSetChanged();
+        }
+        catch (JSONException e)
+        {   e.printStackTrace();    }
+    }
+
+    public void update(String mId, String name, String text, float person_love)
+    {
+        for (int a=0; a<sites.length(); ++a)
+        {
+            try
+            {
+                if (sites.getJSONObject(a).optString("mId").compareTo(mId)==0)
+                {
+                    JSONObject aComment = sites.optJSONObject(a);
+                    aComment.put("name", name);
+                    aComment.put("text", text);
+                    aComment.put("person_love", person_love);
+
+                    notifyDataSetChanged();
+                    break;
+                }
+            }
+            catch (JSONException e)
+            {   e.printStackTrace();    }
+        }
+
     }
 }

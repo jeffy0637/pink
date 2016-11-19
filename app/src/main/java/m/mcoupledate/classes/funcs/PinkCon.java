@@ -1,4 +1,4 @@
-package m.mcoupledate.funcs;
+package m.mcoupledate.classes.funcs;
 
 import android.app.Activity;
 import android.content.Intent;

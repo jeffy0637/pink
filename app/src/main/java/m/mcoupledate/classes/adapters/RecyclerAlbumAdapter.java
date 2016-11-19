@@ -52,27 +52,36 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
         this.notifyDataSetChanged();
     }
 
+    public void clear(Boolean ifNeedNotify)
+    {
+        this.album.clear();
+        if (ifNeedNotify)
+            this.notifyDataSetChanged();
+    }
+
 
     //创建新View，被LayoutManager所调用
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = mInflater.inflate(R.layout.item_gridalbum,viewGroup,false);
 
-//        view.setLayoutParams(new RecyclerView.LayoutParams(Resources.getSystem().getDisplayMetrics().widthPixels, RecyclerView.LayoutParams.MATCH_PARENT));
+        view.setLayoutParams(new RecyclerView.LayoutParams(Resources.getSystem().getDisplayMetrics().widthPixels, RecyclerView.LayoutParams.MATCH_PARENT));
 //        Log.d("HFVIEWHEIGHT", String.valueOf(Resources.getSystem().getDisplayMetrics().widthPixels) + String.valueOf(this.albumHeight));
         ViewHolder vh = new ViewHolder(view);
         return vh;
     }
     //将数据与界面进行绑定的操作
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(ViewHolder viewHolder, int position)
+    {
 
 //        viewHolder.pic.setImageMatrix();
         viewHolder.pic.setImageBitmap((Bitmap) this.album.get(position).get("bitmap"));
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return album.size();
     }
 
@@ -82,7 +91,8 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
     {
         public ImageView pic;
 
-        public ViewHolder(View view){
+        public ViewHolder(View view)
+        {
             super(view);
             pic = (ImageView) view.findViewById(R.id.pic);
         }

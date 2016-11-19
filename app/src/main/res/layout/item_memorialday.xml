@@ -68,8 +68,8 @@
                 android:layout_height="wrap_content"
                 android:text="250"
                 android:textSize="22sp"
-                android:textColor="#92A8D1"
-                android:id="@+id/diffTime"
+                android:textColor="@color/pinkpink"
+                android:id="@+id/offsetDays"
                 android:layout_alignParentRight="true"
                 android:layout_weight="0.16" />
 

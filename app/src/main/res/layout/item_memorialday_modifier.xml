@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="22sp"
                 android:textColor="#92A8D1"
-                android:id="@+id/diffTime"
+                android:id="@+id/offsetDays"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="0.16" />

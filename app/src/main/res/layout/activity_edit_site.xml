@@ -19,13 +19,12 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        tools:context=".AddnewSite">
+        android:focusableInTouchMode="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title"
+            android:text=""
             android:id="@+id/siteTitle"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
@@ -221,7 +220,8 @@
             android:layout_below="@+id/layout_newsite_city_area"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:minHeight="@dimen/info_layout_height">
+            android:minHeight="@dimen/info_layout_height"
+            android:visibility="gone">
 
             <FrameLayout
                 android:id="@+id/left_layout_newsite_restaurant_classes"
@@ -321,7 +321,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:text="營業時間"
-                    android:id="@+id/time"
+                    android:id="@+id/valueText_time"
                     android:layout_gravity="center"/>
 
                 <ImageButton

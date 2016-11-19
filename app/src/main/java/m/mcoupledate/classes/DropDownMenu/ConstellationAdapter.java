@@ -1,6 +1,7 @@
 package m.mcoupledate.classes.DropDownMenu;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class ConstellationAdapter extends BaseAdapter {
     }
 
 
-    public void setCheckItem(int position) {
+    public void setCheckItem(int position, Boolean ifNeedNotify) {
 
         if (this.selectType==this.CHECK || this.selectType==this.CHECK_CAN_SELECTALL)
         {
@@ -69,7 +70,18 @@ public class ConstellationAdapter extends BaseAdapter {
         }
 
 
-        notifyDataSetChanged();
+        if (ifNeedNotify)
+            notifyDataSetChanged();
+    }
+
+    public void setCheckItem(String item, Boolean ifNeedNotify)
+    {
+        int position = this.list.indexOf(item);
+
+//        Log.d("HFsetList", position + "  " + item);
+
+        if (position!=-1)
+            setCheckItem(position, ifNeedNotify);
     }
 
     @Override
@@ -157,6 +169,36 @@ public class ConstellationAdapter extends BaseAdapter {
     public String getCheckedListJSONString()
     {
         return getCheckedListJSONArray().toString();
+    }
+
+
+    public void setCheckedList(JSONArray setList)
+    {
+        try
+        {
+            if (this.selectType == RADIO)
+            {
+                throw new Exception("Should only be used for CHECK or CHECK_CAN_SELECTALL");
+            }
+            else
+            {
+                for (int a=0; a<setList.length(); ++a)
+                {
+                    int position = this.list.indexOf(setList.optString(a));
+
+                    Log.d("HFsetList", position + "  " + setList.optString(a));
+
+                    if (position!=-1)
+                        setCheckItem(position, false);
+                }
+
+                notifyDataSetChanged();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
 }
