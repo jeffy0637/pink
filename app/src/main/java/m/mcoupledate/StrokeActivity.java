@@ -13,7 +13,7 @@ import m.mcoupledate.classes.NavigationActivity;
 public class StrokeActivity extends NavigationActivity {
 
     Intent intent;
-    int tripId;
+    String tripId;
     String tripType;
 
     @Override
@@ -25,9 +25,8 @@ public class StrokeActivity extends NavigationActivity {
         // String tripId = intent.getStringExtra("tripId");
 
         Bundle bundle = this.getIntent().getExtras();
-        tripId = bundle.getInt("tripId");
+        tripId = bundle.getString("tripId");
         tripType = bundle.getString("tripType");
-
 
         if (savedInstanceState == null) {
             showFragment(BoardFragment.newInstance());
@@ -51,15 +50,15 @@ public class StrokeActivity extends NavigationActivity {
         switch (tripType){
             case "my":
                 getMenuInflater().inflate(R.menu.menu_board, menu);
-                Toast.makeText(this,"進入:"+tripType,Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"進入:"+tripType+" ID為"+tripId,Toast.LENGTH_SHORT).show();
                 break;
             case "collection":
                 getMenuInflater().inflate(R.menu.mytrip_like, menu);
-                Toast.makeText(this,"進入:"+tripType,Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"進入:"+tripType+" ID為"+tripId,Toast.LENGTH_SHORT).show();
                 break;
             case "search":
                 getMenuInflater().inflate(R.menu.travel_search, menu);
-                Toast.makeText(this,"進入:"+tripType,Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"進入:"+tripType+" ID為"+tripId,Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;

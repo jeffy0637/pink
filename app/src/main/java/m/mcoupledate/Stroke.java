@@ -9,14 +9,16 @@ public class Stroke {
     /*
     定义学生的构造器，创建学生对象时定义学生的信息。
      */
-    public Stroke(String title, String starttime, String endtime){
+    public Stroke(String title, String starttime, String endtime, String tId){
         this.title = title;
         this.starttime = starttime;
         this.endtime = endtime;
+        this.tId = tId;
     }
     private String title;//行程名稱
     private String starttime;//開始日期
     private String endtime;//結束日期
+    public String tId;
 
     public String getTitle() {
         return title;

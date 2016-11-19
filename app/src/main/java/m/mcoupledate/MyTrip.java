@@ -53,7 +53,7 @@ public class MyTrip extends NavigationActivity {
      */
     private void initData() {
         mData = new ArrayList<Stroke>();
-        Stroke travel1  = new Stroke("哈哈之旅", "2016-06-23", "" );
+        Stroke travel1  = new Stroke("哈哈之旅", "2016-06-23", "","12345" );
         mData.add(travel1);
     }
 
@@ -90,7 +90,7 @@ public class MyTrip extends NavigationActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 EditText editText = (EditText) item1.findViewById(R.id.edittext);
                                 String content = editText.toString();
-                                Stroke new1  = new Stroke(content,"","");
+                                Stroke new1  = new Stroke(content,"","","12345");
                                 mData.add(new1);
                             }
                         })

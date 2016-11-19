@@ -27,8 +27,8 @@ public class MyAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return position;
+    public Stroke getItem(int position) {
+        return mData.get(position);
     }
 
     @Override

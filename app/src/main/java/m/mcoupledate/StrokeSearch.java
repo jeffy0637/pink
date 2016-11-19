@@ -27,6 +27,7 @@ public class StrokeSearch extends NavigationActivity {
     private List<Stroke> mData;
     //定义ListView对象
     private ListView mListViewArray;
+    private MyAdapter adapter;
 
     Intent intent;
     final String tripType = "search";
@@ -42,7 +43,7 @@ public class StrokeSearch extends NavigationActivity {
         //初始化数据
         initData();
         //创建自定义Adapter的对象
-        MyAdapter adapter = new MyAdapter(inflater,mData);
+        adapter = new MyAdapter(inflater,mData);
         //将布局添加到ListView中
         mListViewArray.setAdapter(adapter);
         mListViewArray.setOnItemClickListener(listener);
@@ -106,7 +107,7 @@ public class StrokeSearch extends NavigationActivity {
     private void initData() {
         mData = new ArrayList<Stroke>();
         //連接Firebase 印出行程
-        Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "" );
+        Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "","12345" );
         mData.add(zhangsan);
     }
 
@@ -117,7 +118,7 @@ public class StrokeSearch extends NavigationActivity {
             Intent intent = new Intent();
             intent.setClass(StrokeSearch.this, StrokeActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("tripId", position);
+            bundle.putString("tripId", adapter.getItem(position).tId);
             bundle.putString("tripType", tripType);
             intent.putExtras(bundle);
             startActivity(intent);
