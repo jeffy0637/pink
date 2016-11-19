@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/calendar"
+            app:srcCompat="@drawable/ic_loveday"
             android:layout_gravity="bottom" />
 
         <LinearLayout
@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:id="@+id/dateEditBtn"
-                    app:srcCompat="@drawable/edit"
+                    app:srcCompat="@drawable/ic_calendar"
                     android:background="#00ffffff" />
 
             </LinearLayout>

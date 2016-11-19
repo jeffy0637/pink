@@ -17,14 +17,14 @@
 package m.mcoupledate;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.firebase.client.ChildEventListener;
@@ -44,6 +45,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import m.mcoupledate.draglib.BoardView;
 import m.mcoupledate.draglib.DragItem;
@@ -57,7 +59,7 @@ public class BoardFragment extends Fragment {
     Intent intent;
     private String tripType;
     private String tripTId;
-    int tripTypeNum;
+    private static String startHour;
 
     private static String tripTIdForSend;
 
@@ -65,7 +67,7 @@ public class BoardFragment extends Fragment {
     final String url = "https://couple-project.firebaseio.com/travel";
     final String tId = "12345";
 
-
+    private int hourOfDay, minute;
 
     public static BoardFragment newInstance() {
         return new BoardFragment();
@@ -82,6 +84,12 @@ public class BoardFragment extends Fragment {
         tripType = (String)getArguments().get("TT");
         tripTId = (String)getArguments().get("TI");
         tripTIdForSend = tripTId;
+
+        Calendar calendar = Calendar.getInstance();
+        hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        minute = calendar.get(Calendar.MINUTE);
+
+
         //測試
         setHasOptionsMenu(true);
         Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
@@ -386,6 +394,7 @@ public class BoardFragment extends Fragment {
                     @Override
                     public boolean onLongClick(View v) {
                         //final EditText choose = new EditText(mBoardView.getContext());
+                        /*
                         new AlertDialog.Builder(mBoardView.getContext())
                                 .setTitle("刪除整天行程")
                                 //.setView(choose)
@@ -397,7 +406,18 @@ public class BoardFragment extends Fragment {
                                         }
                                         ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
                                     }
-                                }).show();
+                                }).show();*/
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener()
+                        {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+                            {
+                                ((TextView) header.findViewById(R.id.item_count)).setText("開始時間: " + hourOfDay + "時");
+
+                            }
+                        }, hourOfDay, minute, false);
+
+                        timePickerDialog.show();
                         return true;//true為結束長按動作後不再執行短按
                     }
                 });
@@ -492,6 +512,18 @@ public class BoardFragment extends Fragment {
                             @Override
                             public boolean onLongClick(View v) {
                                 //final EditText choose = new EditText(mBoardView.getContext());
+                                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener()
+                                {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+                                    {
+                                        ((TextView) header.findViewById(R.id.item_count)).setText("Time: " + hourOfDay + ":" + minute);
+                                        startHour = Integer.toString(hourOfDay);
+                                        Toast.makeText(getActivity(),"改成"+startHour,Toast.LENGTH_SHORT).show();
+                                    }
+                                }, hourOfDay, minute, true);
+                                timePickerDialog.show();
+                                /*
                                 new AlertDialog.Builder(mBoardView.getContext())
                                         .setTitle("刪除整天行程")
                                         //.setView(choose)
@@ -503,7 +535,7 @@ public class BoardFragment extends Fragment {
                                                 }
                                                 ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
                                             }
-                                        }).show();
+                                        }).show();*/
                                 return true;//true為結束長按動作後不再執行短按
                             }
                         });

@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/travel1"
         android:layout_width="match_parent"
         android:layout_height="@dimen/travellist_height"
@@ -18,7 +18,31 @@
             android:textSize="@dimen/content_txt_size_big"
             android:text="travel_one"
             android:textColor="#000"
-            android:layout_gravity="center"/>
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/dash"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="-"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="#000"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"/>
+
+        <TextView
+            android:id="@+id/travel_date_end"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="travel_one_date"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="#000"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/dash"
+            android:layout_toStartOf="@+id/dash"
+            android:layout_marginRight="@dimen/default_margin"
+            android:layout_marginEnd="@dimen/default_margin" />
 
         <TextView
             android:id="@+id/travel_date"
@@ -27,8 +51,12 @@
             android:text="travel_one_date"
             android:textSize="@dimen/content_txt_size_medium"
             android:textColor="#000"
-            android:layout_gravity="center_horizontal|bottom"/>
-    </FrameLayout>
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/dash"
+            android:layout_toEndOf="@+id/dash"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginStart="@dimen/default_margin" />
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/travel3"
