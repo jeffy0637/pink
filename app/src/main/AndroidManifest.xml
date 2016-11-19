@@ -83,22 +83,32 @@
         <activity
             android:name=".SiteSearchActivity"
             android:label="@string/title_activity_site_search"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".StrokeActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".IversonTest" />
         <activity
             android:name=".MyLike"
             android:label="我的收藏"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".TravelMap"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_travel_map" />
         <activity
             android:name=".MyTrip"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".StrokeSearch"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:screenOrientation="portrait"
             android:name=".funcs.SQLiteViewer"/>
     </application>
 

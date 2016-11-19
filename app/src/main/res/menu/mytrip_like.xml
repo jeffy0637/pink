@@ -4,12 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/add_travel"
-        android:title="新增行程"
+        android:id="@+id/action_disable_drag"
+        android:title="@string/action_disable_drag"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/remove_travel"
-        android:title="移除行程"
+        android:id="@+id/action_enable_drag"
+        android:title="@string/action_enable_drag"
         app:showAsAction="never"/>
-</menu>
+    <item
+        android:id="@+id/edit"
+        android:title="編輯"
+        app:showAsAction="never"/>
 
+
+</menu>

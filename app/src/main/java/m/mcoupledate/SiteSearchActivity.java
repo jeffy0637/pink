@@ -68,8 +68,18 @@ public class SiteSearchActivity extends NavigationActivity implements
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
                 //重选事件，当前已经选择了这个，又点了这个tab。
-                Intent go2 = new Intent(SiteSearchActivity.this, HomePageActivity.class);
-                startActivity(go2);
+                switch (menuItemId) {
+                    case R.id.bb_menu_memorialday:
+                        Intent go2 = new Intent(SiteSearchActivity.this, HomePageActivity.class);
+                        startActivity(go2);
+                        break;
+                    case R.id.bb_menu_site:
+                        break;
+                    case R.id.bb_menu_trip:
+                        Intent go3 = new Intent(SiteSearchActivity.this, StrokeSearch.class);
+                        startActivity(go3);
+                        break;
+                }
 
             }
         });

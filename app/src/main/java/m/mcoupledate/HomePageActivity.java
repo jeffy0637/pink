@@ -59,7 +59,8 @@ public class HomePageActivity extends NavigationActivity {
                         startActivity(go2);
                         break;
                     case R.id.bb_menu_trip:
-
+                        Intent go3 = new Intent(HomePageActivity.this, StrokeSearch.class);
+                        startActivity(go3);
                         break;
                 }
             }
@@ -67,8 +68,8 @@ public class HomePageActivity extends NavigationActivity {
             @Override
             public void onMenuTabReSelected(@IdRes int menuItemId) {
                 //重选事件，当前已经选择了这个，又点了这个tab。
-                Intent go2 = new Intent(HomePageActivity.this, SiteSearchActivity.class);
-                startActivity(go2);
+                //Intent go2 = new Intent(HomePageActivity.this, SiteSearchActivity.class);
+                //startActivity(go2);
             }
         });
 

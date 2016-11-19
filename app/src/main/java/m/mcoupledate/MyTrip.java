@@ -53,8 +53,8 @@ public class MyTrip extends NavigationActivity {
      */
     private void initData() {
         mData = new ArrayList<Stroke>();
-        Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "" );
-        mData.add(zhangsan);
+        Stroke travel1  = new Stroke("哈哈之旅", "2016-06-23", "" );
+        mData.add(travel1);
     }
 
     private ListView.OnItemClickListener listener = new ListView.OnItemClickListener(){

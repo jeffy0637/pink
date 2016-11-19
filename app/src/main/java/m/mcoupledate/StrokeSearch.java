@@ -4,21 +4,47 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import m.mcoupledate.classes.NavigationActivity;
 
 public class StrokeSearch extends NavigationActivity {
 
     private BottomBar mBottomBar;
-    private ViewPager mViewPager;
+    //定义数据
+    private List<Stroke> mData;
+    //定义ListView对象
+    private ListView mListViewArray;
+
+    Intent intent;
+    String tripType;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_site_search);
+        setContentView(R.layout.activity_stroke_search);
+
+        //为ListView对象赋值
+        mListViewArray = (ListView) findViewById(R.id.list);
+        LayoutInflater inflater =getLayoutInflater();
+        //初始化数据
+        initData();
+        //创建自定义Adapter的对象
+        MyAdapter adapter = new MyAdapter(inflater,mData);
+        //将布局添加到ListView中
+        mListViewArray.setAdapter(adapter);
+        mListViewArray.setOnItemClickListener(listener);
+
+        intent = this.getIntent();
+        tripType = intent.getStringExtra("trip");
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_menu);
@@ -66,23 +92,34 @@ public class StrokeSearch extends NavigationActivity {
         mBottomBar.mapColorForTab(1, 0xFF5D4037);
         mBottomBar.mapColorForTab(2, "#7B1FA2");
 
-        initView();
+        //initView();
     }
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        //保存BottomBar的状态
         mBottomBar.onSaveInstanceState(outState);
     }
 
-    public void initView(){
-
-        int initSearchType;
-        if (this.getIntent().getIntExtra("searchType", -1)==SearchSites.SEARCHTYPE_MYLIKES)
-            initSearchType = SearchSites.SEARCHTYPE_MYLIKES;
-        else
-            initSearchType = SearchSites.SEARCHTYPE_BROWSE;
-
+    /*
+    初始化数据
+     */
+    private void initData() {
+        mData = new ArrayList<Stroke>();
+        Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "" );
+        mData.add(zhangsan);
     }
+
+    private ListView.OnItemClickListener listener = new ListView.OnItemClickListener(){
+        @Override
+        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+            // TODO Auto-generated method stub
+            Intent intent = new Intent();
+            intent.setClass(StrokeSearch.this, StrokeActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("tripId", position);
+            bundle.putString("tripType", tripType);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    };
 }

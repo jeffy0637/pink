@@ -19,6 +19,7 @@ package m.mcoupledate;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -42,10 +43,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import m.mcoupledate.draglib.BoardView;
 import m.mcoupledate.draglib.DragItem;
@@ -55,6 +53,10 @@ public class BoardFragment extends Fragment {
     private static int sCreatedItems = 0;
     private BoardView mBoardView;
     private int mColumns;
+
+    Intent intent;
+    String tripType;
+    int tripTypeNum;
 
     //Firebase用
     final String url = "https://couple-project.firebaseio.com/travel";
@@ -67,7 +69,20 @@ public class BoardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        tripType = (String)getArguments().get("TT");
+
+        switch (tripType){
+            case "my":
+                tripTypeNum = 3;
+            case "trip":
+                tripTypeNum = 2;
+            case "search":
+                tripTypeNum = 1;
+        }
+        //測試
         setHasOptionsMenu(true);
+        Toast.makeText(getActivity(),tripType,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -148,14 +163,13 @@ public class BoardFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_board, menu);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_disable_drag).setVisible(mBoardView.isDragEnabled());
-        menu.findItem(R.id.action_enable_drag).setVisible(!mBoardView.isDragEnabled());
+        //menu.findItem(R.id.action_disable_drag).setVisible(mBoardView.isDragEnabled());
+        //menu.findItem(R.id.action_enable_drag).setVisible(!mBoardView.isDragEnabled());
     }
 
     @Override
