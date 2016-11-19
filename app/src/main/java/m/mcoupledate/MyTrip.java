@@ -34,11 +34,10 @@ public class MyTrip extends NavigationActivity {
 
         //为ListView对象赋值
         mListViewArray = (ListView) findViewById(R.id.list);
-        LayoutInflater inflater =getLayoutInflater();
         //初始化数据
         initData();
         //创建自定义Adapter的对象
-        MyAdapter adapter = new MyAdapter(inflater,mData);
+        StrokeSearchAdapter adapter = new StrokeSearchAdapter(this,mData);
         //将布局添加到ListView中
         mListViewArray.setAdapter(adapter);
         mListViewArray.setOnItemClickListener(listener);

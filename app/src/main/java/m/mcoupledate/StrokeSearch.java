@@ -1,35 +1,52 @@
 package m.mcoupledate;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import m.mcoupledate.classes.NavigationActivity;
+import m.mcoupledate.classes.funcs.PinkCon;
 
 public class StrokeSearch extends NavigationActivity {
 
-    private BottomBar mBottomBar;
-    //定义数据
-    private List<Stroke> mData;
-    //定义ListView对象
-    private ListView mListViewArray;
-    private MyAdapter adapter;
+    private Activity activity;
 
-    Intent intent;
+    private RequestQueue mQueue;
+
+    private BottomBar mBottomBar;
+
+    private ListView strokeListView;
+    private StrokeSearchAdapter strokeSearchAdapter;
+
     final String tripType = "search";
     private SearchView searchView;
 
@@ -37,16 +54,31 @@ public class StrokeSearch extends NavigationActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stroke_search);
 
-        //为ListView对象赋值
-        mListViewArray = (ListView) findViewById(R.id.list);
-        LayoutInflater inflater =getLayoutInflater();
-        //初始化数据
-        initData();
-        //创建自定义Adapter的对象
-        adapter = new MyAdapter(inflater,mData);
-        //将布局添加到ListView中
-        mListViewArray.setAdapter(adapter);
-        mListViewArray.setOnItemClickListener(listener);
+        this.activity = this;
+
+        mQueue = Volley.newRequestQueue(activity);
+
+
+        strokeSearchAdapter = new StrokeSearchAdapter(activity);
+        strokeListView = (ListView) findViewById(R.id.strokeSearchListView);
+        strokeListView.setAdapter(strokeSearchAdapter);
+        strokeListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Intent intent = new Intent(StrokeSearch.this, StrokeActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("tripId", strokeSearchAdapter.getItem(position).tId);
+                bundle.putString("tripType", tripType);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+
+        initStrokeList();
+
 
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_menu);
@@ -93,7 +125,6 @@ public class StrokeSearch extends NavigationActivity {
         mBottomBar.mapColorForTab(1, 0xFF5D4037);
         mBottomBar.mapColorForTab(2, "#7B1FA2");
 
-        //initView();
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -104,26 +135,113 @@ public class StrokeSearch extends NavigationActivity {
     /*
     初始化数据
      */
-    private void initData() {
-        mData = new ArrayList<Stroke>();
-        //連接Firebase 印出行程
-        Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "","12345" );
-        mData.add(zhangsan);
+    private void initStrokeList()
+    {
+        //  連接Firebase 印出行程
+
+        final String firebaseUrl = "https://couple-project.firebaseio.com/travel";
+        Firebase.setAndroidContext(this);
+
+        new Firebase(firebaseUrl).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                JSONArray strokeJSONArray = new JSONArray();
+
+                for(int i = 0 ; i < dataSnapshot.getChildrenCount() ; i++)
+                {
+                    JSONObject aTrip =new JSONObject();
+
+                    DataSnapshot snapShotChild = dataSnapshot.child(String.valueOf(i));
+
+                    String tName = String.valueOf(snapShotChild.child("tripName").getValue());
+                    String tId = String.valueOf(snapShotChild.child("tId").getValue());
+                    String startDate = String.valueOf(snapShotChild.child("start_date").getValue());
+                    String endDate = String.valueOf(snapShotChild.child("end_date").getValue());
+
+                    try
+                    {
+                        aTrip.put("tId", tId);
+                        aTrip.put("tName", tName);
+                        aTrip.put("startDate", startDate);
+                        aTrip.put("endDate", endDate);
+                    }
+                    catch (JSONException e)
+                    {   e.printStackTrace();    }
+
+                    JSONArray tripDays = new JSONArray();
+                    for(int j = 1 ; j <= snapShotChild.child("site").getChildrenCount() ; j++)
+                    {
+                        JSONArray tripDaySites = new JSONArray(); //  一天中的景點
+                        for(int k = 0 ; k < snapShotChild.child("site").child("day" + j).getChildrenCount() ; k++)
+                        {
+                            String sId = String.valueOf(snapShotChild.child("site").child("day" + j).child("" + k).child("sId").getValue());
+                            tripDaySites.put(sId);
+                        }
+                        tripDays.put(tripDaySites);
+                    }
+
+                    try
+                    {
+                        aTrip.put("sites", tripDays);
+                    }
+                    catch (JSONException e)
+                    {   e.printStackTrace();    }
+
+                    strokeJSONArray.put(aTrip);
+                }
+
+                sortStrokes(strokeJSONArray);
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
-    private ListView.OnItemClickListener listener = new ListView.OnItemClickListener(){
-        @Override
-        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-            // TODO Auto-generated method stub
-            Intent intent = new Intent();
-            intent.setClass(StrokeSearch.this, StrokeActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("tripId", adapter.getItem(position).tId);
-            bundle.putString("tripType", tripType);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        }
-    };
+    private void sortStrokes(final JSONArray strokeJSONArray)
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"strokeSearch_sortByRecommend.php",
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        try
+                        {
+                            strokeSearchAdapter.addAll(new JSONArray(response));
+                        }
+                        catch (JSONException e)
+                        {   e.printStackTrace();    }
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {   }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("strokeJSONArray", strokeJSONArray.toString());
+                map.put("mId", getPref().getString("mId", ""));
+
+                return map;
+            }
+        };
+
+        mQueue.add(stringRequest);
+    }
+
+
+
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

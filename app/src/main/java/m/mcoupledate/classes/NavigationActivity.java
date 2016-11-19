@@ -102,6 +102,8 @@ public class NavigationActivity extends AppCompatActivity
 
         View header = navigationView.inflateHeaderView(R.layout.navigation_header);
         ((TextView) header.findViewById(R.id.userName)).setText(pref.getString("mName", null));
+
+
     }
 
     @Override
