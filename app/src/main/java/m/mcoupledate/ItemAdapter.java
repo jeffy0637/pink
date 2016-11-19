@@ -46,7 +46,7 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter
 
         //Firebase用
         final String url = "https://couple-project.firebaseio.com/travel";
-        final String tId = "12345";
+        final String tId = BoardFragment.getTypeFormBoardFragment();
 
     public ItemAdapter(ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
         super(dragOnLongPress);

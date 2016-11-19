@@ -37,6 +37,7 @@ public class StrokeActivity extends NavigationActivity {
 
     private void showFragment(Fragment fragment) {
         Bundle bundle = new Bundle();
+        bundle.putString("TI",tripId);
         bundle.putString("TT",tripType);
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

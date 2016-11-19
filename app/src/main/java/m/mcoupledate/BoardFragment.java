@@ -55,8 +55,11 @@ public class BoardFragment extends Fragment {
     private int mColumns;
 
     Intent intent;
-    String tripType;
+    private String tripType;
+    private String tripTId;
     int tripTypeNum;
+
+    private static String tripTIdForSend;
 
     //Firebase用
     final String url = "https://couple-project.firebaseio.com/travel";
@@ -68,12 +71,17 @@ public class BoardFragment extends Fragment {
         return new BoardFragment();
     }
 
+    public static String getTypeFormBoardFragment(){
+        return tripTIdForSend;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         tripType = (String)getArguments().get("TT");
-
+        tripTId = (String)getArguments().get("TI");
+        tripTIdForSend = tripTId;
         //測試
         setHasOptionsMenu(true);
         Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
