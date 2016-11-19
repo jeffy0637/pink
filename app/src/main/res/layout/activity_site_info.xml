@@ -76,7 +76,7 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="27dp"
-                    android:text="@string/commend"
+                    android:text="評分"
                     android:background="@color/transparent"
                     android:id="@+id/score"/>
 
