@@ -1,5 +1,6 @@
 package m.mcoupledate;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -25,11 +26,13 @@ import m.mcoupledate.classes.NavigationActivity;
 
 public class MyTrip extends NavigationActivity {
 
+    private Activity activity;
+
     //定义数据
     private List<Stroke> mData;
     //定义ListView对象
     private ListView mListViewArray;
-    private MyAdapter adapter;
+    private StrokeSearchAdapter adapter;
     private Dialog addTrip;
     private View addTripView;
     Button startDateEditBtn,endDateEditBtn;
@@ -42,6 +45,8 @@ public class MyTrip extends NavigationActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_trip);
 
+        this.activity = this;
+
         Calendar calendar = Calendar.getInstance();
         yearS = calendar.get(Calendar.YEAR);
         monthOfYearS = calendar.get(Calendar.MONTH);
@@ -53,7 +58,7 @@ public class MyTrip extends NavigationActivity {
         //初始化数据
         initData();
         //创建自定义Adapter的对象
-        adapter = new MyAdapter(inflater,mData);
+        adapter = new StrokeSearchAdapter(activity, mData);
         //将布局添加到ListView中
         mListViewArray.setAdapter(adapter);
         mListViewArray.setOnItemClickListener(listener);
