@@ -13,11 +13,15 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class IversonTest extends Activity {
@@ -78,6 +82,9 @@ public class IversonTest extends Activity {
 //                    Firebase siteRef = (dataSnapshot.child("end_date").getRef());
 //                    siteRef.setValue(end);
 //                }
+
+                //加入空的一天
+                
             }
 
             @Override
@@ -117,13 +124,13 @@ public class IversonTest extends Activity {
 //                        Firebase strokeRemoveRef = (dataSnapshot.child("" + i).getRef());
 //                        strokeRemoveRef.removeValue();
 //                    }
-                for(int i = 0 ; i < dataSnapshot.getChildrenCount() ; i++){
-                    if((""+dataSnapshot.child("" + i).child("tId").getValue()).equals(tId2)){
-                        Firebase siteMoveRef = dataSnapshot.child("" + i).child("site").child("" + dataSnapshot.child("" + i).child("site").getChildrenCount()).getRef();
-                        Site site = new Site(1, "這是一個鳥地方", 2, 3);
-                        siteMoveRef.setValue(site);
-                    }
-                }
+//                for(int i = 0 ; i < dataSnapshot.getChildrenCount() ; i++){
+//                    if((""+dataSnapshot.child("" + i).child("tId").getValue()).equals(tId2)){
+//                        Firebase siteMoveRef = dataSnapshot.child("" + i).child("site").child("" + dataSnapshot.child("" + i).child("site").getChildrenCount()).getRef();
+//                        Site site = new Site(1, "這是一個鳥地方", 2, 3);
+//                        siteMoveRef.setValue(site);
+//                    }
+//                }
             }
 
             @Override
@@ -146,6 +153,48 @@ public class IversonTest extends Activity {
 
             }
         });
+
+
+
+        Firebase.setAndroidContext(this);
+        new Firebase(url2).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Map<String, ArrayList<String>> travelSite = new HashMap<>();
+                for(int i = 0 ; i < dataSnapshot.getChildrenCount() ; i++){
+                    String tempStr = "" + dataSnapshot.child("" + i).child("tId").getValue();
+                    ArrayList<String> a = new ArrayList<String>();
+                    for(int j = 1 ; j <= dataSnapshot.child("" + i).child("site").getChildrenCount() ; j++){
+                       for(int k = 0 ; k < dataSnapshot.child("" + i).child("site").child("day" + j).getChildrenCount() ; k++){
+                          a.add("" + dataSnapshot.child("" + i).child("site").child("day" + j).child("" + k).child("sId").getValue());
+                       }
+                    }
+                    travelSite.put(tempStr, a);
+                }
+                adapter.add(""+travelSite);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
     }
 
 }

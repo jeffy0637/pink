@@ -75,8 +75,7 @@ public class SiteSearchActivity extends NavigationActivity implements
                         case R.id.bb_menu_site:
                             break;
                         case R.id.bb_menu_trip:
-                            Intent go3 = new Intent(SiteSearchActivity.this, StrokeSearch.class);
-                            startActivity(go3);
+
                             break;
                     }
                 }

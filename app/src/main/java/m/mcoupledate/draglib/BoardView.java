@@ -287,7 +287,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         return column;
     }
 
-    private int getCurrentColumn(float posX) {
+    public int getCurrentColumn(float posX) {
         for (int i = 0; i < mLists.size(); i++) {
             RecyclerView list = mLists.get(i);
             View parent = (View) list.getParent();
@@ -298,7 +298,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         return 0;
     }
 
-    private int getClosestColumn() {
+    public int getClosestColumn() {
         int middlePosX = getScrollX() + getMeasuredWidth() / 2;
         int column = 0;
         int minDiffX = Integer.MAX_VALUE;

@@ -51,7 +51,7 @@ import m.mcoupledate.draglib.DragItem;
 public class BoardFragment extends Fragment {
 
     private static int sCreatedItems = 0;
-    private BoardView mBoardView;
+    private static BoardView mBoardView;
     private int mColumns;
 
     Intent intent;
@@ -61,6 +61,8 @@ public class BoardFragment extends Fragment {
     //Firebase用
     final String url = "https://couple-project.firebaseio.com/travel";
     final String tId = "12345";
+
+
 
     public static BoardFragment newInstance() {
         return new BoardFragment();
@@ -102,12 +104,104 @@ public class BoardFragment extends Fragment {
             }
 
             @Override
-            public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
+            public void onItemDragEnded(final int fromColumn, final int fromRow, final int toColumn, final int toRow) {
                 if (fromColumn != toColumn || fromRow != toRow) {
-                    //對firebase的這筆資料做更新
-                    long day = toColumn;
-                    long order = toRow;
+                    //Toast.makeText(mBoardView.getContext(), "Start - column: " + fromColumn + " row: " + fromRow, Toast.LENGTH_SHORT).show();
                     Toast.makeText(mBoardView.getContext(), "End - column: " + toColumn + " row: " + toRow, Toast.LENGTH_SHORT).show();
+                    //被插的重新排序(往下一格)
+                    Firebase.setAndroidContext(mBoardView.getContext());//this用mBoardView.getContext()取代
+                    new Firebase(url).addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                                if(fromColumn == toColumn){//同一天插入景點
+                                    //要先暫存插人的
+                                    String tempjournal = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + fromRow).child("journal").getValue();
+                                    String tempsId = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + fromRow).child("sId").getValue();
+                                    String temptime = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + fromRow).child("times").getValue();
+                                    if(fromRow > toRow){
+                                        for(int i = fromRow - 1 ; i >= toRow ; i--){
+                                            Firebase dragSiteRef = dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + (i + 1)).getRef();//路徑是後一個
+                                            String journal = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("journal").getValue();
+                                            String sId = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("sId").getValue();
+                                            String time = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("times").getValue();
+                                            //Log.v("debug3", i + " " + journal + " " + sId + " "+time);
+                                            Site site = new Site(i + 1, journal, Long.parseLong(sId), Long.parseLong(time));//存到後一個位置
+                                            dragSiteRef.setValue(site);
+                                        }
+                                    }
+                                    else{
+                                        for(int i = fromRow + 1 ; i <= toRow ; i ++){
+                                            Firebase dragSiteRef = dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + (i - 1)).getRef();//路徑是後一個
+                                            String journal = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("journal").getValue();
+                                            String sId = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("sId").getValue();
+                                            String time = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("times").getValue();
+                                            //Log.v("debug3", i + " " + journal + " " + sId + " "+time);
+                                            Site site = new Site(i - 1, journal, Long.parseLong(sId), Long.parseLong(time));//存到後一個位置
+                                            dragSiteRef.setValue(site);
+                                        }
+                                    }
+                                    //把插人的存入
+                                    Firebase dragSiteRef = dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + toRow).getRef();//路徑是插入點
+                                    Site site = new Site(toRow, tempjournal, Long.parseLong(tempsId), Long.parseLong(temptime));//存到後一個位置
+                                    dragSiteRef.setValue(site);
+                                    //不用刪除插人的 因為已經被覆蓋
+                                }
+                                else{//不同天插入景點
+                                    //把被插的那天重新排序
+                                    for(int i = (int)dataSnapshot.child("site").child("day" + (toColumn + 1)).getChildrenCount() - 1 ; i >= toRow ; i--){
+                                        Firebase dragSiteRef = dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + (i + 1)).getRef();//路徑是後一個
+                                        String journal = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("journal").getValue();
+                                        String sId = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("sId").getValue();
+                                        String time = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + i).child("times").getValue();
+                                        //Log.v("debug3", i + " " + journal + " " + sId + " "+time);
+                                        Site site = new Site(i + 1, journal, Long.parseLong(sId), Long.parseLong(time));//存到後一個位置
+                                        dragSiteRef.setValue(site);
+                                    }
+                                    //把插人的存入
+                                    Firebase dragSiteRef = dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + toRow).getRef();//路徑是插入點
+                                    String journal = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + fromRow).child("journal").getValue();
+                                    String sId = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + fromRow).child("sId").getValue();
+                                    String time = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + fromRow).child("times").getValue();
+                                    Site site = new Site(toRow, journal, Long.parseLong(sId), Long.parseLong(time));//存到後一個位置
+                                    dragSiteRef.setValue(site);
+                                    //插人的那天重新排序
+                                    for(int i = fromRow + 1 ; i < (int)dataSnapshot.child("site").child("day" + (fromColumn + 1)).getChildrenCount() ; i++){
+                                        Firebase dragSiteRef2 = dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + (i - 1)).getRef();//路徑是前一格
+                                        String journal2 = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + i).child("journal").getValue();
+                                        String sId2 = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + i).child("sId").getValue();
+                                        String time2 = "" + dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + i).child("times").getValue();
+                                        Site site2 = new Site(i - 1, journal2, Long.parseLong(sId2), Long.parseLong(time2));//存到後一個位置
+                                        dragSiteRef2.setValue(site2);
+                                    }
+                                    //要刪除插人的(或是最後一個 => 情況不同 結果一樣) 並且重新排序插人那排的
+                                    Firebase removeDragSiteRef = dataSnapshot.child("site").child("day" + (fromColumn + 1)).child("" + (dataSnapshot.child("site").child("day" + (fromColumn + 1)).getChildrenCount() - 1)).getRef();//路徑是最後一個人  插人的人會被覆蓋 所以不用理他
+                                    removeDragSiteRef.removeValue();
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                            Toast.makeText(mBoardView.getContext(), "87", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                            Toast.makeText(mBoardView.getContext(), "8787", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                            Toast.makeText(mBoardView.getContext(), "878787", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+//                            Toast.makeText(mBoardView.getContext(), "87878787", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -179,8 +273,40 @@ public class BoardFragment extends Fragment {
                 addColumnList();
                 return true;
             case R.id.action_remove_column:
-                mBoardView.removeColumn(mColumns - 1);
-                mColumns--;
+                //在這裡接firebase
+                Firebase.setAndroidContext(mBoardView.getContext());//this用mBoardView.getContext()取代
+                new Firebase(url).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                            mBoardView.removeColumn(mColumns - 1);
+                            Firebase removeDayRef = (dataSnapshot.child("site").child("day" + mColumns)).getRef();
+                            removeDayRef.removeValue();
+                            mColumns--;
+                        }
+                    }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        //這個是準的
+//                        Toast.makeText(mBoardView.getContext(), "87 3", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                        Toast.makeText(mBoardView.getContext(), "8787 3", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                        Toast.makeText(mBoardView.getContext(), "878787 3", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+//                        Toast.makeText(mBoardView.getContext(), "87878787 3", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 return true;
             case R.id.action_clear_board:
                 mBoardView.clearBoard();
@@ -226,21 +352,24 @@ public class BoardFragment extends Fragment {
                         //mBoardView.replaceItem(0, 0, item1, true);
                         //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
 
+//                        //在特定行程加入景點
+//                        if(count[0] == 0){
+//                            count[0] = (int) dataSnapshot.child("site").child("day" + (column + 1)).getChildrenCount();
+//                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
+//                            Site site = new Site(count[0], "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
+//                            siteRef.setValue(site);
+//                            count[0]++;
+//                        }
+//                        else{
+//                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
+//                            Site site = new Site(count[0], "3小地方", 8, 5);
+//                            siteRef.setValue(site);
+//                            count[0]++;
+//                        }
                         //在特定行程加入景點
-                        if(count[0] == 0){
-                            count[0] = (int) dataSnapshot.child("site").child("day" + (column + 1)).getChildrenCount();
-                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-                            Site site = new Site(count[0], "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-                            siteRef.setValue(site);
-                            count[0]++;
-                        }
-                        else{
-                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-                            Site site = new Site(count[0], "3小地方", 8, 5);
-                            siteRef.setValue(site);
-                            count[0]++;
-                        }
-
+                        Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + (mItemArray.size() - 1)).getRef());
+                        Site site = new Site(mItemArray.size() - 1, "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
+                        siteRef.setValue(site);
                         ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
                     }
                 });
@@ -452,5 +581,12 @@ public class BoardFragment extends Fragment {
             anim.setDuration(ANIMATION_DURATION);
             anim.start();
         }
+    }
+    /**
+     * 回傳現在所在天數
+     * @return
+     */
+    public static int getCurrentColumn(){
+        return mBoardView.getClosestColumn();
     }
 }

@@ -18,6 +18,7 @@ package m.mcoupledate;
 
 import android.support.v4.util.Pair;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,15 +29,24 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+
 import java.util.ArrayList;
 
 import m.mcoupledate.draglib.DragItemAdapter;
 
 public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHolder> {
 
-    private int mLayoutId;
-    private int mGrabHandleId;
-    private View headerr;
+        private int mLayoutId;
+        private int mGrabHandleId;
+        private View headerr;
+
+        //Firebase用
+        final String url = "https://couple-project.firebaseio.com/travel";
+        final String tId = "12345";
 
     public ItemAdapter(ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
         super(dragOnLongPress);
@@ -127,10 +137,79 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter
                                     Toast.makeText(v.getContext(), "遊記···", Toast.LENGTH_SHORT).show();
                                     break;
                                 case R.id.delete:
-                                    removeItem(getPositionForItemId(getItemId()));
-                                    ((TextView) headerr.findViewById(R.id.item_count)).setText("景點數 : " + getItemCount());
-                                    //Toast.makeText(v.getContext(), "删除···", Toast.LENGTH_SHORT).show();
-                                    //Toast.makeText(v.getContext(), "目前"+getItemCount() + "個點", Toast.LENGTH_SHORT).show();
+                                    //這裡連接firebase
+                                    final Firebase myFirebaseRef = new Firebase(url);
+                                    ChildEventListener ref = myFirebaseRef.addChildEventListener(new ChildEventListener() {
+                                        @Override
+                                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                            if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                                                if(dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() >1){
+                                                    //刪view用的 剩一個時不刪
+                                                    removeItem(getPositionForItemId(getItemId()));
+                                                    ((TextView) headerr.findViewById(R.id.item_count)).setText("景點數 : " + getItemCount());
+                                                    //刪view用的
+                                                    //Toast.makeText(v.getContext(), ""+(BoardFragment.getCurrentColumn()+1)+"  "+(getPosition() + 1), Toast.LENGTH_SHORT).show();
+                                                    //getPosition() + 1 => 0 1 2 3...
+                                                    //BoardFragment.getCurrentColumn() + 1 => 1 2 3...
+                                                    Firebase removeSiteRef = dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + (getPosition() + 1)).getRef();
+                                                    removeSiteRef.removeValue();
+                                                    if(dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() - 1 == 0){//一筆以下的資料 刪除後不用再排序
+                                                        //Toast.makeText(v.getContext(), "一筆以下的資料 刪除後不用再排序" + (getPosition() + 1) + (dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() - 1), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else if(getPosition() + 1 == dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() -1 ){//2筆以上的資料 刪除最後一個不用排序
+                                                        //Toast.makeText(v.getContext(), "2筆以上的資料 刪除最後一個不用排序"+ (getPosition() + 1) + (dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() - 1), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else{// 其他情況都要新排序
+                                                        //Toast.makeText(v.getContext(), "其他情況都要新排序"+ (getPosition() + 1) + (dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount() - 1), Toast.LENGTH_SHORT).show();
+                                                        long childCount = dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).getChildrenCount();
+
+                                                        for(int i = getPosition() + 2 ; i < childCount ; i++) {//從下一個位置開始往下數 都要排序
+
+                                                            Firebase moveSiteRef = dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + (i - 1)).getRef();//路徑是前一個
+                                                            String journal = "" + dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + i).child("journal").getValue();
+                                                            String sId = "" + dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + i).child("sId").getValue();
+                                                            String time = "" + dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + i).child("times").getValue();
+                                                            //Log.v("debug3", sId + " "+time);
+                                                            Site site = new Site(i - 1, journal, Long.parseLong(sId), Long.parseLong(time));//存到前一個位置
+                                                            moveSiteRef.setValue(site);
+                                                        }
+                                                        //刪除最後一個
+                                                        Firebase moveLastSiteRef = dataSnapshot.child("site").child("day" + (BoardFragment.getCurrentColumn() + 1)).child("" + (childCount - 1)).getRef();
+                                                        moveLastSiteRef.removeValue();
+                                                    }
+                                                }
+                                                else//剩一個時不給刪 不然那天會不見 之後應該改天數的刪除插入對firebase的讀取
+                                                    Toast.makeText(v.getContext(), "只剩一個景點囉 請更換其他景點", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                            //沒反應
+
+                                        }
+
+                                        @Override
+                                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                            //沒反應
+
+//                                            removeItem(getPositionForItemId(getItemId()));
+//                                            ((TextView) headerr.findViewById(R.id.item_count)).setText("景點數 : " + getItemCount());
+                                        }
+
+                                        @Override
+                                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(FirebaseError firebaseError) {
+
+                                        }
+                                    });
+                                    //停止監控 下次刪除才會重頭算
+                                    myFirebaseRef.removeEventListener(ref);
                                     break;
                                 case R.id.picture:
                                     Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();

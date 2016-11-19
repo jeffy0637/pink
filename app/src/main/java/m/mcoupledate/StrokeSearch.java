@@ -29,7 +29,7 @@ public class StrokeSearch extends NavigationActivity {
     private ListView mListViewArray;
 
     Intent intent;
-    String tripType;
+    final String tripType = "search";
     private SearchView searchView;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +47,6 @@ public class StrokeSearch extends NavigationActivity {
         mListViewArray.setAdapter(adapter);
         mListViewArray.setOnItemClickListener(listener);
 
-        intent = this.getIntent();
-        tripType = intent.getStringExtra("trip");
-
         mBottomBar = BottomBar.attach(this, savedInstanceState);
         mBottomBar.setItems(R.menu.bottom_menu);
         mBottomBar.setOnMenuTabClickListener(new OnMenuTabClickListener() {
@@ -58,8 +55,10 @@ public class StrokeSearch extends NavigationActivity {
                 //单击事件 menuItemId 是 R.menu.bottombar_menu 中 item 的 id
                 switch (menuItemId) {
                     case R.id.bb_menu_memorialday:
+
                         break;
                     case R.id.bb_menu_site:
+
                         break;
                     case R.id.bb_menu_trip:
 
@@ -106,6 +105,7 @@ public class StrokeSearch extends NavigationActivity {
      */
     private void initData() {
         mData = new ArrayList<Stroke>();
+        //連接Firebase 印出行程
         Stroke zhangsan  = new Stroke("哈哈之旅", "2016-06-23", "" );
         mData.add(zhangsan);
     }
