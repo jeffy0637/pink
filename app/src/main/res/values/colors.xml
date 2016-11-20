@@ -28,4 +28,13 @@
     //拖拉用的
     <color name="list_item_background">#AACCCCCC</color>
     <color name="app_color">#8EAE3C</color>
+
+
+    //  travelMap
+    <color name="travelDayColor1">#e5857b</color>
+    <color name="travelDayColor2">#ffdc7d</color>
+    <color name="travelDayColor3">#60bf90</color>
+    <color name="travelDayColor1_selected">#da5244</color>
+    <color name="travelDayColor2_selected">#ffce45</color>
+    <color name="travelDayColor3_selected">#1da462</color>
 </resources>

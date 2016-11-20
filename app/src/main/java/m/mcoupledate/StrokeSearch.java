@@ -1,6 +1,6 @@
 package m.mcoupledate;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -38,7 +38,7 @@ import m.mcoupledate.classes.funcs.PinkCon;
 
 public class StrokeSearch extends NavigationActivity {
 
-    private Activity activity;
+    private Context context;
 
     private RequestQueue mQueue;
 
@@ -54,12 +54,12 @@ public class StrokeSearch extends NavigationActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stroke_search);
 
-        this.activity = this;
+        this.context = this;
 
-        mQueue = Volley.newRequestQueue(activity);
+        mQueue = Volley.newRequestQueue(context);
 
 
-        strokeSearchAdapter = new StrokeSearchAdapter(activity);
+        strokeSearchAdapter = new StrokeSearchAdapter(context);
         strokeListView = (ListView) findViewById(R.id.strokeSearchListView);
         strokeListView.setAdapter(strokeSearchAdapter);
         strokeListView.setOnItemClickListener(new AdapterView.OnItemClickListener()

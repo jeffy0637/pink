@@ -17,8 +17,8 @@ public class Stroke implements Comparable
     public String endDate;//結束日期
     public String tId;
 
-    private ArrayList<String> siteList = new ArrayList<>();
-    private HashMap<String, Integer> cityarea = new HashMap<>();
+    public ArrayList<String> siteList = new ArrayList<>();
+    public HashMap<String, Integer> cityarea = new HashMap<>();
     private double score;
 
     private String searchQuery = "";
