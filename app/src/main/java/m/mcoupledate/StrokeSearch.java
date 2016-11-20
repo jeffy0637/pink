@@ -191,7 +191,7 @@ public class StrokeSearch extends NavigationActivity {
                     strokeJSONArray.put(aTrip);
                 }
 
-                sortStrokes(strokeJSONArray);
+                getRecommendinglySortStrokes(strokeJSONArray);
 
             }
 
@@ -200,7 +200,7 @@ public class StrokeSearch extends NavigationActivity {
         });
     }
 
-    private void sortStrokes(final JSONArray strokeJSONArray)
+    private void getRecommendinglySortStrokes(final JSONArray strokeJSONArray)
     {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL+"strokeSearch_sortByRecommend.php",
                 new Response.Listener<String>()
@@ -260,7 +260,7 @@ public class StrokeSearch extends NavigationActivity {
             @Override
             public boolean onQueryTextChange(String newText)
             {
-                passSearchQuery(newText);
+                strokeSearchAdapter.search(newText);
                 return false;
             }
         });
@@ -269,15 +269,11 @@ public class StrokeSearch extends NavigationActivity {
             @Override
             public boolean onClose()
             {
+                strokeSearchAdapter.closeSearch();
                 return false;
             }
         });
 
         return true;
-    }
-
-    private void passSearchQuery(String query)
-    {
-        //
     }
 }

@@ -11,30 +11,35 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class StrokeSearchAdapter extends BaseAdapter
 {
 
-    private List<Stroke> strokeList;
+    private List<Stroke> allStrokeList;  //  存放所有行程 (for search)
+    private List<Stroke> resultStrokeList;  //  存放要顯示出來的行程
     private LayoutInflater mInflater;
 
     public StrokeSearchAdapter(Activity activity)
     {
         mInflater = LayoutInflater.from(activity);
-        this.strokeList = new ArrayList<>();
+        this.allStrokeList = new ArrayList<>();
+        this.resultStrokeList = new ArrayList<>();
     }
 
     public StrokeSearchAdapter(Activity activity, List<Stroke> strokeList)
     {
         mInflater = LayoutInflater.from(activity);
-        this.strokeList = strokeList;
+        this.allStrokeList = strokeList;
+        this.resultStrokeList = strokeList;
     }
 
     public StrokeSearchAdapter(Activity activity, JSONArray strokeJSONArray)
     {
         this.mInflater = LayoutInflater.from(activity);
-        this.strokeList = new ArrayList<>();
+        this.allStrokeList = new ArrayList<>();
+        this.resultStrokeList = new ArrayList<>();
 
         addAll(strokeJSONArray);
     }
@@ -42,13 +47,13 @@ public class StrokeSearchAdapter extends BaseAdapter
     @Override
     public int getCount()
     {
-        return strokeList.size();
+        return resultStrokeList.size();
     }
 
     @Override
     public Stroke getItem(int position)
     {
-        return strokeList.get(position);
+        return resultStrokeList.get(position);
     }
 
     @Override
@@ -66,29 +71,75 @@ public class StrokeSearchAdapter extends BaseAdapter
         Stroke stroke = getItem(position);
 
         ((TextView) convertView.findViewById(R.id.travel_name)).setText(stroke.getTitle());
-        ((TextView) convertView.findViewById(R.id.travel_date)).setText(stroke.getStarttime());
+        ((TextView) convertView.findViewById(R.id.travel_date)).setText(stroke.getStartDate());
 
 
         return convertView ;
     }
 
 
-    public void add(JSONObject aStroke)
+    public void add(JSONObject aStrokeJSONObj)
     {
-//        strokeList.add(new Stroke())
+        Stroke aStroke = new Stroke(aStrokeJSONObj);
+
+        this.allStrokeList.add(aStroke);
+        this.resultStrokeList.add(aStroke);
     }
 
 
     public void addAll(JSONArray strokeJSONArray)
     {
-        if (getCount()>0)
-            this.strokeList.clear();
+        this.allStrokeList.clear();
+        this.resultStrokeList.clear();
 
         for (int i=0; i<strokeJSONArray.length(); ++i)
         {
-            JSONObject aStroke = strokeJSONArray.optJSONObject(i);
-            this.strokeList.add(new Stroke(aStroke.optString("tName"), aStroke.optString("startDate"), aStroke.optString("endDate"), aStroke.optString("tId")));
+            Stroke aStroke = new Stroke(strokeJSONArray.optJSONObject(i));
+
+            this.allStrokeList.add(aStroke);
+            this.resultStrokeList.add(aStroke);
         }
+
+        notifyDataSetChanged();
+    }
+
+
+
+    public void search(String query)
+    {
+        if (query.compareTo("")==0 || query.matches("[\\s]*"))
+            return ;
+
+        this.resultStrokeList.clear();
+
+        String pattern = ".*"+query+".*";
+
+        for (Stroke aStroke : this.allStrokeList)
+        {
+            if (aStroke.title.matches(pattern))
+                this.resultStrokeList.add(aStroke);
+            else if (aStroke.containsFeature(query))
+                this.resultStrokeList.add(aStroke);
+        }
+
+        sortResult(query);
+
+        notifyDataSetChanged();
+    }
+
+    private void sortResult(String query)
+    {
+        for (Stroke aStroke : this.resultStrokeList)
+            aStroke.setSearchQuery(query);
+
+        Collections.sort(this.resultStrokeList, Collections.reverseOrder());
+    }
+
+
+    public void closeSearch()
+    {
+        this.resultStrokeList.clear();
+        this.resultStrokeList.addAll(this.allStrokeList);
 
         notifyDataSetChanged();
     }
