@@ -39,6 +39,7 @@ public class MyTrip extends NavigationActivity {
     Intent intent;
     String tripType;
     private int yearS, monthOfYearS, dayOfMonthS;
+    private int yearE, monthOfYearE, dayOfMonthE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,9 @@ public class MyTrip extends NavigationActivity {
         yearS = calendar.get(Calendar.YEAR);
         monthOfYearS = calendar.get(Calendar.MONTH);
         dayOfMonthS = calendar.get(Calendar.DAY_OF_MONTH);
+        yearE = calendar.get(Calendar.YEAR);
+        monthOfYearE = calendar.get(Calendar.MONTH);
+        dayOfMonthE = calendar.get(Calendar.DAY_OF_MONTH);
 
         //为ListView对象赋值
         mListViewArray = (ListView) findViewById(R.id.list);
@@ -81,7 +85,7 @@ public class MyTrip extends NavigationActivity {
      */
     private void initData() {
         mData = new ArrayList<Stroke>();
-        Stroke travel1  = new Stroke("哈哈之旅", "2016-06-23", "","12345" );
+        Stroke travel1  = new Stroke("哈哈之旅", "2016-06-23", "2016-06-28","12345" );
         mData.add(travel1);
     }
 
@@ -122,7 +126,8 @@ public class MyTrip extends NavigationActivity {
                                 EditText editText = (EditText) (v.findViewById(R.id.name));
                                 travelName = editText.getText().toString();
                                 startDate = yearS+"-"+monthOfYearS+"-"+dayOfMonthS;
-                                Stroke travel  = new Stroke(travelName, startDate,"","12345" );
+                                endDate = yearE+"-"+monthOfYearE+"-"+dayOfMonthE;
+                                Stroke travel  = new Stroke(travelName, startDate,endDate,"12345" );
                                 mData.add(travel);
                                 Toast.makeText(getApplicationContext(),travelName+startDate , Toast.LENGTH_SHORT).show();
                             }
@@ -142,6 +147,21 @@ public class MyTrip extends NavigationActivity {
                             }
                         }, yearS, monthOfYearS, dayOfMonthS);
                         datePickerDialog.show();
+
+                    }});
+                endDateEditBtn.setOnClickListener(new Button.OnClickListener(){
+                    public void onClick(View v) {
+                        DatePickerDialog datePickerDialog2 = new DatePickerDialog(MyTrip.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear,int dayOfMonth) {
+                                yearE = year;
+                                monthOfYearE = monthOfYear+1;
+                                dayOfMonthE= dayOfMonth;
+                                endDateEditBtn.setText(yearE+"-"+monthOfYearE+"-"+dayOfMonthE);
+                            }
+                        }, yearE, monthOfYearE, dayOfMonthE);
+                        datePickerDialog2.show();
+
                     }});
 
                 return true;

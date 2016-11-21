@@ -72,6 +72,7 @@ public class StrokeSearchAdapter extends BaseAdapter
 
         ((TextView) convertView.findViewById(R.id.travel_name)).setText(stroke.getTitle());
         ((TextView) convertView.findViewById(R.id.travel_date)).setText(stroke.getStartDate());
+        ((TextView) convertView.findViewById(R.id.travel_date_end)).setText(stroke.getEndDate());
 
 
         return convertView ;

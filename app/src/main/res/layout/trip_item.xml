@@ -29,7 +29,7 @@
         <TextView
             android:id="@+id/dash"
             android:layout_width="wrap_content"
-            android:layout_height="29dp"
+            android:layout_height="16dp"
             android:text="-"
             android:textSize="@dimen/content_txt_size_medium"
             android:textColor="@color/white"
@@ -62,13 +62,5 @@
             android:layout_marginLeft="@dimen/default_margin"
             android:layout_marginStart="@dimen/default_margin" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/content_txt_size_small"
-            android:text="2"
-            android:textColor="@color/white"
-            android:layout_above="@+id/dash"
-            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 </RelativeLayout>
