@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -91,7 +90,6 @@ public class BoardFragment extends Fragment {
 
         //測試
         setHasOptionsMenu(true);
-
         Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
     }
 
