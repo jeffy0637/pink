@@ -17,7 +17,7 @@
     <string name="mday">MDAY</string>
 
 
-    //拖拉在用的
+    <!--拖拉在用的-->
     <string name="action_lists">Test lists</string>
     <string name="action_board">Test board </string>
     <string name="action_disable_drag">Disable drag</string>
@@ -26,7 +26,7 @@
     <string name="action_grid_vertical">Grid vertical (drag on long press)</string>
     <string name="action_grid_horizontal">Grid horizontal (drag on long press)</string>
 
-    //左拉選單
+    <!--左拉選單-->
     <string name="page_memberData">使用者資訊</string>
     <string name="page_memorialDay">設定紀念日</string>
     <string name="page_myTravle">我的行程</string>
@@ -60,6 +60,8 @@
 
     <string name="addToFavorite">加入收藏</string>
     <string name="joinMyTrip">加入行程</string>
+
+    <string name="departureTime">出發時間:</string>
 
 
     <!--EditSite InputTimeDialog-->
@@ -145,4 +147,6 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_main3">Main3Activity</string>
+
+
 </resources>

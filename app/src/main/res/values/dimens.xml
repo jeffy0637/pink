@@ -33,4 +33,6 @@
     <!--height-->
     <dimen name="travellist_height">120dp</dimen>
 
+    <dimen name="travellist_margin">10dp</dimen>
+
 </resources>

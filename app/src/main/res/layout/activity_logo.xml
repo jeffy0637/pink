@@ -7,16 +7,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/white"
+    android:background="@drawable/background_w5"
     tools:context="m.mcoupledate.Logo">
 
     <ImageView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:src="@mipmap/ic_launcher"
-        android:id="@+id/imageView3"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo_s"
+        android:id="@+id/logo"
+        android:layout_marginTop="160dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/background_s"
+        android:id="@+id/slogan"
+        android:layout_marginTop="335dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"/>
 
 
 </RelativeLayout>

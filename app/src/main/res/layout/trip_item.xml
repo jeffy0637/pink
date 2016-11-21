@@ -5,31 +5,70 @@
     android:layout_height="fill_parent"
     >
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/travel1"
         android:layout_width="match_parent"
         android:layout_height="@dimen/travellist_height"
-        android:layout_margin="@dimen/default_margin"
+        android:layout_margin="@dimen/travellist_margin"
         android:background="@drawable/days_background"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <TextView
             android:id="@+id/travel_name"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
+            android:layout_height="wrap_content"
             android:textSize="@dimen/content_txt_size_big"
             android:text="travel_one"
-            android:textColor="#000"
-            android:layout_gravity="center"/>
+            android:textColor="@color/white"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/dash"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:text="-"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"/>
 
         <TextView
             android:id="@+id/travel_date"
             android:layout_width="wrap_content"
-            android:layout_height="29dp"
-            android:text="travel_one_date"
+            android:layout_height="wrap_content"
+            android:text="travel_date"
             android:textSize="@dimen/content_txt_size_medium"
-            android:textColor="#000"
-            android:layout_gravity="center_horizontal|bottom"/>
+            android:textColor="@color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/dash"
+            android:layout_toStartOf="@+id/dash"
+            android:layout_marginRight="@dimen/default_margin"
+            android:layout_marginEnd="@dimen/default_margin" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/travel_date_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="travel_date_end"
+            android:textSize="@dimen/content_txt_size_medium"
+            android:textColor="@color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/dash"
+            android:layout_toEndOf="@+id/dash"
+            android:layout_marginLeft="@dimen/default_margin"
+            android:layout_marginStart="@dimen/default_margin" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/content_txt_size_small"
+            android:text="2"
+            android:textColor="@color/white"
+            android:layout_above="@+id/dash"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
 </RelativeLayout>
