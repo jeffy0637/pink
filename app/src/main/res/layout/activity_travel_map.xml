@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <fragment
         android:id="@+id/map"
@@ -26,19 +26,64 @@
         android:layout_gravity="bottom|center"
         android:background="@drawable/shape_borderradius_rectangle"
         android:layout_marginBottom="5dp"
-        android:padding="5dp">
+        android:padding="3dp"
+        android:id="@+id/routeInfoWindow">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/shape_borderradius_whiteborder_emptyrectangle">
+            android:orientation="horizontal"
+            android:background="@drawable/shape_borderradius_whiteborder_emptyrectangle" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/container">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:id="@+id/routeStart"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        app:srcCompat="@drawable/car_white"
+                        android:id="@+id/transMode"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="15dp"
+                        android:background="@drawable/arrow_right"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:textColor="@color/white"
+                        android:id="@+id/transInfo"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center|center_vertical"
+                    android:id="@+id/routeEnd"/>
 
 
+            </LinearLayout>
 
         </LinearLayout>
-
-
-
 
     </LinearLayout>
 

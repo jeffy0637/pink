@@ -4,6 +4,10 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -27,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import m.mcoupledate.R;
+import m.mcoupledate.classes.funcs.Actioner;
 import m.mcoupledate.classes.funcs.PinkCon;
 
 /**
@@ -45,7 +50,11 @@ public class TravelRoutesManager implements
     private int[][] travelDayColorPair;
 
 
-    public TravelRoutesManager(Context context, GoogleMap mMap)
+    private RouteInfoWindow routeInfoWindow;
+    private Actioner travelDaySelectorCoordinator = null;
+
+
+    public TravelRoutesManager(Context context, GoogleMap mMap, View routeInfoWindowView)
     {
         this.mMap = mMap;
 
@@ -58,6 +67,8 @@ public class TravelRoutesManager implements
             {ContextCompat.getColor(context, R.color.travelDayColor2), ContextCompat.getColor(context, R.color.travelDayColor2_selected)},
             {ContextCompat.getColor(context, R.color.travelDayColor3), ContextCompat.getColor(context, R.color.travelDayColor3_selected)}
         };
+
+        this.routeInfoWindow = new RouteInfoWindow(routeInfoWindowView);
     }
 
 
@@ -206,7 +217,7 @@ public class TravelRoutesManager implements
                 }
 
                 if (siteSeq==-1)
-                    displayAllDayRoutes(rSitesManager.valueAt(a));
+                    moveToAllDayRoutesScope(rSitesManager.valueAt(a));
             }
             else
             {
@@ -227,9 +238,15 @@ public class TravelRoutesManager implements
             for (RouteSite routeSite : rSitesManager.get(dayRouteId))
             {
                 if (routeSite.ifContainsRouteLine(polyline))
+                {
                     moveToRoute(routeSite);
+                    if (this.travelDaySelectorCoordinator!=null)
+                        travelDaySelectorCoordinator.act(dayRouteId);
+                }
                 else
+                {
                     routeSite.unFocus();
+                }
             }
         }
 
@@ -238,6 +255,8 @@ public class TravelRoutesManager implements
     private void moveToRoute(RouteSite routeSite)
     {
         routeSite.focus();
+        routeInfoWindow.setRouteInfo(routeSite);
+
 
         LatLngBounds.Builder builder = LatLngBounds.builder();
 
@@ -247,8 +266,10 @@ public class TravelRoutesManager implements
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
     }
 
-    private void displayAllDayRoutes(ArrayList<RouteSite> aDayRSites)
+    private void moveToAllDayRoutesScope(ArrayList<RouteSite> aDayRSites)
     {
+        routeInfoWindow.clear();
+
         LatLngBounds.Builder builder = LatLngBounds.builder();
 
         for (RouteSite routeSite : aDayRSites)
@@ -259,6 +280,104 @@ public class TravelRoutesManager implements
         }
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
+    }
+
+
+    public void setTravelDaySelectorCoordinator(Actioner coordinator)
+    {
+        this.travelDaySelectorCoordinator = coordinator;
+    }
+
+
+
+    private class RouteInfoWindow
+    {
+        private TextView routeStart, routeEnd;
+        private ImageView transMode;
+        private TextView transInfo;
+
+        private LinearLayout container;
+
+        public RouteInfoWindow(View routeInfoWindowView)
+        {
+            this.routeStart = (TextView) routeInfoWindowView.findViewById(R.id.routeStart);
+            this.routeEnd = (TextView) routeInfoWindowView.findViewById(R.id.routeEnd);
+
+            this.transMode = (ImageView) routeInfoWindowView.findViewById(R.id.transMode);
+            this.transInfo = (TextView) routeInfoWindowView.findViewById(R.id.transInfo);
+
+            this.container = (LinearLayout) routeInfoWindowView.findViewById(R.id.container);
+        }
+
+        public void clear()
+        {
+            this.container.setVisibility(View.GONE);
+        }
+
+        public void setRouteInfo(final RouteSite selectedRouteSite)
+        {
+            if (this.container.getVisibility()==View.GONE)
+                this.container.setVisibility(View.VISIBLE);
+
+
+            String routeEndText = "";
+            for (int a=0; a<rSitesManager.size(); ++a)
+            {
+                for (int b=0; b<rSitesManager.valueAt(a).size(); ++b)
+                {
+                    if (rSitesManager.valueAt(a).get(b)==selectedRouteSite)
+                    {
+//                        if (b<(rSitesManager.valueAt(a).size()-1))
+                        routeEndText = rSitesManager.valueAt(a).get(b+1).sName;
+                    }
+                }
+            }
+
+            String distanceMatrixAPIUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?origins="+selectedRouteSite.start.latitude+"%2C"+selectedRouteSite.start.longitude+"&destinations="+selectedRouteSite.end.latitude+"%2C"+selectedRouteSite.end.longitude+"&language=zh-TW&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg";
+
+            final String finalRouteEndText = routeEndText;
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, distanceMatrixAPIUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response)
+                        {
+                            try
+                            {
+                                JSONObject info = new JSONObject(response).optJSONArray("rows").optJSONObject(0).optJSONArray("elements").optJSONObject(0);
+
+                                String time = info.optJSONObject("duration").optString("text");
+                                String distance = info.optJSONObject("distance").optString("text");
+
+                                setRouteInfo(selectedRouteSite.sName, finalRouteEndText, time, distance);
+                            }
+                            catch (JSONException e)
+                            {   e.printStackTrace();    }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+//                            PinkCon.retryConnect(getRootView(), PinkCon.SEARCH_FAIL, initErrorBar,
+//                                    new View.OnClickListener()
+//                                    {
+//                                        @Override
+//                                        public void onClick(View view)
+//                                        {   searchMapLocatePlace(query);  }
+//                                    });
+                        }
+                    });
+
+            mQueue.add(stringRequest);
+        }
+
+        public void setRouteInfo(String routeStartText, String routeEndText, String time, String distance)
+        {
+            this.routeStart.setText(routeStartText);
+            this.routeEnd.setText(routeEndText);
+
+            this.transInfo.setText(time + " / " + distance);
+        }
     }
 
 

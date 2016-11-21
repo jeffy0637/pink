@@ -28,6 +28,7 @@ public class TravelDaySelectorAdapter extends BaseAdapter
     private Actioner travelDaySwitcher = null;
 
 
+
     public TravelDaySelectorAdapter(Context context)
     {
         this.mInflater = LayoutInflater.from(context);
@@ -93,6 +94,16 @@ public class TravelDaySelectorAdapter extends BaseAdapter
         notifyDataSetChanged();
     }
 
+    public void setNowDay(int dayId)
+    {
+        if (dayId>0 && dayId<this.travelDays.size())
+        {
+            this.nowPosition = dayId;
+            notifyDataSetChanged();
+        }
+
+    }
+
 
 
 
@@ -128,6 +139,5 @@ public class TravelDaySelectorAdapter extends BaseAdapter
             };
         }
     }
-
 
 }

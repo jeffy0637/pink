@@ -3,7 +3,6 @@ package m.mcoupledate;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -69,7 +68,16 @@ public class TravelMap extends NavigationActivity implements
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(22.627659714392056,120.27963057160379), 13));
 
 
-        travelRoutesManager = new TravelRoutesManager(this, mMap);
+        travelRoutesManager = new TravelRoutesManager(this, mMap, findViewById(R.id.routeInfoWindow));
+        travelRoutesManager.setTravelDaySelectorCoordinator(new Actioner() {
+            @Override
+            public void act(Object... args)
+            {
+                int dayId = (int) args[0];
+
+                travelDaySelectorAdapter.setNowDay(dayId);
+            }
+        });
 
         Intent intent = getIntent();
         try
