@@ -7,10 +7,15 @@ package m.mcoupledate;
 public class Site {
     private long order;
     private String journal;
-    private long sId;
+    public long sId;
     private long time;//逗留時間
+    public String sName;
 
-    public Site(){}
+    public Site(long sId, String sName)
+    {
+        this.sId = sId;
+        this.sName = sName;
+    }
 
     public Site(long order, String journal, long sId, long time){
         this.order = order;

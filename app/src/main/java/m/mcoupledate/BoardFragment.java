@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -342,11 +341,11 @@ public class BoardFragment extends Fragment {
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
                 if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                     //這段用來動態新增list
-                    final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
+                    final ArrayList<Site> mItemArray = new ArrayList<>();
                     final int addItems = 0;
                     for (int i = 0; i < addItems; i++) {
                         long id = sCreatedItems++;
-                        mItemArray.add(new Pair<>(id, "景點名稱"));
+                        mItemArray.add(new Site(id, "景點名稱"));
                     }
                     //這段用來header的景點數計算 天數計算還有問題
                     final int[] count = {0};
@@ -360,7 +359,7 @@ public class BoardFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             long id = sCreatedItems++;
-                            Pair item = new Pair<>(id, "景點名稱");
+                            Site item = new Site(id, "景點名稱");
                             mBoardView.addItem(column, mItemArray.size(), item, true);
 
                             //mBoardView.moveItem(4, 0, 0, true);
@@ -451,11 +450,11 @@ public class BoardFragment extends Fragment {
                     for(int i = 0 ; i < numberOfDay ; i++){
                         long eachNumberOfDay = dataSnapshot.child("site").child("day" + (i + 1)).getChildrenCount();
                         //這段用來動態新增list
-                        final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
+                        final ArrayList<Site> mItemArray = new ArrayList<>();
                         final int addItems = (int)eachNumberOfDay;
                         for (int j = 0; j < addItems; j++) {
                             long id = sCreatedItems++;
-                            mItemArray.add(new Pair<>(id, "景點名稱"));
+                            mItemArray.add(new Site(id, "景點名稱"));
                         }
                         //這段用來header的景點數計算 天數計算還有問題
                         final int[] count = {0};
@@ -470,7 +469,7 @@ public class BoardFragment extends Fragment {
                             public void onClick(View v) {
                                 long id = sCreatedItems++;
                                 //Pair item = new Pair<>(id, "Test " + id);
-                                Pair item = new Pair<>(id, "景點名稱");
+                                Site item = new Site(id, "景點名稱");
                                 mBoardView.addItem(column, mItemArray.size(), item, true);
 
                                 //mBoardView.moveItem(4, 0, 0, true);

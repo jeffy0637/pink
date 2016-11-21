@@ -126,6 +126,9 @@ public class NavigationActivity extends AppCompatActivity
         return pref;
     }
 
+    protected void setTitle(String title)
+    {   this.getSupportActionBar().setTitle(title); }
+
     public AppBarLayout getAppBarLayout()
     {
         return (AppBarLayout) findViewById(appBarLayout);

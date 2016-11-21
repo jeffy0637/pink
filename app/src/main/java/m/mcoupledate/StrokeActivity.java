@@ -79,7 +79,7 @@ public class StrokeActivity extends NavigationActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_lists:
-                showFragment(ListFragment.newInstance());
+//                showFragment(ListFragment.newInstance());
                 return true;
             case R.id.action_board:
                 showFragment(BoardFragment.newInstance());
