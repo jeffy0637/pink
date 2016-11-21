@@ -89,9 +89,9 @@ public class BoardFragment extends Fragment {
         hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
         minute = calendar.get(Calendar.MINUTE);
 
-
         //測試
         setHasOptionsMenu(true);
+
         Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
     }
 

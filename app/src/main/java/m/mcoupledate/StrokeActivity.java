@@ -12,9 +12,10 @@ import m.mcoupledate.classes.NavigationActivity;
 
 public class StrokeActivity extends NavigationActivity {
 
+    private static String tripType;
     Intent intent;
     String tripId;
-    String tripType;
+    //String tripType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class StrokeActivity extends NavigationActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String getTripType()
+    public static String getTripType()
     {
         String t = tripType;
         return t;

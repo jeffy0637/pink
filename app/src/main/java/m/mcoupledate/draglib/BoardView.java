@@ -15,6 +15,7 @@
  */
 
 package m.mcoupledate.draglib;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -34,6 +35,8 @@ import android.widget.LinearLayout;
 import android.widget.Scroller;
 
 import java.util.ArrayList;
+
+import static m.mcoupledate.StrokeActivity.getTripType;
 
 public class BoardView extends HorizontalScrollView implements AutoScroller.AutoScrollListener {
 
@@ -64,7 +67,8 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     private int mDragStartColumn;
     private int mDragStartRow;
     private boolean mHasLaidOut;
-    private boolean mDragEnabled = true;
+    private boolean mDragEnabled = false;
+    private String tripType;
 
     public BoardView(Context context) {
         super(context);
@@ -72,6 +76,12 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
 
     public BoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        tripType = getTripType();
+        switch (tripType) {
+            case "my":
+                mDragEnabled = true;
+                break;
+        }
     }
 
     public BoardView(Context context, AttributeSet attrs, int defStyleAttr) {
