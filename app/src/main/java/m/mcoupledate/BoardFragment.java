@@ -64,7 +64,7 @@ public class BoardFragment extends Fragment {
 
     //Firebase用
     final String url = "https://couple-project.firebaseio.com/travel";
-    final String tId = "12345";
+
 
     private int hourOfDay, minute;
 
@@ -128,7 +128,7 @@ public class BoardFragment extends Fragment {
                     new Firebase(url).addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                            if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                                 if(fromColumn == toColumn){//同一天插入景點
                                     //要先暫存插人的
                                     String tempjournal = "" + dataSnapshot.child("site").child("day" + (toColumn + 1)).child("" + fromRow).child("journal").getValue();
@@ -234,7 +234,7 @@ public class BoardFragment extends Fragment {
         new Firebase(url).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                     addFirebaseColumnList();
                 }
             }
@@ -293,7 +293,7 @@ public class BoardFragment extends Fragment {
                 new Firebase(url).addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                        if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                             mBoardView.removeColumn(mColumns - 1);
                             Firebase removeDayRef = (dataSnapshot.child("site").child("day" + mColumns)).getRef();
                             removeDayRef.removeValue();
@@ -339,7 +339,7 @@ public class BoardFragment extends Fragment {
         new Firebase(url).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                     //這段用來動態新增list
                     final ArrayList<Site> mItemArray = new ArrayList<>();
                     final int addItems = 0;
@@ -445,7 +445,7 @@ public class BoardFragment extends Fragment {
         new Firebase(url).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(final DataSnapshot dataSnapshot, String s) {
-                if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                if((""+dataSnapshot.child("tId").getValue()).equals(tripTId)){
                     long numberOfDay = dataSnapshot.child("site").getChildrenCount();
                     for(int i = 0 ; i < numberOfDay ; i++){
                         long eachNumberOfDay = dataSnapshot.child("site").child("day" + (i + 1)).getChildrenCount();
