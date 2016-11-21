@@ -19,10 +19,6 @@
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/page_myTravle" />
         <item
-            android:id="@+id/nav_travleEdit"
-            android:icon="@drawable/ic_menu_share"
-            android:title="@string/page_travleEdit" />
-        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_send"
             android:title="@string/page_logout" />

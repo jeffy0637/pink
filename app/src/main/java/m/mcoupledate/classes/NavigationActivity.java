@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
-import m.mcoupledate.EditSite;
+import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;
 import m.mcoupledate.ModifyMemorialDay;
@@ -31,7 +31,6 @@ import m.mcoupledate.MyTrip;
 import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
 import m.mcoupledate.TravelMap;
-import m.mcoupledate.classes.funcs.SQLiteViewer;
 
 import static m.mcoupledate.R.id.appBarLayout;
 
@@ -192,7 +191,7 @@ public class NavigationActivity extends AppCompatActivity
         switch (item.getItemId()) {
 
             case R.id.homepage:
-                intent = new Intent(this, SQLiteViewer.class);
+                intent = new Intent(this, HomePageActivity.class);
                 break;
 
             case R.id.nav_memberData:
@@ -214,11 +213,6 @@ public class NavigationActivity extends AppCompatActivity
                 intent.putExtra("day", 0);
                 intent.putExtra("seq", 1);
 
-                break;
-
-            case R.id.nav_travleEdit:
-                intent = new Intent(this, EditSite.class);
-                intent.putExtra("siteType", "r");
                 break;
 
             case R.id.nav_logout:
