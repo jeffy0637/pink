@@ -98,6 +98,7 @@
                     android:text="@string/addToFavorite"
                     android:background="@drawable/circle_corner_button_selector"
                     android:id="@+id/addLikeBtn"
+                    android:visibility="gone"
                     android:layout_margin="@dimen/default_margin"
                     android:layout_weight="1" />
 
@@ -109,6 +110,7 @@
                     android:background="@drawable/circle_corner_button_selector"
                     android:text="@string/joinMyTrip"
                     android:scaleType="centerInside"
+                    android:visibility="gone"
                     android:id="@+id/addTravelBtn"
                     android:layout_weight="1"/>
 

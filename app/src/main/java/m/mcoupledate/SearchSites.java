@@ -167,6 +167,7 @@ public class SearchSites extends Fragment
             {
                 Intent intent = new Intent(SearchSites.this.getActivity(), SiteInfo.class);
                 intent.putExtra("sId", siteListAdapter.getSiteId(position));
+                intent.putExtra("from","search");
                 startActivity(intent);
             }
         });

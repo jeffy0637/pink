@@ -51,6 +51,8 @@ import m.mcoupledate.classes.adapters.RecyclerAlbumAdapter;
 import m.mcoupledate.classes.mapClasses.WorkaroundMapFragment;
 import m.mcoupledate.classes.funcs.PinkCon;
 
+import static m.mcoupledate.R.id.addLikeBtn;
+
 public class SiteInfo extends PinkClusterMapFragmentActivity{
 
     SharedPreferences pref;
@@ -58,7 +60,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private RequestQueue mQueue;
     private PinkCon.InitErrorBar initErrorBar;
 
-    private String sId, mId, picId;
+    private String sId, mId, picId, tId = "0";
     private int siteType;
     private Boolean ifLiked;
 
@@ -72,6 +74,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private View commentPage;
     private RatingBar commentRBar;
     private TextView commentText;
+    private String from;
 
 
     Button editLikeBtn, addTravelBtn;
@@ -101,10 +104,12 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         pref = this.getSharedPreferences("pinkpink", 0);
         mId = pref.getString("mId", null);
 
+
         mQueue = Volley.newRequestQueue(this);
         initErrorBar = PinkCon.getInitErrorSnackBar(getRootView(), PinkCon.INIT_FAIL, this);
 
         sId = this.getIntent().getStringExtra("sId");
+        from = this.getIntent().getStringExtra("from");
 
         siteCol = new HashMap<String, TextView>();
         //先印圖片 aId+a 不是sId
@@ -127,11 +132,25 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for half filled stars
         stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP); // for empty stars
 
+        switch(from)  /*status 只能為整數、長整數或字元變數.*/
+        {
+            case "search":
+                Button view = (Button)findViewById(R.id.addLikeBtn);
+                view.setVisibility(View.VISIBLE);
+                break;
+            case "like":
+                break;
+            case "travel":
+                Button view1 = (Button)findViewById(R.id.addTravelBtn);
+                view1.setVisibility(View.VISIBLE);
+                break;
+        }
+
 
         //從資料庫抓景點資料出來 (函式移至onMapReady呼叫)
 //        initSiteInfoFromMariDB();
 
-        editLikeBtn = (Button)findViewById(R.id.addLikeBtn);
+        editLikeBtn = (Button)findViewById(addLikeBtn);
         editLikeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

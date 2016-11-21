@@ -312,6 +312,8 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
          */
         @Override
         public void onItemClicked(View view) {
+            //傳判定值
+            //intent.putExtra("from","search");
             Toast.makeText(view.getContext(), "進入景點", Toast.LENGTH_SHORT).show();
         }
 
