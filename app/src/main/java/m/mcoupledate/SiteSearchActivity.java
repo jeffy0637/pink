@@ -125,6 +125,7 @@ public class SiteSearchActivity extends NavigationActivity implements
         else
             initSearchType = SearchSites.SEARCHTYPE_BROWSE;
 
+
         fragmentList = new ArrayList<Fragment>();
         fragmentList.add(SearchSites.newInstance(initSearchType, SearchSites.SITETYPE_ATTRACTION, true));
         fragmentList.add(SearchSites.newInstance(initSearchType, SearchSites.SITETYPE_RESTAURANT, false));

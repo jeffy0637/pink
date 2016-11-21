@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -72,7 +73,9 @@ public class SearchSites extends Fragment
 
     private FloatingActionButton addNewSiteFAB;
 
-    private Boolean ifFirstPage;
+    private Boolean ifInitShow;
+
+    private String siteFrom;
 
 
     public static SearchSites newInstance(int searchType, int siteType, Boolean ifFirstPage)
@@ -82,7 +85,7 @@ public class SearchSites extends Fragment
         Bundle settings = new Bundle();
         settings.putInt("searchType", searchType);
         settings.putInt("siteType", siteType);
-        settings.putBoolean("ifFirstPage", ifFirstPage);
+        settings.putBoolean("ifInitShow", ifFirstPage);
 
         newInstance.setArguments(settings);
 
@@ -98,6 +101,7 @@ public class SearchSites extends Fragment
 
         searchType = getArguments().getInt("searchType");
         siteType = getArguments().getInt("siteType");
+        siteFrom = getArguments().getString("siteFrom");
 
         if (siteType==SITETYPE_ATTRACTION)
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區"}));
@@ -105,7 +109,7 @@ public class SearchSites extends Fragment
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區", "時段", "種類", "口味"}));
 
 
-        ifFirstPage = getArguments().getBoolean("ifFirstPage");
+        ifInitShow = getArguments().getBoolean("ifInitShow");
     }
 
     @Override
@@ -129,28 +133,33 @@ public class SearchSites extends Fragment
         mDropDownMenu= (DropDownMenu) getView().findViewById( R.id.dropDownMenu);
         initDropDownMenu();
 
+        Toast.makeText(this.getActivity(),searchType+"+"+siteFrom , Toast.LENGTH_SHORT).show();
 
-
-        addNewSiteFAB = (FloatingActionButton) getView().findViewById(R.id.addNewSiteFAB);
-        addNewSiteFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                Intent intent = new Intent();
-
-                if (searchType==SearchSites.SEARCHTYPE_BROWSE)
-                    intent.setClass(SearchSites.this.getActivity(), EditSite.class);
-                else
-                    intent.setClass(SearchSites.this.getActivity(), SiteSearchActivity.class);
-
-                intent.putExtra("siteType", siteType);
-                startActivity(intent);
-            }
-        });
-        if (ifFirstPage)
+        if (searchType==SEARCHTYPE_BROWSE)
+        {
+            addNewSiteFAB = (FloatingActionButton) getView().findViewById(R.id.addNewSiteFAB);
             addNewSiteFAB.setVisibility(View.VISIBLE);
+            addNewSiteFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent();
 
+                    if (searchType == SearchSites.SEARCHTYPE_BROWSE)
+                        intent.setClass(SearchSites.this.getActivity(), EditSite.class);
+                    else
+                        intent.setClass(SearchSites.this.getActivity(), SiteSearchActivity.class);
 
+                    intent.putExtra("siteType", siteType);
+                    startActivity(intent);
+                }
+            });
+        }
+        /*
+        switch(searchType) {
+            case 8341:
+                addNewSiteFAB.setVisibility(View.VISIBLE);
+                break;
+        }*/
     }
 
     private void initDropDownMenu()
