@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,9 +89,9 @@ public class BoardFragment extends Fragment {
         hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
         minute = calendar.get(Calendar.MINUTE);
 
-
         //測試
         setHasOptionsMenu(true);
+
         Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
     }
 
@@ -453,8 +454,14 @@ public class BoardFragment extends Fragment {
                         final ArrayList<Site> mItemArray = new ArrayList<>();
                         final int addItems = (int)eachNumberOfDay;
                         for (int j = 0; j < addItems; j++) {
+                            String eachSpendTimes = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("times").getValue();
+                            String eachJournel = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("journel").getValue();
+                            String eachOrder = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("order").getValue();
+                            String eachSId = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("sId").getValue();
+
+//                            Log.v("eachSpendTimes", eachSpendTimes);
                             long id = sCreatedItems++;
-                            mItemArray.add(new Site(id, "景點名稱"));
+                            mItemArray.add(new Site(Long.parseLong(eachOrder), eachJournel, Long.parseLong(eachSId), Long.parseLong(eachSpendTimes), "景點名稱", "高雄市", id));
                         }
                         //這段用來header的景點數計算 天數計算還有問題
                         final int[] count = {0};
@@ -479,20 +486,10 @@ public class BoardFragment extends Fragment {
                                 //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
 
                                 //在特定行程加入景點
-                                if(count[0] == 0){
-                                    count[0] = (int) dataSnapshot.child("site").child("day" + (column + 1)).getChildrenCount();
-                                    Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-                                    Site site = new Site(count[0], "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-                                    siteRef.setValue(site);
-                                    count[0]++;
-                                }
-                                else{
-                                    Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-                                    Site site = new Site(count[0], "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-                                    siteRef.setValue(site);
-                                    count[0]++;
-                                }
-
+                                //在特定行程加入景點
+                                Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + (mItemArray.size() - 1)).getRef());
+                                Site site = new Site(mItemArray.size() - 1, "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
+                                siteRef.setValue(site);
                                 ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
                             }
                         });

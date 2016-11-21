@@ -5,14 +5,15 @@ package m.mcoupledate;
  * 自己寫一個class之後可以用來新增firebase的東西
  */
 public class Site {
+    private long id;
     private long order;
     private String journal;
     public long sId;
     private long time;//逗留時間
     public String sName;
+    private String address;
 
-    public Site(long sId, String sName)
-    {
+    public Site(long sId, String sName) {
         this.sId = sId;
         this.sName = sName;
     }
@@ -22,6 +23,16 @@ public class Site {
         this.journal = journal;
         this.sId = sId;
         this.time = time;
+    }
+
+    public Site(long order, String journal, long sId, long time, String sName, String address, long id){
+        this.order = order;
+        this.journal = journal;
+        this.sId = sId;
+        this.time = time;
+        this.sName = sName;
+        this.address = address;
+        this.id = id;
     }
 
     public void setOrder(long order){
@@ -40,6 +51,10 @@ public class Site {
         this.time = time;
     }
 
+    public void setAddress(String address){
+        this.address = address;
+    }
+
     public long getOrder(){
         return this.order;
     }
@@ -54,5 +69,13 @@ public class Site {
 
     public long getTimes(){
         return this.time;
+    }
+
+    public String getAddress(){
+        return this.address;
+    }
+
+    public long getId(){
+        return this.id;
     }
 }

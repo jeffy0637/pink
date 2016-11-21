@@ -80,9 +80,16 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        String text = mItemList.get(position).sName;
-        holder.mText.setText(text);
-        holder.itemView.setTag(text);
+
+        String name = mItemList.get(position).sName;
+        holder.mText.setText(name);
+        holder.itemView.setTag(name);
+
+        String address = mItemList.get(position).getAddress();
+        holder.maddress.setText(address);
+
+        //holder.mStartTime.setText();
+        //holder.mEndTime.setText();
 
         holder.menu_button.setText("Menu");
 
@@ -95,17 +102,20 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
      */
     @Override
     public long getItemId(int position) {
-        return mItemList.get(position).sId;
+        return mItemList.get(position).getId();
     }
 
     /**
      * 抓到list的各個元素 TextView會在其他地方操作 button直接在這裡觸發事件
      */
-    public class ViewHolder extends DragItemAdapter<Pair<Long, String>, ViewHolder>.ViewHolder
+    public class ViewHolder extends DragItemAdapter<Site, ViewHolder>.ViewHolder
     {
         public ImageButton carIcon;
         public TextView mText;
         public Button menu_button;
+        public TextView maddress;
+        public TextView mStartTime;
+        public TextView mEndTime;
 
         public ViewHolder(final View itemView)
         {
@@ -123,9 +133,11 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
             偵測前面有沒有座標
             每次拖拉都要重新計算
              */
-            //ll linearlayout的
+            //每個景點的顯示資訊
             mText = (TextView) itemView.findViewById(R.id.text);
-
+            maddress = (TextView) itemView.findViewById(R.id.site_address);
+            mStartTime = (TextView) itemView.findViewById(R.id.site_address);
+            mEndTime = (TextView) itemView.findViewById(R.id.startTime);
             menu_button = (Button) itemView.findViewById(R.id.menu_button);
             menu_button.setOnClickListener(new View.OnClickListener() {
                 @Override
