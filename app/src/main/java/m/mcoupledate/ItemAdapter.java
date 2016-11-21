@@ -18,7 +18,6 @@ package m.mcoupledate;
 
 import android.support.v4.util.Pair;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,24 +37,27 @@ import java.util.ArrayList;
 
 import m.mcoupledate.draglib.DragItemAdapter;
 
-public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHolder> {
+public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
 
-        private int mLayoutId;
-        private int mGrabHandleId;
-        private View headerr;
+    private int mLayoutId;
+    private int mGrabHandleId;
+    private View headerr;
 
-        //Firebase用
-        final String url = "https://couple-project.firebaseio.com/travel";
-        final String tId = BoardFragment.getTypeFormBoardFragment();
+    //Firebase用
+    final String url = "https://couple-project.firebaseio.com/travel";
+    final String tId = BoardFragment.getTypeFormBoardFragment();
 
-    public ItemAdapter(ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
+    public ItemAdapter(ArrayList<Site> list, int layoutId, int grabHandleId, boolean dragOnLongPress)
+    {
         super(dragOnLongPress);
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
         setHasStableIds(true);
         setItemList(list);
     }
-    public ItemAdapter(View header, ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
+
+    public ItemAdapter(View header, ArrayList<Site> list, int layoutId, int grabHandleId, boolean dragOnLongPress)
+    {
         super(dragOnLongPress);
         headerr = header;
         mLayoutId = layoutId;
@@ -78,7 +80,7 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        String text = mItemList.get(position).second;
+        String text = mItemList.get(position).sName;
         holder.mText.setText(text);
         holder.itemView.setTag(text);
 
@@ -93,18 +95,20 @@ public class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter
      */
     @Override
     public long getItemId(int position) {
-        return mItemList.get(position).first;
+        return mItemList.get(position).sId;
     }
 
     /**
      * 抓到list的各個元素 TextView會在其他地方操作 button直接在這裡觸發事件
      */
-    public class ViewHolder extends DragItemAdapter<Pair<Long, String>, ViewHolder>.ViewHolder {
+    public class ViewHolder extends DragItemAdapter<Pair<Long, String>, ViewHolder>.ViewHolder
+    {
         public ImageButton carIcon;
         public TextView mText;
         public Button menu_button;
 
-        public ViewHolder(final View itemView) {
+        public ViewHolder(final View itemView)
+        {
             super(itemView, mGrabHandleId);
             //lil linearlayout的
             carIcon = (ImageButton) itemView.findViewById(R.id.carIcon);

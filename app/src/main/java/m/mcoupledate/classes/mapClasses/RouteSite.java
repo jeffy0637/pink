@@ -1,7 +1,5 @@
 package m.mcoupledate.classes.mapClasses;
 
-import android.graphics.Color;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -23,20 +21,24 @@ public class RouteSite
 {
     public String sId;
     public String sName;
-    public LatLng start, end;
+    public LatLng start = null, end = null;
 
     private Marker startMarker = null;
 
-    private ArrayList<RouteStep> routeSteps = new ArrayList<RouteStep>();
+    private ArrayList<RouteStep> routeSteps = new ArrayList<>();
 
     private GoogleMap mMap = null;
 
+    private Boolean ifFocused= false;
+    private int[] routeLineColorPair;
 
-    public RouteSite(String sId, String sName, JSONObject leg)
+
+    public RouteSite(GoogleMap mMap, String sId, String sName, JSONObject leg, int[] routeLineColorPair)
     {
         this.sId = sId;
         this.sName = sName;
 
+        this.mMap = mMap;
         this.start = new LatLng(leg.optJSONObject("start_location").optDouble("lat"), leg.optJSONObject("start_location").optDouble("lng"));
         this.end = new LatLng(leg.optJSONObject("end_location").optDouble("lat"), leg.optJSONObject("end_location").optDouble("lng"));
 
@@ -44,21 +46,22 @@ public class RouteSite
         for (int a=0; a<steps.length(); ++a)
             this.routeSteps.add(new RouteStep(steps.optJSONObject(a)));
 
+        this.routeLineColorPair = routeLineColorPair;
     }
 
-    public RouteSite(String sId, String sName, LatLng start)
+    public RouteSite(GoogleMap mMap, String sId, String sName, LatLng start, int[] routeLineColorPair)
     {
         this.sId = sId;
         this.sName = sName;
 
+        this.mMap = mMap;
         this.start = start;
+
+        this.routeLineColorPair = routeLineColorPair;
     }
 
-    public void showRoute(GoogleMap mMap)
+    public void showRoute()
     {
-        if (this.mMap==null)
-            this.mMap = mMap;
-
         if (startMarker!=null)
             startMarker.setVisible(true);
         else
@@ -68,28 +71,52 @@ public class RouteSite
             routeStep.draw();
     }
 
-    public void hideRoute(GoogleMap mMap)
+    public void hideRoute()
     {
-        if (this.mMap==null)
-            this.mMap = mMap;
-
-
         if (startMarker!=null)
-            startMarker.setVisible(false);;
+            startMarker.setVisible(false);
 
         for (RouteStep routeStep : routeSteps)
             routeStep.hide();
+
+        unFocus();
     }
 
     public Boolean ifContainsRouteLine(Polyline polyline)
     {
         for (RouteStep routeStep : routeSteps)
         {
-            if (routeStep.routLine.equals(polyline))
+            if (routeStep.routLine!=null && routeStep.routLine.equals(polyline))
                 return true;
         }
         return false;
 //        return routeSteps.contains(polyline);
+    }
+
+    public void focus()
+    {
+        if (ifFocused)
+            return ;
+
+        for (RouteStep routeStep : routeSteps)
+        {
+            routeStep.routLine.setColor(routeLineColorPair[1]);
+        }
+
+        ifFocused = true;
+    }
+
+    public void unFocus()
+    {
+        if (!ifFocused)
+            return ;
+
+        for (RouteStep routeStep : routeSteps)
+        {
+            routeStep.routLine.setColor(routeLineColorPair[0]);
+        }
+
+        ifFocused = false;
     }
 
 
@@ -168,7 +195,7 @@ public class RouteSite
                 this.routLine = mMap.addPolyline(new PolylineOptions()
                         .addAll(decodePolylineString(polylineCode))
                         .width(12)
-                        .color(Color.parseColor("#05b1fb"))//Google maps blue color
+                        .color(routeLineColorPair[0])//Google maps blue color
                         .geodesic(true)
                         .clickable(true)
                         .visible(true));

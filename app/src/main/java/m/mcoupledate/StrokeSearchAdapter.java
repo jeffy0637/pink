@@ -1,6 +1,6 @@
 package m.mcoupledate;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,23 +21,23 @@ public class StrokeSearchAdapter extends BaseAdapter
     private List<Stroke> resultStrokeList;  //  存放要顯示出來的行程
     private LayoutInflater mInflater;
 
-    public StrokeSearchAdapter(Activity activity)
+    public StrokeSearchAdapter(Context context)
     {
-        mInflater = LayoutInflater.from(activity);
+        mInflater = LayoutInflater.from(context);
         this.allStrokeList = new ArrayList<>();
         this.resultStrokeList = new ArrayList<>();
     }
 
-    public StrokeSearchAdapter(Activity activity, List<Stroke> strokeList)
+    public StrokeSearchAdapter(Context context, List<Stroke> strokeList)
     {
-        mInflater = LayoutInflater.from(activity);
+        mInflater = LayoutInflater.from(context);
         this.allStrokeList = strokeList;
         this.resultStrokeList = strokeList;
     }
 
-    public StrokeSearchAdapter(Activity activity, JSONArray strokeJSONArray)
+    public StrokeSearchAdapter(Context context, JSONArray strokeJSONArray)
     {
-        this.mInflater = LayoutInflater.from(activity);
+        this.mInflater = LayoutInflater.from(context);
         this.allStrokeList = new ArrayList<>();
         this.resultStrokeList = new ArrayList<>();
 
@@ -107,8 +107,16 @@ public class StrokeSearchAdapter extends BaseAdapter
 
     public void search(String query)
     {
-        if (query.compareTo("")==0 || query.matches("[\\s]*"))
+        if (query.compareTo("")==0)
+        {
+            this.resultStrokeList.clear();
+            notifyDataSetChanged();
             return ;
+        }
+        else if(query.matches("[\\s]*"))
+        {
+            return ;
+        }
 
         this.resultStrokeList.clear();
 
@@ -120,6 +128,9 @@ public class StrokeSearchAdapter extends BaseAdapter
                 this.resultStrokeList.add(aStroke);
             else if (aStroke.containsFeature(query))
                 this.resultStrokeList.add(aStroke);
+
+//            Log.d("HFstokeSites", aStroke.title + aStroke.siteList.toString());
+//            Log.d("HFstokeCityarea", aStroke.title + aStroke.cityarea.toString());
         }
 
         sortResult(query);

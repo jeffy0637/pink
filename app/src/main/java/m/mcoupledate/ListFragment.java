@@ -24,8 +24,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -145,28 +143,28 @@ public class ListFragment extends Fragment {
     }
 
     private void setupListRecyclerView() {
-        mDragListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.list_item, R.id.image, false);
-        mDragListView.setAdapter(listAdapter, true);
-        mDragListView.setCanDragHorizontally(false);
-        mDragListView.setCustomDragItem(new MyDragItem(getContext(), R.layout.list_item));
+//        mDragListView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.list_item, R.id.image, false);
+//        mDragListView.setAdapter(listAdapter, true);
+//        mDragListView.setCanDragHorizontally(false);
+//        mDragListView.setCustomDragItem(new MyDragItem(getContext(), R.layout.list_item));
     }
 
     private void setupGridVerticalRecyclerView() {
-        mDragListView.setLayoutManager(new GridLayoutManager(getContext(), 4));
-        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.grid_item, R.id.item_layout, true);
-        mDragListView.setAdapter(listAdapter, true);
-        mDragListView.setCanDragHorizontally(true);
-        mDragListView.setCustomDragItem(null);
+//        mDragListView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+//        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.grid_item, R.id.item_layout, true);
+//        mDragListView.setAdapter(listAdapter, true);
+//        mDragListView.setCanDragHorizontally(true);
+//        mDragListView.setCustomDragItem(null);
 
     }
 
     private void setupGridHorizontalRecyclerView() {
-        mDragListView.setLayoutManager(new GridLayoutManager(getContext(), 4, LinearLayoutManager.HORIZONTAL, false));
-        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.grid_item, R.id.item_layout, true);
-        mDragListView.setAdapter(listAdapter, true);
-        mDragListView.setCanDragHorizontally(true);
-        mDragListView.setCustomDragItem(null);
+//        mDragListView.setLayoutManager(new GridLayoutManager(getContext(), 4, LinearLayoutManager.HORIZONTAL, false));
+//        ItemAdapter listAdapter = new ItemAdapter(mItemArray, R.layout.grid_item, R.id.item_layout, true);
+//        mDragListView.setAdapter(listAdapter, true);
+//        mDragListView.setCanDragHorizontally(true);
+//        mDragListView.setCustomDragItem(null);
     }
 
     private static class MyDragItem extends DragItem {

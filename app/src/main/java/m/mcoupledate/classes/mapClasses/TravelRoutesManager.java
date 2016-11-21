@@ -1,6 +1,9 @@
 package m.mcoupledate.classes.mapClasses;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.util.SparseArray;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -21,9 +24,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import m.mcoupledate.R;
 import m.mcoupledate.classes.funcs.PinkCon;
 
 /**
@@ -36,7 +39,10 @@ public class TravelRoutesManager implements
 
     private GoogleMap mMap;
     private RequestQueue mQueue;
-    private HashMap<String, ArrayList<RouteSite>> rSitesManager  = new HashMap<String, ArrayList<RouteSite>>();
+    private SparseArray<ArrayList<RouteSite>> rSitesManager  = new SparseArray<>();
+    //  天數從1開始，景點從0開始
+
+    private int[][] travelDayColorPair;
 
 
     public TravelRoutesManager(Context context, GoogleMap mMap)
@@ -47,11 +53,18 @@ public class TravelRoutesManager implements
 
         mMap.setOnPolylineClickListener(this);
 
+        travelDayColorPair = new int[][]{
+            {ContextCompat.getColor(context, R.color.travelDayColor1), ContextCompat.getColor(context, R.color.travelDayColor1_selected)},
+            {ContextCompat.getColor(context, R.color.travelDayColor2), ContextCompat.getColor(context, R.color.travelDayColor2_selected)},
+            {ContextCompat.getColor(context, R.color.travelDayColor3), ContextCompat.getColor(context, R.color.travelDayColor3_selected)}
+        };
     }
 
 
-    public void addADayRoute(final String dayRouteName, final List<String> routeSites, final Boolean ifShow)
+    public void addADayRoute(final int dayRouteId, final ArrayList<String> routeSites, final int initSiteSeq)
     {
+        //  若不需init顯示哪段的話，initSiteSeq可設負數
+
         if (routeSites.size()==0)
             return ;
 
@@ -65,10 +78,10 @@ public class TravelRoutesManager implements
                         {
                             JSONArray rSitesDetails = new JSONArray(response);
 
-                            setADayRoute(dayRouteName, rSitesDetails, ifShow);
+                            setADayRoute(dayRouteId, rSitesDetails, initSiteSeq);
                         }
                         catch (JSONException e)
-                        {   e.printStackTrace();    }
+                        {   Log.d("HFjsonerr", e.getMessage());    }
                     }
                 },
                 new Response.ErrorListener() {
@@ -98,17 +111,18 @@ public class TravelRoutesManager implements
     }
 
 
-    private void setADayRoute(final String dayRouteName, final JSONArray rSitesDetails, final Boolean ifShow)
+    private void setADayRoute(final int dayRouteId, final JSONArray rSitesDetails, final int initSiteSeq)
     {
         final ArrayList<RouteSite> aDayRSites = new ArrayList<RouteSite>();
-        rSitesManager.put(dayRouteName, aDayRSites);
+        rSitesManager.put(dayRouteId, aDayRSites);
 
 
+        final int colorPairIndex = (dayRouteId-1)%3;
 
         if (rSitesDetails.length()==1)
         {
             JSONObject aRSitesDetail = rSitesDetails.optJSONObject(0);
-            aDayRSites.add(new RouteSite(aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), new LatLng(aRSitesDetail.optDouble("Py"), aRSitesDetail.optDouble("Px"))));
+            aDayRSites.add(new RouteSite(mMap, aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), new LatLng(aRSitesDetail.optDouble("Py"), aRSitesDetail.optDouble("Px")), travelDayColorPair[colorPairIndex]));
 
             return ;
         }
@@ -128,10 +142,9 @@ public class TravelRoutesManager implements
             wayPointsDesc = "&waypoints=" + wayPointsDesc.substring(0, (wayPointsDesc.length()-1));
         }
 
-
         String url = "https://maps.googleapis.com/maps/api/directions/json?origin="+origin.latitude+"%2C"+origin.longitude+"&destination="+dest.latitude+"%2C"+dest.longitude+wayPointsDesc+"&key=AIzaSyBn1wKXTrwBl2qZRVY9feOZC3aeklAnZXg";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response)
@@ -145,13 +158,13 @@ public class TravelRoutesManager implements
                                 JSONObject aRSitesDetail = rSitesDetails.optJSONObject(a);
 
                                 if (legs.optJSONObject(a)!=null)
-                                    aDayRSites.add(new RouteSite(aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), legs.optJSONObject(a)));
+                                    aDayRSites.add(new RouteSite(mMap, aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), legs.optJSONObject(a), travelDayColorPair[colorPairIndex]));
                                 else
-                                    aDayRSites.add(new RouteSite(aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), new LatLng(aRSitesDetail.optDouble("Py"), aRSitesDetail.optDouble("Px"))));
+                                    aDayRSites.add(new RouteSite(mMap, aRSitesDetail.optString("sId"), aRSitesDetail.optString("sName"), new LatLng(aRSitesDetail.optDouble("Py"), aRSitesDetail.optDouble("Px")), travelDayColorPair[colorPairIndex]));
                             }
 
-                            if (ifShow)
-                                showADayRoute(dayRouteName);
+                            if (initSiteSeq>=0 && initSiteSeq<=aDayRSites.size())
+                                showADayRoute(dayRouteId, initSiteSeq);
                         }
                         catch (Exception e)
                         {
@@ -175,12 +188,31 @@ public class TravelRoutesManager implements
         mQueue.add(stringRequest);
     }
 
+    public void showADayRoute(int dayRouteId)
+    {   showADayRoute(dayRouteId, -1);   }
 
-    public void showADayRoute(String dayRouteName)
+    public void showADayRoute(int dayRouteId, int siteSeq)
     {
-        for (RouteSite routeSite : rSitesManager.get(dayRouteName))
+        for (int a=0; a<rSitesManager.size(); ++a)
         {
-            routeSite.showRoute(mMap);
+            if (rSitesManager.keyAt(a)==dayRouteId)
+            {
+                for (int b=0; b< rSitesManager.valueAt(a).size(); ++b)
+                {
+                    rSitesManager.valueAt(a).get(b).showRoute();
+
+                    if (b == siteSeq)
+                        moveToRoute(rSitesManager.valueAt(a).get(b));
+                }
+
+                if (siteSeq==-1)
+                    displayAllDayRoutes(rSitesManager.valueAt(a));
+            }
+            else
+            {
+                for (int b=0; b< rSitesManager.valueAt(a).size(); ++b)
+                    rSitesManager.valueAt(a).get(b).hideRoute();
+            }
         }
     }
 
@@ -188,18 +220,25 @@ public class TravelRoutesManager implements
     @Override
     public void onPolylineClick(Polyline polyline)
     {
-        for (String dayRouteName : rSitesManager.keySet())
+        for (int a=0; a<rSitesManager.size(); ++a)
         {
-            for (RouteSite routeSite : rSitesManager.get(dayRouteName))
+            int dayRouteId = rSitesManager.keyAt(a);
+
+            for (RouteSite routeSite : rSitesManager.get(dayRouteId))
             {
                 if (routeSite.ifContainsRouteLine(polyline))
                     moveToRoute(routeSite);
+                else
+                    routeSite.unFocus();
             }
         }
+
     }
 
-    public void moveToRoute(RouteSite routeSite)
+    private void moveToRoute(RouteSite routeSite)
     {
+        routeSite.focus();
+
         LatLngBounds.Builder builder = LatLngBounds.builder();
 
         builder.include(routeSite.start);
@@ -207,4 +246,20 @@ public class TravelRoutesManager implements
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
     }
+
+    private void displayAllDayRoutes(ArrayList<RouteSite> aDayRSites)
+    {
+        LatLngBounds.Builder builder = LatLngBounds.builder();
+
+        for (RouteSite routeSite : aDayRSites)
+        {
+            builder.include(routeSite.start);
+            if (routeSite.end!=null)
+                builder.include(routeSite.end);
+        }
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100));
+    }
+
+
 }
