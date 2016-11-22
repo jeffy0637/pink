@@ -146,25 +146,26 @@ public class SearchSites extends Fragment
 
         Toast.makeText(this.getActivity(),searchType+"+"+siteFrom , Toast.LENGTH_SHORT).show();
 
-        if (searchType==SEARCHTYPE_BROWSE)
-        {
-            addNewSiteFAB = (FloatingActionButton) getView().findViewById(R.id.addNewSiteFAB);
-            addNewSiteFAB.setVisibility(View.VISIBLE);
-            addNewSiteFAB.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent();
+        if(!fromTravel)
+            if (searchType==SEARCHTYPE_BROWSE)
+            {
+                addNewSiteFAB = (FloatingActionButton) getView().findViewById(R.id.addNewSiteFAB);
+                addNewSiteFAB.setVisibility(View.VISIBLE);
+                addNewSiteFAB.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent();
 
-                    if (searchType == SearchSites.SEARCHTYPE_BROWSE)
-                        intent.setClass(SearchSites.this.getActivity(), EditSite.class);
-                    else
-                        intent.setClass(SearchSites.this.getActivity(), SiteSearchActivity.class);
+                        if (searchType == SearchSites.SEARCHTYPE_BROWSE)
+                            intent.setClass(SearchSites.this.getActivity(), EditSite.class);
+                        else
+                            intent.setClass(SearchSites.this.getActivity(), SiteSearchActivity.class);
 
-                    intent.putExtra("siteType", siteType);
-                    startActivity(intent);
-                }
-            });
-        }
+                        intent.putExtra("siteType", siteType);
+                        startActivity(intent);
+                    }
+                });
+            }
     }
 
     private void initDropDownMenu()

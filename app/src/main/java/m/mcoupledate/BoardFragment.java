@@ -376,6 +376,7 @@ public class BoardFragment extends Fragment {
                                                     intent.putExtra("column", "" + (column + 1));
                                                     intent.putExtra("count", "" + mItemArray.size());
                                                     intent.putExtra("fromTravel",true);
+                                                    intent.putExtra("searchType",SearchSites.SEARCHTYPE_BROWSE);
                                                     startActivity(intent);
 
                                                     Site item = new Site(id, "景點名稱1");
@@ -388,6 +389,7 @@ public class BoardFragment extends Fragment {
                                                     intent.putExtra("column", "" + (column + 1));
                                                     intent.putExtra("count", "" + mItemArray.size());
                                                     intent.putExtra("fromTravel",true);
+                                                    intent.putExtra("searchType",SearchSites.SEARCHTYPE_MYLIKES);
                                                     startActivity(intent);
 
                                                     Site item = new Site(id, "景點名稱1");
@@ -513,6 +515,7 @@ public class BoardFragment extends Fragment {
                                                         intent.putExtra("column", "" + (column + 1));
                                                         intent.putExtra("count", "" + mItemArray.size());
                                                         intent.putExtra("fromTravel",true);
+                                                        intent.putExtra("searchType",SearchSites.SEARCHTYPE_BROWSE);
                                                         startActivity(intent);
 
                                                         Site item = new Site(id, "景點名稱1");
@@ -525,6 +528,7 @@ public class BoardFragment extends Fragment {
                                                         intent.putExtra("column", "" + (column + 1));
                                                         intent.putExtra("count", "" + mItemArray.size());
                                                         intent.putExtra("fromTravel",true);
+                                                        intent.putExtra("searchType",SearchSites.SEARCHTYPE_MYLIKES);
                                                         startActivity(intent);
 
                                                         Site item = new Site(id, "景點名稱1");
