@@ -43,6 +43,7 @@ public class SearchSites extends Fragment
 {
     public static final int SITETYPE_ATTRACTION = 8341, SITETYPE_RESTAURANT = 8342;
     public static final int SEARCHTYPE_BROWSE = 8341, SEARCHTYPE_MYLIKES = 8342;
+    //public static final int SEARCHTYPE_BROWSE = 8341, SEARCHTYPE_MYLIKES = 8342;
 
     private int searchType, siteType;
 
@@ -80,6 +81,7 @@ public class SearchSites extends Fragment
     private String tId;
     private String column;
     private String count;
+    private Boolean fromTravel;
 
 
     public static SearchSites newInstance(int searchType, int siteType, Boolean ifFirstPage)
@@ -110,6 +112,7 @@ public class SearchSites extends Fragment
         tId = this.getActivity().getIntent().getStringExtra("tId");//接收tId
         column = this.getActivity().getIntent().getStringExtra("column");
         count = this.getActivity().getIntent().getStringExtra("count");
+        fromTravel = this.getActivity().getIntent().getBooleanExtra("fromTravel",false);
 
         if (siteType==SITETYPE_ATTRACTION)
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區"}));
@@ -162,12 +165,6 @@ public class SearchSites extends Fragment
                 }
             });
         }
-        /*
-        switch(searchType) {
-            case 8341:
-                addNewSiteFAB.setVisibility(View.VISIBLE);
-                break;
-        }*/
     }
 
     private void initDropDownMenu()
@@ -188,6 +185,7 @@ public class SearchSites extends Fragment
                 intent.putExtra("tId", tId);
                 intent.putExtra("column", "" + column);
                 intent.putExtra("count", "" + count);
+                intent.putExtra("fromTravel",fromTravel);
                 startActivity(intent);
             }
         });

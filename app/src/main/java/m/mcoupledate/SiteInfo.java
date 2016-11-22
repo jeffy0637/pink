@@ -102,6 +102,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private String tId;
     private String column;
     private String count;
+    private Boolean fromTravel = false;
 
     final String url = "https://couple-project.firebaseio.com/travel";
 
@@ -122,6 +123,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         tId = this.getIntent().getStringExtra("tId");
         column = this.getIntent().getStringExtra("column");
         count = this.getIntent().getStringExtra("count");
+        fromTravel = this.getIntent().getBooleanExtra("fromTravel",false);
 
         Toast.makeText(this, tId + " " + column + " " + count, Toast.LENGTH_SHORT).show();
 
@@ -148,21 +150,20 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
         Button view = (Button)findViewById(R.id.addLikeBtn);
         Button view1 = (Button)findViewById(R.id.addTravelBtn);
-        switch(from)  /*status 只能為整數、長整數或字元變數.*/
-        {
-            case "search":
-                view1.setVisibility(View.VISIBLE);
-                view.setVisibility(View.VISIBLE);
-                break;
-            case "like":
-                view1.setVisibility(View.VISIBLE);
-                break;
-            case "travel":
+        if (fromTravel)
+            view1.setVisibility(View.VISIBLE);
+        else {
+            switch (from)  /*status 只能為整數、長整數或字元變數.*/ {
+                case "search":
 
-                view1.setVisibility(View.VISIBLE);
-                break;
+                    view.setVisibility(View.VISIBLE);
+                    break;
+                case "like":
+
+                    break;
+
+            }
         }
-
 
         //從資料庫抓景點資料出來 (函式移至onMapReady呼叫)
 //        initSiteInfoFromMariDB();

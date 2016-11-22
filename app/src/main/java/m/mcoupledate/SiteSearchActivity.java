@@ -51,11 +51,16 @@ public class SiteSearchActivity extends NavigationActivity implements
     private BottomBar mBottomBar;
 
     private SearchView searchView;
+    private Boolean fromTravel = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_site_search);
+
+        if(this.getIntent().getBooleanExtra("fromTravel",false)){
+            fromTravel = getIntent().getBooleanExtra("fromTravel",false);
+        }
 
         initView();
 

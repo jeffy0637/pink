@@ -23,12 +23,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -377,6 +375,7 @@ public class BoardFragment extends Fragment {
                                                     intent .putExtra("tId",tripTId);
                                                     intent.putExtra("column", "" + (column + 1));
                                                     intent.putExtra("count", "" + mItemArray.size());
+                                                    intent.putExtra("fromTravel",true);
                                                     startActivity(intent);
 
                                                     Site item = new Site(id, "景點名稱1");
@@ -388,6 +387,7 @@ public class BoardFragment extends Fragment {
                                                     intent.putExtra("tId",tripTId);
                                                     intent.putExtra("column", "" + (column + 1));
                                                     intent.putExtra("count", "" + mItemArray.size());
+                                                    intent.putExtra("fromTravel",true);
                                                     startActivity(intent);
 
                                                     Site item = new Site(id, "景點名稱1");
@@ -512,6 +512,7 @@ public class BoardFragment extends Fragment {
                                                         intent .putExtra("tId",tripTId);
                                                         intent.putExtra("column", "" + (column + 1));
                                                         intent.putExtra("count", "" + mItemArray.size());
+                                                        intent.putExtra("fromTravel",true);
                                                         startActivity(intent);
 
                                                         Site item = new Site(id, "景點名稱1");
@@ -523,6 +524,7 @@ public class BoardFragment extends Fragment {
                                                         intent.putExtra("tId",tripTId);
                                                         intent.putExtra("column", "" + (column + 1));
                                                         intent.putExtra("count", "" + mItemArray.size());
+                                                        intent.putExtra("fromTravel",true);
                                                         startActivity(intent);
 
                                                         Site item = new Site(id, "景點名稱1");
