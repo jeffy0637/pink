@@ -39,18 +39,35 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
+import m.mcoupledate.classes.funcs.PinkCon;
 import m.mcoupledate.draglib.BoardView;
 import m.mcoupledate.draglib.DragItem;
 
 public class BoardFragment extends Fragment {
+
+
+    private RequestQueue mQueue;
 
     private static int sCreatedItems = 0;
     private static BoardView mBoardView;
@@ -80,6 +97,8 @@ public class BoardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mQueue = Volley.newRequestQueue(this.getActivity());
 
         tripType = (String)getArguments().get("TT");
         tripTId = (String)getArguments().get("TI");
@@ -474,114 +493,28 @@ public class BoardFragment extends Fragment {
                     for(int i = 0 ; i < numberOfDay ; i++){
                         long eachNumberOfDay = dataSnapshot.child("site").child("day" + (i + 1)).getChildrenCount();
                         //這段用來動態新增list
-                        final ArrayList<Site> mItemArray = new ArrayList<>();
+                        final JSONArray mJSONArray = new JSONArray();
                         final int addItems = (int)eachNumberOfDay;
-                        for (int j = 0; j < addItems; j++) {
-                            String eachSpendTimes = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("times").getValue();
-                            String eachJournel = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("journel").getValue();
-                            String eachOrder = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("order").getValue();
-                            String eachSId = "" + dataSnapshot.child("site").child("day" + (i + 1)).child(""+j).child("sId").getValue();
+                        for (int j = 0; j < addItems; j++)
+                        {
+                            DataSnapshot aSiteSnapshot = dataSnapshot.child("site").child("day" + (i + 1)).child(""+j);
 
-//                            Log.v("eachSpendTimes", eachSpendTimes);
-                            long id = sCreatedItems++;
-                            mItemArray.add(new Site(Long.parseLong(eachOrder), eachJournel, Long.parseLong(eachSId), Long.parseLong(eachSpendTimes), "景點名稱", "高雄市", id));
+                            JSONObject aSiteJSONObj = new JSONObject();
+                            try
+                            {
+                                aSiteJSONObj.put("sId", aSiteSnapshot.child("sId").getValue());
+                                aSiteJSONObj.put("times", aSiteSnapshot.child("times").getValue());
+                                aSiteJSONObj.put("journel", aSiteSnapshot.child("journel").getValue());
+                                aSiteJSONObj.put("order", aSiteSnapshot.child("order").getValue());
+                                long id = sCreatedItems++;
+                                aSiteJSONObj.put("id", id);
+                            }
+                            catch (JSONException e)
+                            {   e.printStackTrace();    }
+
+                            mJSONArray.put(aSiteJSONObj);
                         }
-                        //這段用來header的景點數計算 天數計算還有問題
-                        final int[] count = {0};
-                        final int column = mColumns;
-                        final View header = View.inflate(getActivity(), R.layout.column_header, null);
-                        final ItemAdapter listAdapter = new ItemAdapter(header, mItemArray, R.layout.column_item, R.id.item_layout, true);
-                        ((TextView) header.findViewById(R.id.text)).setText("第" + (mColumns + 1) + "天");
-                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-                        switch (tripType) {
-                            case "my":
-                            header.setOnClickListener(new View.OnClickListener() {
-                                //這段是新增新的景點(點擊header)
-                                @Override
-                                public void onClick(View v) {
-                                    final long id = sCreatedItems++;
-                                    String[] provinces = new String[] {"景點的搜尋", "收藏的景點"};
-
-                                    new AlertDialog.Builder(mBoardView.getContext())
-                                            .setTitle("從哪裡加入景點")
-                                            //.setView(choose)
-                                            .setItems(provinces, new DialogInterface.OnClickListener(){
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //Toast.makeText(mBoardView.getContext(), "" + which, Toast.LENGTH_SHORT).show();
-                                                    if(which == 0){
-                                                        Intent intent = new Intent(mBoardView.getContext(), SiteSearchActivity.class);
-                                                        intent .putExtra("tId",tripTId);
-                                                        intent.putExtra("column", "" + (column + 1));
-                                                        intent.putExtra("count", "" + mItemArray.size());
-                                                        intent.putExtra("fromTravel",true);
-                                                        intent.putExtra("searchType",SearchSites.SEARCHTYPE_BROWSE);
-                                                        startActivity(intent);
-
-                                                        Site item = new Site(id, "景點名稱1");
-                                                        mBoardView.addItem(column, mItemArray.size(), item, true);
-                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-                                                    }
-                                                    else if(which == 1){
-                                                        Intent intent = new Intent(mBoardView.getContext(), MyLike.class);
-                                                        intent.putExtra("tId",tripTId);
-                                                        intent.putExtra("column", "" + (column + 1));
-                                                        intent.putExtra("count", "" + mItemArray.size());
-                                                        intent.putExtra("fromTravel",true);
-                                                        intent.putExtra("searchType",SearchSites.SEARCHTYPE_MYLIKES);
-                                                        startActivity(intent);
-
-                                                        Site item = new Site(id, "景點名稱1");
-                                                        mBoardView.addItem(column, mItemArray.size(), item, true);
-                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-                                                    }
-                                                }
-                                            })
-                                            .show();
-
-                                }
-                            });
-                        //長按header輸入要刪除的景點(應該改成整列清除)
-
-                                header.setOnLongClickListener(new View.OnLongClickListener() {
-                                    @Override
-                                    public boolean onLongClick(View v) {
-                                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener() {
-                                            @Override
-                                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                                ((TextView) header.findViewById(R.id.departureTime)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
-                                                startHour = Integer.toString(hourOfDay);
-                                                startMin = Integer.toString(minute);
-                                                Toast.makeText(getActivity(), "1改成" + startHour + ":" + startMin, Toast.LENGTH_SHORT).show();
-                                            }
-                                        }, hourOfDay, minute, false);
-
-                                        timePickerDialog.show();
-                                        return true;//true為結束長按動作後不再執行短按
-
-                                        /*
-                                        new AlertDialog.Builder(mBoardView.getContext())
-                                                .setTitle("刪除整天行程")
-                                                //.setView(choose)
-                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        while (mItemArray.size() != 0){
-                                                            mBoardView.removeItem(column, 0);
-                                                        }
-                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
-                                                    }
-                                                }).show();*/
-                                    }
-                                });
-                                break;
-                            case "collection":
-                                break;
-                            case "search":
-                                break;
-                        }
-                        mBoardView.addColumnList(listAdapter, header, false);
-                        mColumns++;
+                        addAllSites(mJSONArray, dataSnapshot);
                     }
                 }
             }
@@ -669,5 +602,159 @@ public class BoardFragment extends Fragment {
      */
     public static int getCurrentColumn(){
         return mBoardView.getClosestColumn();
+    }
+
+
+    private void addAllSites(final JSONArray sitesJSONArray, final DataSnapshot dataSnapshot)
+    {
+        final HashMap<String, JSONObject> sitesHashMap = new HashMap<>();
+        final ArrayList<String> sIdArrayList = new ArrayList<>();
+        for (int a=0; a<sitesJSONArray.length(); ++a)
+        {
+            JSONObject aSiteJSONObject = sitesJSONArray.optJSONObject(a);
+            sitesHashMap.put(aSiteJSONObject.optString("sId"), aSiteJSONObject);
+            sIdArrayList.add(aSiteJSONObject.optString("sId"));
+        }
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL + "getDetailsBySIdArray.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        final ArrayList<Site> mItemArray = new ArrayList<>();
+                        try
+                        {
+                            JSONArray details = new JSONArray(response);
+
+                            for (int a=0; a<details.length(); ++a)
+                            {
+                                JSONObject aSiteDetail = details.optJSONObject(a);
+                                JSONObject aSiteJSONObject = sitesHashMap.get(aSiteDetail.optString("sId"));
+
+                                mItemArray.add(new Site(aSiteJSONObject.optLong("order"), aSiteJSONObject.optString("journel"), aSiteJSONObject.optLong("sId"), Long.parseLong(aSiteJSONObject.optString("times")), aSiteDetail.optString("sName"), aSiteDetail.optString("address"), aSiteJSONObject.optLong("id")));
+                            }
+
+                        }
+                        catch (JSONException e)
+                        {   e.printStackTrace();    }
+
+
+
+                        //這段用來header的景點數計算 天數計算還有問題
+                        final int[] count = {0};
+                        final int column = mColumns;
+                        final View header = View.inflate(getActivity(), R.layout.column_header, null);
+                        final ItemAdapter listAdapter = new ItemAdapter(header, mItemArray, R.layout.column_item, R.id.item_layout, true);
+                        ((TextView) header.findViewById(R.id.text)).setText("第" + (mColumns + 1) + "天");
+                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                        switch (tripType) {
+                            case "my":
+                                header.setOnClickListener(new View.OnClickListener() {
+                                    //這段是新增新的景點(點擊header)
+                                    @Override
+                                    public void onClick(View v) {
+                                        final long id = sCreatedItems++;
+                                        String[] provinces = new String[] {"景點的搜尋", "收藏的景點"};
+
+                                        new AlertDialog.Builder(mBoardView.getContext())
+                                                .setTitle("從哪裡加入景點")
+                                                //.setView(choose)
+                                                .setItems(provinces, new DialogInterface.OnClickListener(){
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        //Toast.makeText(mBoardView.getContext(), "" + which, Toast.LENGTH_SHORT).show();
+                                                        if(which == 0){
+                                                            Intent intent = new Intent(mBoardView.getContext(), SiteSearchActivity.class);
+                                                            intent .putExtra("tId",tripTId);
+                                                            intent.putExtra("column", "" + (column + 1));
+                                                            intent.putExtra("count", "" + mItemArray.size());
+                                                            intent.putExtra("fromTravel",true);
+                                                            intent.putExtra("searchType",SearchSites.SEARCHTYPE_BROWSE);
+                                                            startActivity(intent);
+
+                                                            Site item = new Site(id, "景點名稱1");
+                                                            mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                            ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                        }
+                                                        else if(which == 1){
+                                                            Intent intent = new Intent(mBoardView.getContext(), MyLike.class);
+                                                            intent.putExtra("tId",tripTId);
+                                                            intent.putExtra("column", "" + (column + 1));
+                                                            intent.putExtra("count", "" + mItemArray.size());
+                                                            intent.putExtra("fromTravel",true);
+                                                            intent.putExtra("searchType",SearchSites.SEARCHTYPE_MYLIKES);
+                                                            startActivity(intent);
+
+                                                            Site item = new Site(id, "景點名稱1");
+                                                            mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                            ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                        }
+                                                    }
+                                                })
+                                                .show();
+
+                                    }
+                                });
+                                //長按header輸入要刪除的景點(應該改成整列清除)
+
+                                header.setOnLongClickListener(new View.OnLongClickListener() {
+                                    @Override
+                                    public boolean onLongClick(View v) {
+                                        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), AlertDialog.BUTTON_POSITIVE, new TimePickerDialog.OnTimeSetListener() {
+                                            @Override
+                                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                                ((TextView) header.findViewById(R.id.departureTime)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
+                                                startHour = Integer.toString(hourOfDay);
+                                                startMin = Integer.toString(minute);
+                                                Toast.makeText(getActivity(), "1改成" + startHour + ":" + startMin, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }, hourOfDay, minute, false);
+
+                                        timePickerDialog.show();
+                                        return true;//true為結束長按動作後不再執行短按
+
+                                        /*
+                                        new AlertDialog.Builder(mBoardView.getContext())
+                                                .setTitle("刪除整天行程")
+                                                //.setView(choose)
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        while (mItemArray.size() != 0){
+                                                            mBoardView.removeItem(column, 0);
+                                                        }
+                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                    }
+                                                }).show();*/
+                                    }
+                                });
+                                break;
+                            case "collection":
+                                break;
+                            case "search":
+                                break;
+                        }
+                        mBoardView.addColumnList(listAdapter, header, false);
+                        mColumns++;
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {}
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("sites", sIdArrayList.toString());
+
+                return map;
+            }
+        };
+
+        mQueue.add(stringRequest);
+
     }
 }
