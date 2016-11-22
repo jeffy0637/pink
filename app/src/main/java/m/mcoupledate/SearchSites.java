@@ -77,6 +77,10 @@ public class SearchSites extends Fragment
 
     private String siteFrom;
 
+    private String tId;
+    private String column;
+    private String count;
+
 
     public static SearchSites newInstance(int searchType, int siteType, Boolean ifFirstPage)
     {
@@ -102,6 +106,10 @@ public class SearchSites extends Fragment
         searchType = getArguments().getInt("searchType");
         siteType = getArguments().getInt("siteType");
         siteFrom = getArguments().getString("siteFrom");
+
+        tId = this.getActivity().getIntent().getStringExtra("tId");//接收tId
+        column = this.getActivity().getIntent().getStringExtra("column");
+        count = this.getActivity().getIntent().getStringExtra("count");
 
         if (siteType==SITETYPE_ATTRACTION)
             headers.addAll(Arrays.asList(new String[]{"大行政區", "小行政區"}));
@@ -177,6 +185,9 @@ public class SearchSites extends Fragment
                 Intent intent = new Intent(SearchSites.this.getActivity(), SiteInfo.class);
                 intent.putExtra("sId", siteListAdapter.getSiteId(position));
                 intent.putExtra("from","search");
+                intent.putExtra("tId", tId);
+                intent.putExtra("column", "" + column);
+                intent.putExtra("count", "" + count);
                 startActivity(intent);
             }
         });

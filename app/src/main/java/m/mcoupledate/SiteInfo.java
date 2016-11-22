@@ -35,6 +35,10 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -60,7 +64,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private RequestQueue mQueue;
     private PinkCon.InitErrorBar initErrorBar;
 
-    private String sId, mId, picId, tId = "0";
+    private String sId, mId, picId;
     private int siteType;
     private Boolean ifLiked;
 
@@ -95,6 +99,11 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     ListView allComments;
     CommentAdapter allCommentsAdapter;
 
+    private String tId;
+    private String column;
+    private String count;
+
+    final String url = "https://couple-project.firebaseio.com/travel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +119,11 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
 
         sId = this.getIntent().getStringExtra("sId");
         from = this.getIntent().getStringExtra("from");
+        tId = this.getIntent().getStringExtra("tId");
+        column = this.getIntent().getStringExtra("column");
+        count = this.getIntent().getStringExtra("count");
+
+        Toast.makeText(this, tId + " " + column + " " + count, Toast.LENGTH_SHORT).show();
 
         siteCol = new HashMap<String, TextView>();
         //先印圖片 aId+a 不是sId
@@ -132,16 +146,19 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         stars.getDrawable(1).setColorFilter(getResources().getColor(R.color.pinkpink), PorterDuff.Mode.SRC_ATOP); // for half filled stars
         stars.getDrawable(0).setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP); // for empty stars
 
+        Button view = (Button)findViewById(R.id.addLikeBtn);
+        Button view1 = (Button)findViewById(R.id.addTravelBtn);
         switch(from)  /*status 只能為整數、長整數或字元變數.*/
         {
             case "search":
-                Button view = (Button)findViewById(R.id.addLikeBtn);
+                view1.setVisibility(View.VISIBLE);
                 view.setVisibility(View.VISIBLE);
                 break;
             case "like":
+                view1.setVisibility(View.VISIBLE);
                 break;
             case "travel":
-                Button view1 = (Button)findViewById(R.id.addTravelBtn);
+
                 view1.setVisibility(View.VISIBLE);
                 break;
         }
@@ -162,7 +179,46 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         addTravelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Firebase.setAndroidContext(view.getContext());//this用mBoardView.getContext()取代
+                new Firebase(url).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
+                            //在特定行程加入景點
+                            Firebase siteRef = (dataSnapshot.child("site").child("day" + column).child("" + count).getRef());
+                            Site site = new Site(Long.parseLong(count), "這是一個新的景點", 8 , 5);//剛開始journel應該是null
+                            siteRef.setValue(site);
+                        }
+                    }
 
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+                //回傳&回去行程
+                Intent intent = new Intent(SiteInfo.this, StrokeActivity.class);
+                intent.putExtra("sId", sId);
+                intent.putExtra("tripId", tId);
+                intent.putExtra("tripType", "my");
+//                intent.putExtra("column", "" + column);
+//                intent.putExtra("count", "" + count);
+                startActivity(intent);
             }
         });
 

@@ -433,7 +433,6 @@ public class EditSite extends PinkClusterMapFragmentActivity implements
 
         //-------------------------------------飛-----------------------------------------
         uploadPic_album = (ImageButton) findViewById(R.id.uploadPic_album);
-
         //使用者選相簿
         uploadPic_album.setOnClickListener(new View.OnClickListener() {
             @Override

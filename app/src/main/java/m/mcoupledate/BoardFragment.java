@@ -20,12 +20,15 @@ import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -359,35 +362,48 @@ public class BoardFragment extends Fragment {
                             //這段是新增新的景點(點擊header)
                             @Override
                             public void onClick(View v) {
-                                long id = sCreatedItems++;
-                                Site item = new Site(id, "景點名稱");
-                                mBoardView.addItem(column, mItemArray.size(), item, true);
+                                final long id = sCreatedItems++;
+                                String[] provinces = new String[] {"景點的搜尋", "收藏的景點"};
+
+                                new AlertDialog.Builder(mBoardView.getContext())
+                                        .setTitle("從哪裡加入景點")
+                                        //.setView(choose)
+                                        .setItems(provinces, new DialogInterface.OnClickListener(){
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                //Toast.makeText(mBoardView.getContext(), "" + which, Toast.LENGTH_SHORT).show();
+                                                if(which == 0){
+                                                    Intent intent = new Intent(mBoardView.getContext(), SiteSearchActivity.class);
+                                                    intent .putExtra("tId",tripTId);
+                                                    intent.putExtra("column", "" + (column + 1));
+                                                    intent.putExtra("count", "" + mItemArray.size());
+                                                    startActivity(intent);
+
+                                                    Site item = new Site(id, "景點名稱1");
+                                                    mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                    ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                }
+                                                else if(which == 1){
+                                                    Intent intent = new Intent(mBoardView.getContext(), MyLike.class);
+                                                    intent.putExtra("tId",tripTId);
+                                                    intent.putExtra("column", "" + (column + 1));
+                                                    intent.putExtra("count", "" + mItemArray.size());
+                                                    startActivity(intent);
+
+                                                    Site item = new Site(id, "景點名稱1");
+                                                    mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                    ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                }
+                                            }
+                                        })
+                                        .show();
+
 
                                 //mBoardView.moveItem(4, 0, 0, true);
-                                //mBoardView.removeItem(column, 0);
-                                //mBoardView.moveItem(0, 0, 1, 3, false);
-                                //mBoardView.replaceItem(0, 0, item1, true);
-                                //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
-
-    //                        //在特定行程加入景點
-    //                        if(count[0] == 0){
-    //                            count[0] = (int) dataSnapshot.child("site").child("day" + (column + 1)).getChildrenCount();
-    //                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-    //                            Site site = new Site(count[0], "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-    //                            siteRef.setValue(site);
-    //                            count[0]++;
-    //                        }
-    //                        else{
-    //                            Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + count[0]).getRef());
-    //                            Site site = new Site(count[0], "3小地方", 8, 5);
-    //                            siteRef.setValue(site);
-    //                            count[0]++;
-    //                        }
-                                //在特定行程加入景點
-                                Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + (mItemArray.size() - 1)).getRef());
-                                Site site = new Site(mItemArray.size() - 1, "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-                                siteRef.setValue(site);
-                                ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                            //mBoardView.removeItem(column, 0);
+                            //mBoardView.moveItem(0, 0, 1, 3, false);
+                            //mBoardView.replaceItem(0, 0, item1, true);
+                            //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
                             }
                         });
                         //長按header修改出發時間
@@ -481,23 +497,42 @@ public class BoardFragment extends Fragment {
                                 //這段是新增新的景點(點擊header)
                                 @Override
                                 public void onClick(View v) {
-                                    long id = sCreatedItems++;
-                                    //Pair item = new Pair<>(id, "Test " + id);
-                                    Site item = new Site(id, "景點名稱");
-                                    mBoardView.addItem(column, mItemArray.size(), item, true);
+                                    final long id = sCreatedItems++;
+                                    String[] provinces = new String[] {"景點的搜尋", "收藏的景點"};
 
-                                    //mBoardView.moveItem(4, 0, 0, true);
-                                    //mBoardView.removeItem(column, 0);
-                                    //mBoardView.moveItem(0, 0, 1, 3, false);
-                                    //mBoardView.replaceItem(0, 0, item1, true);
-                                    //((TextView) header.findViewById(R.id.item_count)).setText("" + mItemArray.size());
+                                    new AlertDialog.Builder(mBoardView.getContext())
+                                            .setTitle("從哪裡加入景點")
+                                            //.setView(choose)
+                                            .setItems(provinces, new DialogInterface.OnClickListener(){
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //Toast.makeText(mBoardView.getContext(), "" + which, Toast.LENGTH_SHORT).show();
+                                                    if(which == 0){
+                                                        Intent intent = new Intent(mBoardView.getContext(), SiteSearchActivity.class);
+                                                        intent .putExtra("tId",tripTId);
+                                                        intent.putExtra("column", "" + (column + 1));
+                                                        intent.putExtra("count", "" + mItemArray.size());
+                                                        startActivity(intent);
 
-                                    //在特定行程加入景點
-                                    //在特定行程加入景點
-                                    Firebase siteRef = (dataSnapshot.child("site").child("day" + (column + 1)).child("" + (mItemArray.size() - 1)).getRef());
-                                    Site site = new Site(mItemArray.size() - 1, "3小地方", 8, 5);//資料更改後不準了 day拿掉變成order 所以路徑要指到哪一天才對
-                                    siteRef.setValue(site);
-                                    ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                        Site item = new Site(id, "景點名稱1");
+                                                        mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                    }
+                                                    else if(which == 1){
+                                                        Intent intent = new Intent(mBoardView.getContext(), MyLike.class);
+                                                        intent.putExtra("tId",tripTId);
+                                                        intent.putExtra("column", "" + (column + 1));
+                                                        intent.putExtra("count", "" + mItemArray.size());
+                                                        startActivity(intent);
+
+                                                        Site item = new Site(id, "景點名稱1");
+                                                        mBoardView.addItem(column, mItemArray.size(), item, true);
+                                                        ((TextView) header.findViewById(R.id.item_count)).setText("景點數 : " + mItemArray.size());
+                                                    }
+                                                }
+                                            })
+                                            .show();
+
                                 }
                             });
                         //長按header輸入要刪除的景點(應該改成整列清除)
