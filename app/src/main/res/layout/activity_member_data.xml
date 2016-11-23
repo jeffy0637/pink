@@ -194,8 +194,9 @@
             android:layout_height="35dp"
             android:layout_weight="1"
             android:id="@+id/submitBtn"
-            android:background="@drawable/circle_corner_button"
-            android:text="完成"/>
+            android:background="@drawable/circle_corner_button_p_filled"
+            android:text="完成"
+            android:textColor="@color/white"/>
 
 
     </LinearLayout>

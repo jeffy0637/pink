@@ -44,6 +44,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:id="@+id/routeStart"/>
 
@@ -67,6 +68,9 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="35dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_horizontal"
+                        android:textSize="@dimen/content_txt_size_small"
                         android:textColor="@color/white"
                         android:id="@+id/transInfo"/>
 
@@ -76,6 +80,9 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:textColor="@color/white"
                     android:layout_gravity="center|center_vertical"
                     android:id="@+id/routeEnd"/>

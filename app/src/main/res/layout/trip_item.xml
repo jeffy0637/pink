@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/content_txt_size_big"
             android:text="travel_one"
+            android:textStyle="bold"
             android:textColor="@color/white"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
@@ -29,7 +30,7 @@
         <TextView
             android:id="@+id/dash"
             android:layout_width="wrap_content"
-            android:layout_height="16dp"
+            android:layout_height="wrap_content"
             android:text="-"
             android:textSize="@dimen/content_txt_size_medium"
             android:textColor="@color/white"
@@ -37,10 +38,10 @@
             android:layout_alignParentBottom="true"/>
 
         <TextView
-            android:id="@+id/travel_date"
+            android:id="@+id/travel_date_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="travel_date"
+            android:text="travel_one_date"
             android:textSize="@dimen/content_txt_size_medium"
             android:textColor="@color/white"
             android:layout_alignParentBottom="true"
@@ -50,10 +51,10 @@
             android:layout_marginEnd="@dimen/default_margin" />
 
         <TextView
-            android:id="@+id/travel_date_end"
+            android:id="@+id/travel_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="travel_date_end"
+            android:text="travel_one_date"
             android:textSize="@dimen/content_txt_size_medium"
             android:textColor="@color/white"
             android:layout_alignParentBottom="true"
@@ -62,5 +63,13 @@
             android:layout_marginLeft="@dimen/default_margin"
             android:layout_marginStart="@dimen/default_margin" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="ex: 2"
+            android:textColor="@color/white"
+            android:layout_above="@+id/dash"
+            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 </RelativeLayout>

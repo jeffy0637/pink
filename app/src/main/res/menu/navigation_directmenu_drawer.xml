@@ -4,38 +4,35 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/homepage"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_homepage"
             android:title="首頁" />
         <item
             android:id="@+id/nav_memberData"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_person_pink"
             android:title="@string/page_memberData" />
         <item
             android:id="@+id/nav_memorialDay"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_date_pink"
             android:title="@string/page_memorialDay" />
-        <item
-            android:id="@+id/nav_myTravel"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="@string/page_myTravle" />
+
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/ic_logout"
             android:title="@string/page_logout" />
 
         <item android:title="我的收藏">
             <menu>
                 <item
                     android:id="@+id/my_attraction"
-                    android:icon="@drawable/ic_menu_share"
+                    android:icon="@drawable/ic_favoritesite_pink"
                     android:title="收藏的景點" />
                 <item
                     android:id="@+id/my_trip"
-                    android:icon="@drawable/ic_menu_send"
+                    android:icon="@drawable/ic_favoritetrip_pink"
                     android:title="我的行程" />
                 <item
                     android:id="@+id/my_ctrip"
-                    android:icon="@drawable/ic_menu_send"
+                    android:icon="@drawable/ic_favoritetrip_pink"
                     android:title="收藏的行程" />
             </menu>
         </item>

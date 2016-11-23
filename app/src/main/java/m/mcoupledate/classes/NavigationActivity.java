@@ -22,8 +22,6 @@ import android.widget.TextView;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
-import m.mcoupledate.EditSite;
-import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;
@@ -32,7 +30,6 @@ import m.mcoupledate.MyLike;
 import m.mcoupledate.MyTrip;
 import m.mcoupledate.R;
 import m.mcoupledate.SearchSites;
-import m.mcoupledate.TravelMap;
 
 import static m.mcoupledate.R.id.appBarLayout;
 
@@ -204,17 +201,6 @@ public class NavigationActivity extends AppCompatActivity
             case R.id.nav_memorialDay:
                 // 設定從這個活動跳至 home 的活動
                 intent = new Intent(this, ModifyMemorialDay.class);
-                break;
-
-            case R.id.nav_myTravel:
-                intent = new Intent(this, TravelMap.class);
-
-//                ArrayList<String> routeSites2 = new ArrayList<String>(Arrays.asList("209", "1160", "7", "225", "1"));
-
-                intent.putExtra("aStroke", "{\"tId\":\"12345\",\"tName\":\"%%之旅\",\"startDate\":\"2016-08-29\",\"endDate\":\"2016-08-31\",\"sites\":[[\"2\",\"4\",\"1037\",\"8\"],[\"2\",\"8\",\"2\",\"2\",\"2\"],[\"2\",\"1\",\"3\"],[\"8\",\"8\"]]}");
-                intent.putExtra("day", 0);
-                intent.putExtra("seq", 1);
-
                 break;
 
             case R.id.nav_logout:

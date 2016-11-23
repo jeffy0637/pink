@@ -112,37 +112,48 @@
                         android:id="@+id/rightPart"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/circle_corner_layout">
+                        android:background="@drawable/circle_corner_button_g">
                         <LinearLayout
                             android:id="@+id/secondPart"
-                            android:layout_width="100dp"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
                             android:gravity="center_vertical"
-                            android:layout_margin="@dimen/default_margin">
+                            android:layout_marginTop="@dimen/default_margin"
+                            android:layout_marginBottom="@dimen/default_margin"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_toLeftOf="@+id/menu_button"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true">
 
                             <TextView
                                 android:id="@+id/text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/site_name"
-                                android:textSize="@dimen/content_txt_size_big" />
+                                android:textSize="@dimen/content_txt_size_medium" />
 
                             <TextView
                                 android:id="@+id/site_address"
                                 android:text="@string/site_address"
                                 android:layout_width="match_parent"
+                                android:textSize="@dimen/trip_address_txt_size"
+                                android:maxLines="1"
+                                android:ellipsize="marquee"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:marqueeRepeatLimit="-1"
                                 android:layout_height="wrap_content" />
                         </LinearLayout>
 
                         <Button
                             android:id="@+id/menu_button"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="@dimen/icon_size"
+                            android:layout_height="@dimen/icon_size"
+                            android:layout_margin="@dimen/default_margin"
                             android:scaleType="centerInside"
-                            android:src="@drawable/ic_more"
-                            android:background="@color/transparent"
-                            android:text="Menu"
+                            android:background="@drawable/ic_more"
                             android:layout_alignParentTop="true"
                             android:layout_alignParentRight="true"/>
 
