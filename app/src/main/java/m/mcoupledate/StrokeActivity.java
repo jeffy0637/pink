@@ -1,11 +1,17 @@
 package m.mcoupledate;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import m.mcoupledate.classes.NavigationActivity;
@@ -16,6 +22,7 @@ public class StrokeActivity extends NavigationActivity {
     Intent intent;
     String tripId;
     //String tripType;
+    EditText share_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +97,26 @@ public class StrokeActivity extends NavigationActivity {
             case "my":
                 switch (item.getItemId()) {
                     case  R.id.together :
-                        Toast.makeText(this,"共享喔",Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.share_others, null);
+                        dialog.setView(layout);
+                        share_dialog = (EditText)layout.findViewById(R.id.name);
+                        dialog.setPositiveButton("查找", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String searchC = share_dialog.getText().toString();
+                                Toast.makeText(StrokeActivity.this,searchC,Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+
+                        });
+                        dialog.show();
+
                 }
                 break;
             case "collection":

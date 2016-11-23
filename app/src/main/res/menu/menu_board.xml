@@ -13,7 +13,7 @@
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_clear_board"
-        android:title="刪除全部"
+        android:title="清空行程"
         app:showAsAction="never"/>
     <item
         android:id="@+id/share"
