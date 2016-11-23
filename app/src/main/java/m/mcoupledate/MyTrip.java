@@ -103,7 +103,7 @@ public class MyTrip extends NavigationActivity {
         strokeListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,int position, long id) {
-                Toast.makeText(MyTrip.this,"long" , Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyTrip.this,"long"+Integer.toString(position) , Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
