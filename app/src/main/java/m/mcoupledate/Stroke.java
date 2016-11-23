@@ -12,10 +12,11 @@ import java.util.HashMap;
 
 public class Stroke implements Comparable
 {
-    public String title;//行程名稱
-    public String startDate;//開始日期
-    public String endDate;//結束日期
+    public String tripName;//行程名稱
+    public String start_date;//開始日期
+    public String end_date;//結束日期
     public String tId;
+    public String editor;
 
     public ArrayList<String> siteList = new ArrayList<>();
     public HashMap<String, Integer> cityarea = new HashMap<>();
@@ -24,53 +25,56 @@ public class Stroke implements Comparable
     private String searchQuery = "";
 
 
-    public Stroke(String title, String startDate, String endtime, String tId)
-    {
-        this.title = title;
-        this.startDate = startDate;
-        this.endDate = endtime;
+    public Stroke(String title, String startDate, String endtime, String tId, String mId) {
+        this.tripName = title;
+        this.start_date = startDate;
+        this.end_date = endtime;
         this.tId = tId;
+        this.editor = mId;
     }
 
     public Stroke(JSONObject aStrokeObj)
     {
-        this.title = aStrokeObj.optString("tName");
-        this.startDate = aStrokeObj.optString("startDate");
-        this.endDate = aStrokeObj.optString("endDate");
+        this.tripName = aStrokeObj.optString("tName");
+        this.start_date = aStrokeObj.optString("startDate");
+        this.end_date = aStrokeObj.optString("endDate");
         this.tId = aStrokeObj.optString("tId");
 
         JSONArray sitesJSONArray = aStrokeObj.optJSONArray("sites");
-        for (int a=0; a<sitesJSONArray.length(); ++a)
-            this.siteList.add(sitesJSONArray.optString(a));
+        if (sitesJSONArray!=null) {
+            for (int a = 0; a < sitesJSONArray.length(); ++a)
+                this.siteList.add(sitesJSONArray.optString(a));
+        }
 
         JSONArray cityareaJSONArray = aStrokeObj.optJSONArray("cityarea");
-        for (int a=0; a<cityareaJSONArray.length(); ++a)
-            cityarea.put(cityareaJSONArray.optJSONObject(a).optString("caName"), cityareaJSONArray.optJSONObject(a).optInt("count"));
-
+        if (cityareaJSONArray!=null) {
+            for (int a = 0; a < cityareaJSONArray.length(); ++a)
+                cityarea.put(cityareaJSONArray.optJSONObject(a).optString("caName"), cityareaJSONArray.optJSONObject(a).optInt("count"));
+        }
 
         this.score = aStrokeObj.optDouble("score");
     }
 
 
     public String getTitle() {
-        return title;
+        return tripName;
     }
     public void setTitle(String title) {
-        this.title = title;
+        this.tripName = title;
     }
 
     public String getStartDate() {
-        return startDate;
+        return start_date;
     }
-    public void setStartDate(String age) {
-        this.startDate = startDate;
+    public void setStartDate(String start_date) {
+        this.start_date = start_date;
     }
 
     public String getEndDate() {
-        return endDate;
+        return end_date;
     }
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
+    public void setEndDate(String end_date) {
+        this.end_date = end_date;
     }
 
 
@@ -111,11 +115,11 @@ public class Stroke implements Comparable
         String titlePattern = ".*" + searchQuery + ".*";
 
         //  1.比對title相似
-        if (this.title.matches(titlePattern) && !anotherStroke.title.matches(titlePattern))
+        if (this.tripName.matches(titlePattern) && !anotherStroke.tripName.matches(titlePattern))
         {
             return 1;
         }
-        else if (!this.title.matches(titlePattern) && anotherStroke.title.matches(titlePattern))
+        else if (!this.tripName.matches(titlePattern) && anotherStroke.tripName.matches(titlePattern))
         {
             return -1;
         }

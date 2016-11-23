@@ -85,6 +85,16 @@ public class StrokeSearchAdapter extends BaseAdapter
 
         this.allStrokeList.add(aStroke);
         this.resultStrokeList.add(aStroke);
+
+        notifyDataSetChanged();
+    }
+
+    public void add(Stroke aStroke)
+    {
+        this.allStrokeList.add(aStroke);
+        this.resultStrokeList.add(aStroke);
+
+        notifyDataSetChanged();
     }
 
 
@@ -125,7 +135,7 @@ public class StrokeSearchAdapter extends BaseAdapter
 
         for (Stroke aStroke : this.allStrokeList)
         {
-            if (aStroke.title.matches(pattern))
+            if (aStroke.tripName.matches(pattern))
                 this.resultStrokeList.add(aStroke);
             else if (aStroke.containsFeature(query))
                 this.resultStrokeList.add(aStroke);

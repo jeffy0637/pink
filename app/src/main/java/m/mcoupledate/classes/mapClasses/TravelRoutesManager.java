@@ -296,10 +296,13 @@ public class TravelRoutesManager implements
         private ImageView transMode;
         private TextView transInfo;
 
+        private View windowView;
         private LinearLayout container;
 
         public RouteInfoWindow(View routeInfoWindowView)
         {
+            this.windowView = routeInfoWindowView;
+
             this.routeStart = (TextView) routeInfoWindowView.findViewById(R.id.routeStart);
             this.routeEnd = (TextView) routeInfoWindowView.findViewById(R.id.routeEnd);
 
@@ -311,13 +314,13 @@ public class TravelRoutesManager implements
 
         public void clear()
         {
-            this.container.setVisibility(View.GONE);
+            this.windowView.setVisibility(View.GONE);
         }
 
         public void setRouteInfo(final RouteSite selectedRouteSite)
         {
-            if (this.container.getVisibility()==View.GONE)
-                this.container.setVisibility(View.VISIBLE);
+            if (this.windowView.getVisibility()==View.GONE)
+                this.windowView.setVisibility(View.VISIBLE);
 
 
             String routeEndText = "";

@@ -22,6 +22,8 @@ import android.widget.TextView;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
+import m.mcoupledate.EditSite;
+import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.HomePageActivity;
 import m.mcoupledate.MainActivity;
 import m.mcoupledate.MemberData;

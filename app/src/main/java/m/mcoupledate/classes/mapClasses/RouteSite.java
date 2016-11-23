@@ -86,7 +86,7 @@ public class RouteSite
     {
         for (RouteStep routeStep : routeSteps)
         {
-            if (routeStep.routLine!=null && routeStep.routLine.equals(polyline))
+            if (routeStep.routeLine !=null && routeStep.routeLine.equals(polyline))
                 return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class RouteSite
 
         for (RouteStep routeStep : routeSteps)
         {
-            routeStep.routLine.setColor(routeLineColorPair[1]);
+            routeStep.routeLine.setColor(routeLineColorPair[1]);
         }
 
         ifFocused = true;
@@ -113,7 +113,7 @@ public class RouteSite
 
         for (RouteStep routeStep : routeSteps)
         {
-            routeStep.routLine.setColor(routeLineColorPair[0]);
+            routeStep.routeLine.setColor(routeLineColorPair[0]);
         }
 
         ifFocused = false;
@@ -173,7 +173,7 @@ public class RouteSite
         public String note;
 
         public String polylineCode;
-        public Polyline routLine = null;
+        public Polyline routeLine = null;
 
         public RouteStep(JSONObject step)
         {
@@ -186,13 +186,14 @@ public class RouteSite
 
         public void draw()
         {
-            if (routLine!=null)
+            if (routeLine !=null)
             {
-                routLine.setVisible(true);
+                routeLine.setVisible(true);
+                routeLine.setClickable(true);
             }
             else
             {
-                this.routLine = mMap.addPolyline(new PolylineOptions()
+                this.routeLine = mMap.addPolyline(new PolylineOptions()
                         .addAll(decodePolylineString(polylineCode))
                         .width(12)
                         .color(routeLineColorPair[0])//Google maps blue color
@@ -204,13 +205,14 @@ public class RouteSite
 
         public void hide()
         {
-            if (routLine!=null)
+            if (routeLine !=null)
             {
-                routLine.setVisible(false);
+                routeLine.setVisible(false);
+                routeLine.setClickable(false);
             }
 //            else
 //            {
-//                this.routLine = mMap.addPolyline(new PolylineOptions()
+//                this.routeLine = mMap.addPolyline(new PolylineOptions()
 //                        .addAll(decodePolylineString(polylineCode))
 //                        .width(12)
 //                        .color(Color.parseColor("#05b1fb"))//Google maps blue color

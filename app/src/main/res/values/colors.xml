@@ -13,6 +13,7 @@
 
     <color name="white">#ffffff</color>
     <color name="gray">#8C8C8C</color>
+    <color name="black">#000000</color>
 
     <color name="drop_down_selected">#fc87ce</color>
     <color name="drop_down_unselected">#111111</color>
