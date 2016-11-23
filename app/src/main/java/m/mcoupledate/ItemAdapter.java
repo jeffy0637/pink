@@ -16,6 +16,7 @@
 
 package m.mcoupledate;
 
+import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +36,8 @@ import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
 
+import m.mcoupledate.classes.adapters.StrokeDetailContainerAdapter;
+import m.mcoupledate.classes.funcs.Actioner;
 import m.mcoupledate.draglib.DragItemAdapter;
 
 import static m.mcoupledate.StrokeActivity.getTripType;
@@ -44,6 +48,8 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
     private int mGrabHandleId;
     private View headerr;
     String tripType;
+
+    private Context context;
 
     //Firebase用
     final String url = "https://couple-project.firebaseio.com/travel";
@@ -66,6 +72,18 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         mGrabHandleId = grabHandleId;
         setHasStableIds(true);
         setItemList(list);
+    }
+
+    public ItemAdapter(View header, ArrayList<Site> list, int layoutId, int grabHandleId, boolean dragOnLongPress, Context context)
+    {
+        super(dragOnLongPress);
+        headerr = header;
+        mLayoutId = layoutId;
+        mGrabHandleId = grabHandleId;
+        setHasStableIds(true);
+        setItemList(list);
+
+        this.context = context;
     }
 
     @Override
@@ -118,6 +136,7 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         public TextView maddress;
         public TextView mStartTime;
         public TextView mEndTime;
+        public ExpandableListView detailContainer;
 
         public ViewHolder(final View itemView)
         {
@@ -131,9 +150,26 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                     //把點擊carIcon後的動作寫在這裡
                 }
             });
-            //抓TripType
+
+            Actioner journalSubmiter = new Actioner(){
+                @Override
+                public void act(Object... args)
+                {
+                    String journalText = (String) args[0];
+
+                }
+            };
+            StrokeDetailContainerAdapter strokeDetailContainerAdapter = new StrokeDetailContainerAdapter(context, journalSubmiter);
+            detailContainer = (ExpandableListView) itemView.findViewById(R.id.detailContainer);
+            detailContainer.setAdapter(strokeDetailContainerAdapter);
+
+            strokeDetailContainerAdapter.setJournal("245678yuj89ughbuikyhvbnmiok;lhnjmpuo;lj;dcxs");
+
+
 
             tripType = getTripType();
+
+
             /*
             偵測前面有沒有座標
             每次拖拉都要重新計算
@@ -208,10 +244,8 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                                                 }
 
                                                 @Override
-                                                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                                                    //沒反應
-
-                                                }
+                                                public void onChildChanged(DataSnapshot dataSnapshot, String s) {//沒反應
+                                                     }
 
                                                 @Override
                                                 public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -222,14 +256,10 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                                                 }
 
                                                 @Override
-                                                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                                                }
+                                                public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
 
                                                 @Override
-                                                public void onCancelled(FirebaseError firebaseError) {
-
-                                                }
+                                                public void onCancelled(FirebaseError firebaseError) { }
                                             });
                                             //停止監控 下次刪除才會重頭算
                                             myFirebaseRef.removeEventListener(ref);
@@ -251,31 +281,6 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                     });
                     break;
                 case "collection":
-                    menu_button = (Button) itemView.findViewById(R.id.menu_button);
-                    menu_button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(final View v) {
-                            PopupMenu popup = new PopupMenu(v.getContext(), v);//第二个参数是绑定的那个view
-                            MenuInflater inflater = popup.getMenuInflater();
-                            inflater.inflate(R.menu.menu_button_not_my, popup.getMenu());
-                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem item) {
-                                    switch (item.getItemId()) {
-                                        case R.id.journal:
-                                            Toast.makeText(v.getContext(), "遊記···", Toast.LENGTH_SHORT).show();
-                                            break;
-                                        case R.id.picture:
-                                            Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();
-                                            break;
-                                    }
-                                    return false;
-                                }
-                            });
-                            popup.show();
-                        }
-                    });
-                    break;
                 case "search":
                     menu_button = (Button) itemView.findViewById(R.id.menu_button);
                     menu_button.setOnClickListener(new View.OnClickListener() {

@@ -71,10 +71,6 @@
         <activity
             android:name=".ManageSiteActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".EditSite"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -107,15 +103,12 @@
             android:name=".StrokeSearch"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:screenOrientation="portrait"
-            android:name=".funcs.SQLiteViewer"/>
         <activity android:name=".classes.funcs.SQLiteViewer" />
-        <activity
-            android:name=".StrokeSearch"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".EditSite"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
