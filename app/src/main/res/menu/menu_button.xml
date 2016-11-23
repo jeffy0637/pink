@@ -12,9 +12,9 @@
         android:title="刪除"/>
 
     <item
-        android:id="@+id/journal"
+        android:id="@+id/journal_time"
         android:orderInCategory="100"
-        android:title="遊記"/>
+        android:title="設定遊玩時間"/>
 
     <item
         android:id="@+id/picture"

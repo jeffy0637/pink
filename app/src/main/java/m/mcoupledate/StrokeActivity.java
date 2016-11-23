@@ -47,8 +47,8 @@ public class StrokeActivity extends NavigationActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        //
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_board_move, menu); 原版
         switch (tripType){
             case "my":
                 getMenuInflater().inflate(R.menu.menu_board, menu);
@@ -69,8 +69,8 @@ public class StrokeActivity extends NavigationActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean listFragment = getSupportFragmentManager().findFragmentByTag("fragment") instanceof ListFragment;
-        menu.findItem(R.id.action_lists).setVisible(!listFragment);
-        menu.findItem(R.id.action_board).setVisible(listFragment);
+        //menu.findItem(R.id.action_lists).setVisible(!listFragment);
+        //menu.findItem(R.id.action_board).setVisible(listFragment);
 
         return true;
     }
@@ -97,6 +97,10 @@ public class StrokeActivity extends NavigationActivity {
 
                 break;
             case "search":
+                switch (item.getItemId()) {
+                    case  R.id.together :
+                        Toast.makeText(this,"共享喔",Toast.LENGTH_SHORT).show();
+                }
 
                 break;
         }

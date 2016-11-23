@@ -17,6 +17,8 @@
 package m.mcoupledate;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -48,6 +50,7 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
     private int mGrabHandleId;
     private View headerr;
     String tripType;
+    String num;
 
     private Context context;
 
@@ -188,12 +191,23 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                             PopupMenu popup = new PopupMenu(v.getContext(), v);//第二个参数是绑定的那个view
                             MenuInflater inflater = popup.getMenuInflater();
                             inflater.inflate(R.menu.menu_button, popup.getMenu());
+                            final String[] items={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
                             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                 @Override
                                 public boolean onMenuItemClick(MenuItem item) {
                                     switch (item.getItemId()) {
-                                        case R.id.journal:
-                                            Toast.makeText(v.getContext(), "遊記···", Toast.LENGTH_SHORT).show();
+                                        case R.id.journal_time:
+                                            new AlertDialog.Builder(context)
+                                                    .setTitle("請選擇時間(小時)")
+                                                    .setItems(items, new DialogInterface.OnClickListener(){
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            num = Integer.toString(which+1);
+                                                            Toast.makeText(v.getContext(),num,Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    })
+                                                    .show();
+
                                             break;
                                         case R.id.delete:
                                             //這裡連接firebase
