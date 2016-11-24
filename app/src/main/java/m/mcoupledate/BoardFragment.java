@@ -39,6 +39,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -94,8 +95,6 @@ public class BoardFragment extends Fragment {
     public static String getTypeFormBoardFragment(){
         return tripTIdForSend;
     }
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -398,6 +397,7 @@ public class BoardFragment extends Fragment {
                                                     intent .putExtra("tId",tripTId);
                                                     intent.putExtra("column", "" + (column + 1));
                                                     intent.putExtra("count", "" + mItemArray.size());
+                                                    intent.putExtra("transId", "" + id);
                                                     intent.putExtra("fromTravel",true);
                                                     intent.putExtra("searchType",SearchSites.SEARCHTYPE_BROWSE);
                                                     startActivity(intent);
@@ -413,6 +413,7 @@ public class BoardFragment extends Fragment {
                                                     intent.putExtra("count", "" + mItemArray.size());
                                                     intent.putExtra("fromTravel",true);
                                                     intent.putExtra("searchType",SearchSites.SEARCHTYPE_MYLIKES);
+                                                    intent.putExtra("transId", "" + id);
                                                     startActivity(intent);
 
                                                     Site item = new Site(id, "景點名稱1");
@@ -641,25 +642,21 @@ public class BoardFragment extends Fragment {
                     public void onResponse(String response)
                     {
                         Log.d("HFresponse", response);
-                        try
-                        {
+                        try {
                             JSONObject sIdDetailDict = new JSONObject(response);
 
-                            for (int a=0; a<allDaySiteArray.size(); ++a)
-                            {
+                            for (int a = 0; a < allDaySiteArray.size(); ++a) {
                                 final ArrayList<Site> mItemArray = new ArrayList<>();
 
                                 ArrayList<JSONObject> aDaySiteArray = allDaySiteArray.get(a);
 
-                                for (int b = 0; b < aDaySiteArray.size(); ++b)
-                                {
+                                for (int b = 0; b < aDaySiteArray.size(); ++b) {
                                     JSONObject aSiteJSONObject = aDaySiteArray.get(b);
                                     Log.d("HFaSite", a + " - " + b + " - " + aSiteJSONObject.toString());
                                     JSONObject aSiteDetail = sIdDetailDict.getJSONObject(aSiteJSONObject.optString("sId"));
 
                                     mItemArray.add(new Site(aSiteJSONObject.optLong("order"), aSiteJSONObject.optString("journal"), aSiteJSONObject.optLong("sId"), Long.parseLong(aSiteJSONObject.optString("times")), aSiteDetail.optString("sName"), aSiteDetail.optString("address"), aSiteJSONObject.optLong("id")));
                                 }
-
 
 
                                 //這段用來header的景點數計算 天數計算還有問題
@@ -692,6 +689,7 @@ public class BoardFragment extends Fragment {
                                                                     intent.putExtra("count", "" + mItemArray.size());
                                                                     intent.putExtra("fromTravel", true);
                                                                     intent.putExtra("searchType", SearchSites.SEARCHTYPE_BROWSE);
+                                                                    intent.putExtra("transId", "" + id);
                                                                     startActivity(intent);
 
                                                                     Site item = new Site(id, "景點名稱1");
@@ -704,6 +702,7 @@ public class BoardFragment extends Fragment {
                                                                     intent.putExtra("count", "" + mItemArray.size());
                                                                     intent.putExtra("fromTravel", true);
                                                                     intent.putExtra("searchType", SearchSites.SEARCHTYPE_MYLIKES);
+                                                                    intent.putExtra("transId", "" + id);
                                                                     startActivity(intent);
 
                                                                     Site item = new Site(id, "景點名稱1");
@@ -764,9 +763,9 @@ public class BoardFragment extends Fragment {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error)
-                    {}
-                }){
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> map = new HashMap<String, String>();
@@ -781,10 +780,4 @@ public class BoardFragment extends Fragment {
         mQueue.add(stringRequest);
 
     }
-
-
-
-
-
-
 }

@@ -72,7 +72,7 @@ public class PinkClusterMapFragmentActivity extends NavigationActivity implement
         LatLng y = new LatLng(23.9036873,121.0793705);  // 預設台灣
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(y, 6));
 
-        mMap.setMyLocationEnabled(true);
+//        mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 

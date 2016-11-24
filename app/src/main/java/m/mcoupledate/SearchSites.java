@@ -81,6 +81,7 @@ public class SearchSites extends Fragment
     private String column;
     private String count;
     private Boolean fromTravel;
+    private String transId;
 
 
     public static SearchSites newInstance(int searchType, int siteType, Boolean ifFirstPage)
@@ -111,6 +112,7 @@ public class SearchSites extends Fragment
         tId = this.getActivity().getIntent().getStringExtra("tId");//接收tId
         column = this.getActivity().getIntent().getStringExtra("column");
         count = this.getActivity().getIntent().getStringExtra("count");
+        transId = this.getActivity().getIntent().getStringExtra("transId");
         fromTravel = this.getActivity().getIntent().getBooleanExtra("fromTravel",false);
 
         if (siteType==SITETYPE_ATTRACTION)
@@ -186,6 +188,7 @@ public class SearchSites extends Fragment
                 intent.putExtra("column", "" + column);
                 intent.putExtra("count", "" + count);
                 intent.putExtra("fromTravel",fromTravel);
+                intent.putExtra("transId", "" + transId);
                 startActivity(intent);
             }
         });

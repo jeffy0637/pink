@@ -102,6 +102,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
     private String tId;
     private String column;
     private String count;
+    private String transId;
     private Boolean fromTravel = false;
 
     final String url = "https://couple-project.firebaseio.com/travel";
@@ -124,6 +125,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         column = this.getIntent().getStringExtra("column");
         count = this.getIntent().getStringExtra("count");
         fromTravel = this.getIntent().getBooleanExtra("fromTravel",false);
+        transId = this.getIntent().getStringExtra("transId");
 
         //Toast.makeText(this, tId + " " + column + " " + count, Toast.LENGTH_SHORT).show();
 
@@ -187,7 +189,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
                         if((""+dataSnapshot.child("tId").getValue()).equals(tId)){
                             //在特定行程加入景點
                             Firebase siteRef = (dataSnapshot.child("site").child("day" + column).child("" + count).getRef());
-                            Site site = new Site(Long.parseLong(count), "這是一個新的景點", 8 , 5);//剛開始journel應該是null
+                            Site site = new Site(Long.parseLong(count), "", Long.parseLong(sId) , 1);//剛開始journel應該是null
                             siteRef.setValue(site);
                         }
                     }

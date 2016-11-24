@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -133,6 +135,11 @@ public class StrokeActivity extends NavigationActivity {
             case "collection":
                 break;
             case "search":
+                switch (item.getItemId()) {
+                    case  R.id.add_like :
+                        addMyTravelCollection();
+                        break;
+                }
                 break;
         }
 
@@ -271,5 +278,47 @@ public class StrokeActivity extends NavigationActivity {
             protected Boolean onCancel()
             {   return true;    }
         };
+    }
+
+
+
+    private void addMyTravelCollection()
+    {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, PinkCon.URL + "addMyTravelCollection.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        Toast.makeText(context, "收藏成功", Toast.LENGTH_SHORT).show();
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+//                        PinkCon.retryConnect(getRootView(), PinkCon.SEARCH_FAIL, initErrorBar,
+//                                new View.OnClickListener()
+//                                {
+//                                    @Override
+//                                    public void onClick(View view)
+//                                    {   searchMapLocatePlace(query);  }
+//                                });
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+
+                map.put("mId", context.getSharedPreferences("pinkpink", 0).getString("mId", ""));
+                map.put("tId", tripId);
+
+                Log.d("HFaddCollection", map.toString());
+
+                return map;
+            }
+        };
+
+        mQueue.add(stringRequest);
     }
 }

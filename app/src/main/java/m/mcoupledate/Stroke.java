@@ -32,6 +32,7 @@ public class Stroke implements Comparable
         this.tId = tId;
     }
 
+
     public Stroke(JSONObject aStrokeObj)
     {
         this.tripName = aStrokeObj.optString("tName");

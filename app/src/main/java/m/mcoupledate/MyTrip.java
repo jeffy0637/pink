@@ -1,7 +1,9 @@
 package m.mcoupledate;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -35,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import m.mcoupledate.classes.NavigationActivity;
@@ -132,7 +136,9 @@ public class MyTrip extends NavigationActivity {
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.mytrip, menu);//这里是调用menu文件夹中的main.xml，在登陆界面label右上角的三角里显示其他功能
+        if (tripType.compareTo("my")==0) {
+            getMenuInflater().inflate(R.menu.mytrip, menu);//这里是调用menu文件夹中的main.xml，在登陆界面label右上角的三角里显示其他功能
+        }
         return true;
     }
 
@@ -366,8 +372,8 @@ public class MyTrip extends NavigationActivity {
                     {
                         aTrip.put("tId", tId);
                         aTrip.put("tName", tName);
-                        aTrip.put("start_date", startDate);
-                        aTrip.put("end_date", endDate);
+                        aTrip.put("startDate", startDate);
+                        aTrip.put("endDate", endDate);
                     }
                     catch (JSONException e)
                     {   e.printStackTrace();    }

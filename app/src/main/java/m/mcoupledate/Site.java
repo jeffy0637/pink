@@ -1,5 +1,8 @@
 package m.mcoupledate;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by bbkk5 on 2016/10/15.
  * 自己寫一個class之後可以用來新增firebase的東西
@@ -78,7 +81,4 @@ public class Site {
     public long getId(){
         return this.id;
     }
-
-
-
 }
