@@ -39,7 +39,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -96,6 +95,8 @@ public class BoardFragment extends Fragment {
         return tripTIdForSend;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +115,6 @@ public class BoardFragment extends Fragment {
 
         //測試
         setHasOptionsMenu(true);
-        Toast.makeText(getActivity(),"傳進來了"+tripType,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -129,7 +129,7 @@ public class BoardFragment extends Fragment {
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
-                Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(mBoardView.getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
                 //對firebase的這筆資料做鎖定
             }
 
@@ -145,7 +145,7 @@ public class BoardFragment extends Fragment {
             public void onItemDragEnded(final int fromColumn, final int fromRow, final int toColumn, final int toRow) {
                 if (fromColumn != toColumn || fromRow != toRow) {
                     //Toast.makeText(mBoardView.getContext(), "Start - column: " + fromColumn + " row: " + fromRow, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(mBoardView.getContext(), "End - column: " + toColumn + " row: " + toRow, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mBoardView.getContext(), "End - column: " + toColumn + " row: " + toRow, Toast.LENGTH_SHORT).show();
                     //被插的重新排序(往下一格)
                     Firebase.setAndroidContext(mBoardView.getContext());//this用mBoardView.getContext()取代
                     new Firebase(url).addChildEventListener(new ChildEventListener() {
@@ -442,7 +442,6 @@ public class BoardFragment extends Fragment {
                                             ((TextView) header.findViewById(R.id.departureTime)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
                                             startHour = Integer.toString(hourOfDay);
                                             startMin = Integer.toString(minute);
-                                            Toast.makeText(getActivity(), "1改成" + startHour + ":" + startMin, Toast.LENGTH_SHORT).show();
                                         }
                                     }, hourOfDay, minute, false);
 
@@ -662,6 +661,7 @@ public class BoardFragment extends Fragment {
                                 }
 
 
+
                                 //這段用來header的景點數計算 天數計算還有問題
                                 final int[] count = {0};
                                 final int column = mColumns;
@@ -727,7 +727,6 @@ public class BoardFragment extends Fragment {
                                                         ((TextView) header.findViewById(R.id.departureTime)).setText("開始時間: " + hourOfDay + "時" + minute + "分");
                                                         startHour = Integer.toString(hourOfDay);
                                                         startMin = Integer.toString(minute);
-                                                        Toast.makeText(context, "1改成" + startHour + ":" + startMin, Toast.LENGTH_SHORT).show();
                                                     }
                                                 }, hourOfDay, minute, false);
 
@@ -782,4 +781,10 @@ public class BoardFragment extends Fragment {
         mQueue.add(stringRequest);
 
     }
+
+
+
+
+
+
 }

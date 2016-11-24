@@ -19,8 +19,8 @@ package m.mcoupledate;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.content.Context;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -113,6 +113,17 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         String address = mItemList.get(position).getAddress();
         holder.maddress.setText(address);
 
+        holder.setJournal(mItemList.get(position).getJournal());
+
+        holder.carIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        Log.d("HFmItem", mItemList.get(position).toString());
+
         //holder.mStartTime.setText();
         //holder.mEndTime.setText();
 
@@ -142,19 +153,25 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         public TextView mStartTime;
         public TextView mEndTime;
         public ExpandableListView detailContainer;
+        private StrokeDetailContainerAdapter strokeDetailContainerAdapter;
+
+        public void setJournal(String journalText)
+        {
+            strokeDetailContainerAdapter.setJournal(journalText);
+        }
 
         public ViewHolder(final View itemView)
         {
             super(itemView, mGrabHandleId);
             //lil linearlayout的
             carIcon = (ImageButton) itemView.findViewById(R.id.carIcon);
-            carIcon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //carIcon.setVisibility(v.INVISIBLE);
-                    //把點擊carIcon後的動作寫在這裡
-                }
-            });
+//            carIcon.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    //carIcon.setVisibility(v.INVISIBLE);
+//                    //把點擊carIcon後的動作寫在這裡
+//                }
+//            });
 
             Actioner journalSubmiter = new Actioner(){
                 @Override
@@ -164,11 +181,11 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
 
                 }
             };
-            StrokeDetailContainerAdapter strokeDetailContainerAdapter = new StrokeDetailContainerAdapter(context, journalSubmiter);
+            strokeDetailContainerAdapter = new StrokeDetailContainerAdapter(context, journalSubmiter);
             detailContainer = (ExpandableListView) itemView.findViewById(R.id.detailContainer);
             detailContainer.setAdapter(strokeDetailContainerAdapter);
 
-            strokeDetailContainerAdapter.setJournal("245678yuj89ughbuikyhvbnmiok;lhnjmpuo;lj;dcxs");
+
 
 
 
@@ -205,7 +222,7 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
                                                             num = Integer.toString(which+1);
-                                                            Toast.makeText(v.getContext(),num,Toast.LENGTH_SHORT).show();
+//                                                            Toast.makeText(v.getContext(),num,Toast.LENGTH_SHORT).show();
                                                         }
                                                     })
                                                     .show();
@@ -281,10 +298,10 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                                             myFirebaseRef.removeEventListener(ref);
                                             break;
                                         case R.id.picture:
-                                            Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();
                                             break;
                                         case R.id.change_site:
-                                            Toast.makeText(v.getContext(), "換景點···", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(v.getContext(), "換景點···", Toast.LENGTH_SHORT).show();
                                             break;
                                         default:
                                             break;
@@ -310,10 +327,10 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
                                 public boolean onMenuItemClick(MenuItem item) {
                                     switch (item.getItemId()) {
                                         case R.id.journal:
-                                            Toast.makeText(v.getContext(), "遊記···", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(v.getContext(), "遊記···", Toast.LENGTH_SHORT).show();
                                             break;
                                         case R.id.picture:
-                                            Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(v.getContext(), "相簿···", Toast.LENGTH_SHORT).show();
                                             break;
                                     }
                                     return false;
@@ -335,7 +352,7 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         public void onItemClicked(View view) {
             //傳判定值
             //intent.putExtra("from","search");
-            Toast.makeText(view.getContext(), "進入景點", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(view.getContext(), "進入景點", Toast.LENGTH_SHORT).show();
         }
 
         /**
@@ -346,7 +363,7 @@ public class ItemAdapter extends DragItemAdapter<Site, ItemAdapter.ViewHolder> {
         @Override
         public boolean onItemLongClicked(View view) {
 
-            Toast.makeText(view.getContext(), "拖拉排序", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(view.getContext(), "拖拉排序", Toast.LENGTH_SHORT).show();
             return true;
         }
     }

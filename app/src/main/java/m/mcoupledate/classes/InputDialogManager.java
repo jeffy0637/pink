@@ -18,7 +18,7 @@ import java.util.HashMap;
 /**
  * Created by user on 2016/10/16.
  */
-public class InputDialogManager
+public abstract class InputDialogManager
 {
     private Context context;
 
@@ -47,7 +47,8 @@ public class InputDialogManager
         initDialog(dialogTitle, positiveBtnText, neutralBtnText);
     }
 
-    protected void initContent() {}
+
+    protected abstract void initContent();
 
     public String getInputsData() throws JSONException
     {   return "";      }
@@ -59,12 +60,10 @@ public class InputDialogManager
     {   return new JSONObject();      }
 
     //return true if the dialog is ready to be dismissed
-    protected Boolean onConfirm()
-    {   return true;    }
+    protected abstract Boolean onConfirm();
 
     //return true if the dialog is ready to be dismissed
-    protected Boolean onCancel()
-    {   return true;    }
+    protected abstract Boolean onCancel();
 
     public void printResult(){}
 

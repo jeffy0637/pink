@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -35,6 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import m.mcoupledate.classes.NavigationActivity;
 import m.mcoupledate.classes.funcs.PinkCon;
@@ -103,7 +104,6 @@ public class MyTrip extends NavigationActivity {
         strokeListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,int position, long id) {
-                Toast.makeText(MyTrip.this,"long"+Integer.toString(position) , Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -163,11 +163,15 @@ public class MyTrip extends NavigationActivity {
                                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                             Long tId = dataSnapshot.getChildrenCount();
                                             //Toast.makeText(getApplicationContext(), ""+tId, Toast.LENGTH_SHORT).show();
-                                            Stroke travel = new Stroke(travelName, startDate, endDate, "" + tId, MyTrip.this.getSharedPreferences("pinkpink", 0).getString("mId", ""));
+                                            Stroke travel  = new Stroke(travelName, startDate,endDate,""+tId);
                                             strokeSearchAdapter.add(travel);
-                                            Toast.makeText(getApplicationContext(), travelName + startDate, Toast.LENGTH_SHORT).show();
                                             Firebase addTravelRef = (dataSnapshot.child("" + tId)).getRef();
                                             addTravelRef.setValue(travel);
+                                            //MyTrip.this.getSharedPreferences("pinkpink", 0).getString("mId", "")
+                                            Firebase addTravelMIdRef = (dataSnapshot.child("" + tId).child("editor")).getRef();
+                                            Map<String, Object> nameMap = new HashMap<String, Object>();
+                                            nameMap.put("0", MyTrip.this.getSharedPreferences("pinkpink", 0).getString("mId", ""));
+                                            addTravelMIdRef.updateChildren(nameMap);
                                         }
 
                                         @Override
@@ -280,6 +284,50 @@ public class MyTrip extends NavigationActivity {
 
     private void initDataByMy()
     {
+        final String url = "https://couple-project.firebaseio.com";
+
+        //丟一個for迴圈印出各個行程
+        Firebase.setAndroidContext(this);//this用mBoardView.getContext()取代
+        new Firebase(url).addChildEventListener(new ChildEventListener() {
+            int count = 0;
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for(int i = 0 ; i < dataSnapshot.getChildrenCount() ; i++){
+                    for(int j = 0 ; j < dataSnapshot.child(""+i).child("editor").getChildrenCount() ; j ++){
+                        if((""+dataSnapshot.child("" + i).child("editor").child("" + j).getValue()).equals(MyTrip.this.getSharedPreferences("pinkpink", 0).getString("mId", ""))){
+                            String tName = "" + dataSnapshot.child("" + i).child("tripName").getValue();
+                            String sDate = "" + dataSnapshot.child("" + i).child("start_date").getValue();
+                            String eDate = "" + dataSnapshot.child("" + i).child("end_date").getValue();
+                            String MyTripTId = "" + dataSnapshot.child("" + i).child("tId").getValue();
+                            Stroke travel1  = new Stroke(tName, sDate, eDate,MyTripTId );
+                            strokeSearchAdapter.add(travel1);
+                        }
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
 
     }
 

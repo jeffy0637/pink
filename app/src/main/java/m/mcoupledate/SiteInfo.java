@@ -125,7 +125,7 @@ public class SiteInfo extends PinkClusterMapFragmentActivity{
         count = this.getIntent().getStringExtra("count");
         fromTravel = this.getIntent().getBooleanExtra("fromTravel",false);
 
-        Toast.makeText(this, tId + " " + column + " " + count, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, tId + " " + column + " " + count, Toast.LENGTH_SHORT).show();
 
         siteCol = new HashMap<String, TextView>();
         //先印圖片 aId+a 不是sId

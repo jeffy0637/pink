@@ -153,6 +153,11 @@ public class MemorialDaysModifierAdapter extends MemorialDaysAdapter
             }
 
             @Override
+            protected Boolean onCancel() {
+                return true;
+            }
+
+            @Override
             public void updateContentData(Object... args)
             {
                 vars.put("position", args[0]);

@@ -25,12 +25,11 @@ public class Stroke implements Comparable
     private String searchQuery = "";
 
 
-    public Stroke(String title, String startDate, String endtime, String tId, String mId) {
+    public Stroke(String title, String startDate, String endtime, String tId) {
         this.tripName = title;
         this.start_date = startDate;
         this.end_date = endtime;
         this.tId = tId;
-        this.editor = mId;
     }
 
     public Stroke(JSONObject aStrokeObj)

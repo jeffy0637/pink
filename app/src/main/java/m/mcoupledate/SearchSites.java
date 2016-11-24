@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -144,7 +143,7 @@ public class SearchSites extends Fragment
         mDropDownMenu= (DropDownMenu) getView().findViewById( R.id.dropDownMenu);
         initDropDownMenu();
 
-        Toast.makeText(this.getActivity(),searchType+"+"+siteFrom , Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this.getActivity(),searchType+"+"+siteFrom , Toast.LENGTH_SHORT).show();
 
         if(!fromTravel)
             if (searchType==SEARCHTYPE_BROWSE)
@@ -366,7 +365,7 @@ public class SearchSites extends Fragment
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-//                    Log.d("HFresponse", response);
+                    Log.d("HFresponse", response);
                             try {
                                 initSiteList = new JSONArray(response);
                                 siteListAdapter.changeData(initSiteList);
